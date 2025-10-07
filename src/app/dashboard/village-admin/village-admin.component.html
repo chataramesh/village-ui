@@ -1,0 +1,106 @@
+<div class="dashboard"><!-- Dashboard -->
+  <!-- Navigation -->
+  <section class="navigation">
+    <img src="assets/img/logo-thumbnail.png" alt="InstinctHub Logo" class="logo" />
+
+    <div>
+      <span class="material-icons-outlined"> dashboard </span>
+      <span class="material-icons-outlined"> trending_up </span>
+      <span class="material-icons-outlined"> people_alt </span>
+      <span class="material-icons-outlined"> insert_invitation </span>
+      <span class="material-icons-outlined"> settings_suggest </span>
+    </div>
+
+    <img src="assets/img/2.jpg" alt="User Image" class="user" />
+  </section>
+
+  <!-- Main -->
+  <section class="main">
+    <!-- Search -->
+    <div class="search">
+      <form>
+        <input
+          type="text"
+          name="search"
+          id="searchProject"
+          placeholder="Search Here"
+          [(ngModel)]="searchText"
+          name="search"
+        />
+        <span class="material-icons-outlined"> search </span>
+      </form>
+
+      <div class="notification">
+        <span class="material-icons-outlined"> notifications </span>
+        <span class="material-icons-outlined"> edit </span>
+      </div>
+    </div>
+
+    <div class="title">
+      <h1>My Project</h1>
+
+      <label for="projects">Sort By</label>
+      <select id="projectFilter" [(ngModel)]="filterStatus">
+        <option value="">...</option>
+        <option value="recent">Recent Project</option>
+        <option value="finished">Finished Project</option>
+        <option value="ongoing">Ongoing Project</option>
+        <option value="stalled">Stalled Project</option>
+      </select>
+    </div>
+
+    <!-- Project List -->
+    <div class="project_list">
+      <div
+        class="project"
+        *ngFor="let project of projects | projectFilter:filterStatus | search:searchText"
+        [attr.data-status]="project.status"
+        [title]="project.title"
+      >
+        <div class="category" [ngClass]="project.categoryColor"></div>
+        <h2>{{ project.name }}</h2>
+        <p>{{ project.time }}</p>
+
+        <ul class="activity">
+          <li *ngFor="let task of project.tasks">{{ task }}</li>
+        </ul>
+
+        <div class="meta">
+          <div class="contributors">
+            <img
+              *ngFor="let user of project.contributors; let i = index"
+              [src]="user"
+              [class.stack]="i > 0"
+              alt="Contributor"
+            />
+          </div>
+          <span class="material-icons-outlined">more_vert</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Secondary -->
+  <section class="secondary">
+    <div class="chart">
+      <h2>Total Project</h2>
+      <canvas id="myChart" width="400" height="400"></canvas>
+
+      <div class="complete">
+        <h3>3 Completed</h3>
+        <p>from 5 projects</p>
+      </div>
+    </div>
+
+    <div class="recent_project">
+      <div class="listing" *ngFor="let recent of recentProjects">
+        <div class="title">
+          <div class="category" [ngClass]="recent.categoryColor"></div>
+          <h2>{{ recent.name }}</h2>
+          <p>by {{ recent.owner }}</p>
+        </div>
+        <span class="material-icons-outlined">more_vert</span>
+      </div>
+    </div>
+  </section>
+</div>

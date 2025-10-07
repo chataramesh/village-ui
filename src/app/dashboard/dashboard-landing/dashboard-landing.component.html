@@ -1,0 +1,20 @@
+<div class="dashboard-layout">
+  <!-- Top Navbar -->
+  <app-navbar></app-navbar>
+
+  <!-- Sidebar (hidden on mobile, toggleable) -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Main Body -->
+  <main class="dashboard-body">
+    <!-- Role-based dashboard rendering -->
+    <ng-container >
+      <app-super-admin *ngIf="role=='SUPER_ADMIN'"></app-super-admin>
+      <app-village-admin *ngIf="role=='VILLAGE_ADMIN'"></app-village-admin>
+      <app-villager *ngIf="role=='VILLAGER'"></app-villager>
+    </ng-container>
+  </main>
+
+  <!-- Bottom Navigation (mobile only) -->
+  <app-footer></app-footer>
+</div>
