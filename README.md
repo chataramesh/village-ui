@@ -7,6 +7,7 @@ It follows a clean modular architecture for scalability and maintainability.
 
 ## 📂 Project Structure
 
+```text
 src/app/
 ├── core/                         # Interceptors, guards, services, models
 │   ├── guards/
@@ -67,8 +68,6 @@ src/app/
 ├── app-routing.module.ts
 ├── app.module.ts
 └── environments/
-
-
 
 
 
