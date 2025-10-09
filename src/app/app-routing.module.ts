@@ -22,7 +22,7 @@ const routes: Routes = [
     path: 'users',
     loadChildren: () => import('./users/users.module').then(m => m.UsersModule),
     canActivate: [AuthGuard, RoleGuard],
-    data: { role: 'VILLAGE_ADMIN' }
+    data: { roles: ['VILLAGE_ADMIN', 'SUPER_ADMIN'] }
   },
   {
     path: 'admins',
@@ -33,7 +33,8 @@ const routes: Routes = [
   {
     path: 'villages',
     loadChildren: () => import('./villages/villages.module').then(m => m.VillagesModule),
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
+    data: { role: 'SUPER_ADMIN' }
   },
   {
     path: 'entities',

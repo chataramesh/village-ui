@@ -1,106 +1,253 @@
-<div class="dashboard"><!-- Dashboard -->
-  <!-- Navigation -->
-  <section class="navigation">
-    <img src="assets/img/logo-thumbnail.png" alt="InstinctHub Logo" class="logo" />
-
-    <div>
-      <span class="material-icons-outlined"> dashboard </span>
-      <span class="material-icons-outlined"> trending_up </span>
-      <span class="material-icons-outlined"> people_alt </span>
-      <span class="material-icons-outlined"> insert_invitation </span>
-      <span class="material-icons-outlined"> settings_suggest </span>
-    </div>
-
-    <img src="assets/img/2.jpg" alt="User Image" class="user" />
-  </section>
-
-  <!-- Main -->
-  <section class="main">
-    <!-- Search -->
-    <div class="search">
-      <form>
-        <input
-          type="text"
-          name="search"
-          id="searchProject"
-          placeholder="Search Here"
-          [(ngModel)]="searchText"
-          name="search"
-        />
-        <span class="material-icons-outlined"> search </span>
-      </form>
-
-      <div class="notification">
-        <span class="material-icons-outlined"> notifications </span>
-        <span class="material-icons-outlined"> edit </span>
+<!-- Village Admin Dashboard -->
+<div class="village-admin-dashboard">
+  <div class="dashboard-container">
+    
+    <!-- Header with User Menu -->
+    <div class="dashboard-header">
+      <div class="header-left">
+        <h1 class="dashboard-title">{{villageName}}</h1>
+        <p class="dashboard-subtitle">Village Admin Dashboard</p>
       </div>
-    </div>
-
-    <div class="title">
-      <h1>My Project</h1>
-
-      <label for="projects">Sort By</label>
-      <select id="projectFilter" [(ngModel)]="filterStatus">
-        <option value="">...</option>
-        <option value="recent">Recent Project</option>
-        <option value="finished">Finished Project</option>
-        <option value="ongoing">Ongoing Project</option>
-        <option value="stalled">Stalled Project</option>
-      </select>
-    </div>
-
-    <!-- Project List -->
-    <div class="project_list">
-      <div
-        class="project"
-        *ngFor="let project of projects | projectFilter:filterStatus | search:searchText"
-        [attr.data-status]="project.status"
-        [title]="project.title"
-      >
-        <div class="category" [ngClass]="project.categoryColor"></div>
-        <h2>{{ project.name }}</h2>
-        <p>{{ project.time }}</p>
-
-        <ul class="activity">
-          <li *ngFor="let task of project.tasks">{{ task }}</li>
-        </ul>
-
-        <div class="meta">
-          <div class="contributors">
-            <img
-              *ngFor="let user of project.contributors; let i = index"
-              [src]="user"
-              [class.stack]="i > 0"
-              alt="Contributor"
-            />
+      <div class="header-right">
+        <!-- User Profile Menu -->
+        <div class="user-menu-wrapper">
+          <button class="user-menu-btn" (click)="toggleUserMenu()">
+            <img [src]="userImage || 'assets/img/default-user.png'" alt="User" class="user-avatar">
+            <svg class="dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          
+          <!-- Dropdown Menu -->
+          <div class="user-dropdown" *ngIf="showUserMenu">
+            <button class="dropdown-item" (click)="viewProfile()">
+              <svg class="dropdown-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              View Profile
+            </button>
+            <button class="dropdown-item" (click)="viewSubscriptions()">
+              <svg class="dropdown-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+              </svg>
+              View Subscriptions
+            </button>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item logout" (click)="handleLogout()">
+              <svg class="dropdown-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+              Logout
+            </button>
           </div>
-          <span class="material-icons-outlined">more_vert</span>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- Secondary -->
-  <section class="secondary">
-    <div class="chart">
-      <h2>Total Project</h2>
-      <canvas id="myChart" width="400" height="400"></canvas>
-
-      <div class="complete">
-        <h3>3 Completed</h3>
-        <p>from 5 projects</p>
-      </div>
-    </div>
-
-    <div class="recent_project">
-      <div class="listing" *ngFor="let recent of recentProjects">
-        <div class="title">
-          <div class="category" [ngClass]="recent.categoryColor"></div>
-          <h2>{{ recent.name }}</h2>
-          <p>by {{ recent.owner }}</p>
+    <!-- Count Cards Row -->
+    <div class="count-cards-row">
+      <div class="count-card entity-card">
+        <div class="count-card-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
         </div>
-        <span class="material-icons-outlined">more_vert</span>
+        <div class="count-card-content">
+          <p class="count-card-label">Entities</p>
+          <p class="count-card-value">{{counts.entities}}</p>
+        </div>
+      </div>
+
+      <div class="count-card villager-card">
+        <div class="count-card-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+        </div>
+        <div class="count-card-content">
+          <p class="count-card-label">Villagers</p>
+          <p class="count-card-value">{{counts.villagers}}</p>
+        </div>
+      </div>
+
+      <div class="count-card event-card">
+        <div class="count-card-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <div class="count-card-content">
+          <p class="count-card-label">Events</p>
+          <p class="count-card-value">{{counts.events}}</p>
+        </div>
       </div>
     </div>
-  </section>
+
+    <!-- Navigation Cards Row -->
+    <div class="nav-cards-row">
+      <button class="nav-card entity-nav" (click)="navigateToEntityCreate()">
+        <div class="nav-card-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+        </div>
+        <p class="nav-card-title">Entity</p>
+        <p class="nav-card-desc">Manage village entities</p>
+      </button>
+
+      <button class="nav-card villager-nav" (click)="navigateToUserCreate()">
+        <div class="nav-card-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+          </svg>
+        </div>
+        <p class="nav-card-title">Villager</p>
+        <p class="nav-card-desc">Manage villagers</p>
+      </button>
+
+      <button class="nav-card event-nav" (click)="navigateToEventCreate()">
+        <div class="nav-card-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <p class="nav-card-title">Events</p>
+        <p class="nav-card-desc">Create and manage events</p>
+      </button>
+
+      <button class="nav-card image-nav" (click)="navigateToImageCreate()">
+        <div class="nav-card-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <p class="nav-card-title">Images</p>
+        <p class="nav-card-desc">Upload and manage images</p>
+      </button>
+    </div>
+
+    <!-- Event Messages Ticker -->
+    <div class="event-messages-section">
+      <h2 class="section-title">📢 Event Messages</h2>
+      <div class="event-messages-container">
+        <div class="event-messages-scroll">
+          <div *ngFor="let message of eventMessages" class="event-message-item">
+            <div class="event-message-time">{{message.time}}</div>
+            <div class="event-message-content">
+              <h4 class="event-message-title">{{message.title}}</h4>
+              <p class="event-message-text">{{message.message}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <h2 class="section-title">Analytics Overview</h2>
+      
+      <div class="charts-grid">
+        <!-- Entities Chart -->
+        <div class="chart-card">
+          <h3 class="chart-title">Entities Distribution</h3>
+          <canvas #entitiesChart></canvas>
+        </div>
+
+        <!-- Villagers Chart -->
+        <div class="chart-card">
+          <h3 class="chart-title">Villagers Growth</h3>
+          <canvas #villagersChart></canvas>
+        </div>
+
+        <!-- Events Chart -->
+        <div class="chart-card">
+          <h3 class="chart-title">Events Timeline</h3>
+          <canvas #eventsChart></canvas>
+        </div>
+
+        <!-- Activity Chart -->
+        <div class="chart-card">
+          <h3 class="chart-title">Daily Activity</h3>
+          <canvas #activityChart></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Chat Button (Bottom Right) -->
+  <button class="chat-fab" (click)="toggleChatPopup()">
+    <svg class="chat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+    </svg>
+    <span class="chat-badge" *ngIf="unreadMessages > 0">{{unreadMessages}}</span>
+  </button>
+
+  <!-- Chat Popup -->
+  <div class="chat-popup" *ngIf="showChatPopup">
+    <div class="chat-popup-header">
+      <h3 class="chat-popup-title">Chat</h3>
+      <button class="chat-close-btn" (click)="toggleChatPopup()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="chat-popup-body">
+      <!-- User Selection -->
+      <div class="chat-user-select">
+        <label class="chat-label">Select User to Chat</label>
+        <select class="chat-select" [(ngModel)]="selectedChatUser" (change)="loadChatMessages()">
+          <option value="">Choose a user...</option>
+          <option *ngFor="let user of chatUsers" [value]="user.id">{{user.name}} - {{user.role}}</option>
+        </select>
+      </div>
+
+      <!-- Chat Messages -->
+      <div class="chat-messages" *ngIf="selectedChatUser">
+        <div *ngFor="let message of chatMessages" 
+             [class.message-sent]="message.sender === 'me'"
+             [class.message-received]="message.sender !== 'me'"
+             class="chat-message">
+          <p class="message-text">{{message.text}}</p>
+          <span class="message-time">{{message.time}}</span>
+        </div>
+      </div>
+
+      <div class="chat-empty" *ngIf="!selectedChatUser">
+        <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+        </svg>
+        <p>Select a user to start chatting</p>
+      </div>
+    </div>
+
+    <!-- Chat Input -->
+    <div class="chat-popup-footer" *ngIf="selectedChatUser">
+      <input type="text" 
+             class="chat-input" 
+             placeholder="Type a message..." 
+             [(ngModel)]="chatMessage"
+             (keyup.enter)="sendMessage()">
+      <button class="chat-send-btn" (click)="sendMessage()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
 </div>

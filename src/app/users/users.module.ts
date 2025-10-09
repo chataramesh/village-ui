@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 import { UsersRoutingModule } from './users-routing.module';
 import { UserListComponent } from './user-list/user-list.component';
@@ -10,14 +12,15 @@ import { UserStatsComponent } from './user-stats/user-stats.component';
 @NgModule({
   declarations: [
     UserListComponent,
-    UserListComponent,
     UserCreateComponent,
     UserStatsComponent
   ],
   imports: [
     CommonModule,
+    FormsModule,
+    HttpClientModule,
     UsersRoutingModule
   ],
-  exports: [UserStatsComponent],
+  exports: [UserStatsComponent,UserListComponent],
 })
 export class UsersModule { }

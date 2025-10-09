@@ -1,67 +1,286 @@
-<div class="min-h-screen bg-gray-100 p-6">
-    <div class="max-w-7xl mx-auto">
-      <!-- Header -->
-      <div class="flex justify-between items-center mb-6">
-        <div>
-          <h1 class="text-4xl font-extrabold text-gray-900">VillageConnect</h1>
-          <h2 class="text-xl font-semibold text-blue-700">SuperAdmin Dashboard</h2>
-        </div>
-        <button (click)="handleLogout()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-          <i class="fas fa-sign-out-alt mr-2"></i>Logout
-        </button>
+<!-- Super Admin Dashboard -->
+<div class="super-admin-dashboard">
+  <div class="dashboard-container">
+    
+    <!-- Header with User Menu -->
+    <div class="dashboard-header">
+      <div class="header-left">
+        <h1 class="dashboard-title">Super Admin Dashboard</h1>
+        <p class="dashboard-subtitle">Manage everything from here</p>
       </div>
-  
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition transform hover:scale-105">
-          <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
-            <i class="fas fa-user-shield text-blue-600 mr-2"></i>VillageAdmins
-          </h3>
-          <p class="text-2xl font-bold text-blue-600">12</p>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition transform hover:scale-105">
-          <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
-            <i class="fas fa-map-marked-alt text-green-600 mr-2"></i>Villages Assigned
-          </h3>
-          <p class="text-2xl font-bold text-green-600">34</p>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition transform hover:scale-105">
-          <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
-            <i class="fas fa-clock text-yellow-600 mr-2"></i>Pending Requests
-          </h3>
-          <p class="text-2xl font-bold text-yellow-600">5</p>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition transform hover:scale-105">
-          <h3 class="text-lg font-semibold text-gray-700 mb-2 flex items-center">
-            <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>System Alerts
-          </h3>
-          <p class="text-2xl font-bold text-red-600">2</p>
-        </div>
-      </div>
-  
-      <!-- Actions -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white p-6 rounded-lg shadow">
-          <h4 class="text-xl font-semibold text-gray-800 mb-4">Manage VillageAdmins</h4>
-          <button onclick="addAdmin()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
-            <i class="fas fa-user-plus mr-2"></i>Add New Admin
+      <div class="header-right">
+        <!-- User Profile Menu -->
+        <div class="user-menu-wrapper">
+          <button class="user-menu-btn" (click)="toggleUserMenu()">
+            <svg class="user-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+            <svg class="dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
           </button>
-          <button onclick="viewAdmins()" class="ml-4 bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 transition">
-            <i class="fas fa-users mr-2"></i>View All
-          </button>
-        </div>
-  
-        <div class="bg-white p-6 rounded-lg shadow">
-          <h4 class="text-xl font-semibold text-gray-800 mb-4">Assign Villages</h4>
-          <button (click)="assignVillage()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
-            <i class="fas fa-map-pin mr-2"></i>Assign Village
-          </button>
-          <button onclick="viewAssignments()" class="ml-4 bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 transition">
-            <i class="fas fa-list-alt mr-2"></i>View Assignments
-          </button>
+          
+          <!-- Dropdown Menu -->
+          <div class="user-dropdown" *ngIf="showUserMenu">
+            <button class="dropdown-item" (click)="viewProfile()">
+              <svg class="dropdown-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              View Profile
+            </button>
+            <button class="dropdown-item" (click)="viewSubscriptions()">
+              <svg class="dropdown-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+              </svg>
+              View Subscriptions
+            </button>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item logout" (click)="handleLogout()">
+              <svg class="dropdown-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Count Cards Row -->
+    <div class="count-cards-row">
+      <!-- Total Users Card -->
+      <div class="count-card users-card">
+        <div class="count-card-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+        </div>
+        <div class="count-card-content">
+          <p class="count-card-label">Total Users</p>
+          <p class="count-card-value">{{counts.totalUsers}}</p>
+          <div class="count-card-details">
+            <span class="detail-item active">
+              <span class="detail-dot active"></span>
+              {{counts.activeUsers}} Active
+            </span>
+            <span class="detail-item inactive">
+              <span class="detail-dot inactive"></span>
+              {{counts.inactiveUsers}} Inactive
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Village Admins Card -->
+      <div class="count-card village-admin-card">
+        <div class="count-card-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          </svg>
+        </div>
+        <div class="count-card-content">
+          <p class="count-card-label">Village Admins</p>
+          <p class="count-card-value">{{counts.villageAdmins}}</p>
+          <div class="count-card-details">
+            <span class="detail-item active">
+              <span class="detail-dot active"></span>
+              {{counts.activeVillageAdmins}} Active
+            </span>
+            <span class="detail-item inactive">
+              <span class="detail-dot inactive"></span>
+              {{counts.inactiveVillageAdmins}} Inactive
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Villagers Card -->
+      <div class="count-card villager-card">
+        <div class="count-card-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+        </div>
+        <div class="count-card-content">
+          <p class="count-card-label">Villagers</p>
+          <p class="count-card-value">{{counts.villagers}}</p>
+          <div class="count-card-details">
+            <span class="detail-item active">
+              <span class="detail-dot active"></span>
+              {{counts.activeVillagers}} Active
+            </span>
+            <span class="detail-item inactive">
+              <span class="detail-dot inactive"></span>
+              {{counts.inactiveVillagers}} Inactive
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Villages Card -->
+      <div class="count-card village-card">
+        <div class="count-card-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+          </svg>
+        </div>
+        <div class="count-card-content">
+          <p class="count-card-label">Villages</p>
+          <p class="count-card-value">{{counts.villages}}</p>
+          <div class="count-card-details">
+            <span class="detail-item active">
+              <span class="detail-dot active"></span>
+              {{counts.activeVillages}} Active
+            </span>
+            <span class="detail-item inactive">
+              <span class="detail-dot inactive"></span>
+              {{counts.inactiveVillages}} Inactive
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Cards Row -->
+    <div class="nav-cards-row">
+      <button class="nav-card village-admin-nav" (click)="navigateToUserCreate()">
+        <div class="nav-card-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+          </svg>
+        </div>
+        <p class="nav-card-title">Village Admin</p>
+        <p class="nav-card-desc">Manage village administrators</p>
+      </button>
+
+      <button class="nav-card villager-nav" (click)="navigateToUserCreate()">
+        <div class="nav-card-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+          </svg>
+        </div>
+        <p class="nav-card-title">Villager</p>
+        <p class="nav-card-desc">Manage villagers</p>
+      </button>
+
+      <button class="nav-card village-nav" (click)="navigateToVillagesTree()">
+        <div class="nav-card-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+        </div>
+        <p class="nav-card-title">Village</p>
+        <p class="nav-card-desc">Manage villages</p>
+      </button>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <h2 class="section-title">Analytics Overview</h2>
+      
+      <div class="charts-grid">
+        <!-- Village Admins Chart -->
+        <div class="chart-card">
+          <h3 class="chart-title">Village Admins Distribution</h3>
+          <canvas #villageAdminsChart></canvas>
+        </div>
+
+        <!-- Villages Chart -->
+        <div class="chart-card">
+          <h3 class="chart-title">Villages by District</h3>
+          <canvas #villagesChart></canvas>
+        </div>
+
+        <!-- Villagers Chart -->
+        <div class="chart-card">
+          <h3 class="chart-title">Villagers Growth</h3>
+          <canvas #villagersChart></canvas>
+        </div>
+
+        <!-- Activity Chart -->
+        <div class="chart-card">
+          <h3 class="chart-title">System Activity</h3>
+          <canvas #activityChart></canvas>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  
+  <!-- Chat Button (Bottom Right) -->
+  <button class="chat-fab" (click)="toggleChatPopup()">
+    <svg class="chat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+    </svg>
+    <span class="chat-badge" *ngIf="unreadMessages > 0">{{unreadMessages}}</span>
+  </button>
+
+  <!-- Chat Popup -->
+  <div class="chat-popup" *ngIf="showChatPopup">
+    <div class="chat-popup-header">
+      <h3 class="chat-popup-title">Chat</h3>
+      <button class="chat-close-btn" (click)="toggleChatPopup()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="chat-popup-body">
+      <!-- User Selection -->
+      <div class="chat-user-select">
+        <label class="chat-label">Select User to Chat</label>
+        <select class="chat-select" [(ngModel)]="selectedChatUser" (change)="loadChatMessages()">
+          <option value="">Choose a user...</option>
+          <option *ngFor="let user of chatUsers" [value]="user.id">{{user.name}} - {{user.role}}</option>
+        </select>
+      </div>
+
+      <!-- Chat Messages -->
+      <div class="chat-messages" *ngIf="selectedChatUser">
+        <div *ngFor="let message of chatMessages" 
+             [class.message-sent]="message.sender === 'me'"
+             [class.message-received]="message.sender !== 'me'"
+             class="chat-message">
+          <p class="message-text">{{message.text}}</p>
+          <span class="message-time">{{message.time}}</span>
+        </div>
+      </div>
+
+      <div class="chat-empty" *ngIf="!selectedChatUser">
+        <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+        </svg>
+        <p>Select a user to start chatting</p>
+      </div>
+    </div>
+
+    <!-- Chat Input -->
+    <div class="chat-popup-footer" *ngIf="selectedChatUser">
+      <input type="text" 
+             class="chat-input" 
+             placeholder="Type a message..." 
+             [(ngModel)]="chatMessage"
+             (keyup.enter)="sendMessage()">
+      <button class="chat-send-btn" (click)="sendMessage()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

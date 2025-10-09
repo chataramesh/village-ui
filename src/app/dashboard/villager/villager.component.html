@@ -1,1 +1,322 @@
-<p>villager works!</p>
+<!-- Villager Dashboard -->
+<div class="villager-dashboard">
+  <div class="dashboard-container">
+    
+    <!-- Header with User Menu -->
+    <div class="dashboard-header">
+      <div class="header-left">
+        <h1 class="dashboard-title">Villager Dashboard</h1>
+        <p class="dashboard-subtitle">Welcome, {{userName}}!</p>
+      </div>
+      <div class="header-right">
+        <!-- User Profile Menu -->
+        <div class="user-menu-wrapper">
+          <button class="user-menu-btn" (click)="toggleUserMenu()">
+            <img [src]="userImage" alt="User" class="user-avatar" />
+            <svg class="dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+          
+          <!-- Dropdown Menu -->
+          <div class="user-dropdown" *ngIf="showUserMenu">
+            <button class="dropdown-item" (click)="viewProfile()">
+              <svg class="dropdown-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              View Profile
+            </button>
+            <button class="dropdown-item" (click)="viewSubscriptions()">
+              <svg class="dropdown-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+              </svg>
+              View Subscriptions
+            </button>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item logout" (click)="handleLogout()">
+              <svg class="dropdown-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions Grid -->
+    <div class="quick-actions-section">
+      <h2 class="section-heading">
+        <span class="heading-icon">⚡</span>
+        Quick Actions
+      </h2>
+      <div class="actions-grid">
+        
+        <!-- ENTITIES Card -->
+        <div class="action-card entities-card" [class.expanded]="showEntitiesDropdown">
+          <div class="action-card-header" (click)="toggleEntitiesDropdown()">
+            <div class="action-icon-wrapper entities-gradient">
+              <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+            </div>
+            <div class="action-content">
+              <h3 class="action-title">Entities</h3>
+              <p class="action-subtitle">{{subscribedEntities.length}} Available</p>
+            </div>
+            <svg class="expand-icon" [class.rotated]="showEntitiesDropdown" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+          
+          <!-- Entities Dropdown -->
+          <div class="action-dropdown" *ngIf="showEntitiesDropdown">
+            <div class="entity-grid">
+              <button *ngFor="let entity of subscribedEntities" 
+                      class="entity-card-item" 
+                      (click)="selectEntity(entity)">
+                <div class="entity-card-icon">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  </svg>
+                </div>
+                <span class="entity-card-name">{{entity.name}}</span>
+                <span class="entity-card-type">{{entity.type}}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Selected Entity Details -->
+          <div class="entity-details-modal" *ngIf="selectedEntity">
+            <div class="modal-overlay" (click)="closeEntityDetails()"></div>
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4>{{selectedEntity.name}}</h4>
+                <button class="modal-close" (click)="closeEntityDetails()">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="detail-row">
+                  <span class="detail-label">Type</span>
+                  <span class="detail-value">{{selectedEntity.type}}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Owner</span>
+                  <span class="detail-value">{{selectedEntity.ownerName}}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Status</span>
+                  <span class="detail-value status" [class.open]="selectedEntity.isOpen" [class.closed]="!selectedEntity.isOpen">
+                    <span class="status-dot"></span>
+                    {{selectedEntity.isOpen ? 'Open' : 'Closed'}}
+                  </span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Timings</span>
+                  <span class="detail-value">{{selectedEntity.openingTime}} - {{selectedEntity.closingTime}}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Available Slots</span>
+                  <span class="detail-value slots">{{selectedEntity.availableSlots}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VEHICLE Card -->
+        <div class="action-card vehicle-card" [class.expanded]="showVehicleDropdown">
+          <div class="action-card-header" (click)="toggleVehicleDropdown()">
+            <div class="action-icon-wrapper vehicle-gradient">
+              <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+              </svg>
+            </div>
+            <div class="action-content">
+              <h3 class="action-title">Vehicle</h3>
+              <p class="action-subtitle">Book Now</p>
+            </div>
+            <svg class="expand-icon" [class.rotated]="showVehicleDropdown" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+          
+          <!-- Vehicle Types Dropdown -->
+          <div class="action-dropdown" *ngIf="showVehicleDropdown">
+            <div class="vehicle-grid">
+              <button *ngFor="let type of vehicleTypes" 
+                      class="vehicle-type-card" 
+                      (click)="selectVehicleType(type)">
+                <svg class="vehicle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                <span>{{type}}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- IMAGES Card -->
+        <div class="action-card images-card" (click)="navigateToImageCreate()">
+          <div class="action-card-header">
+            <div class="action-icon-wrapper images-gradient">
+              <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <div class="action-content">
+              <h3 class="action-title">Images</h3>
+              <p class="action-subtitle">Upload Photos</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPLAINTS Card -->
+        <div class="action-card complaints-card" (click)="navigateToComplaintCreate()">
+          <div class="action-card-header">
+            <div class="action-icon-wrapper complaints-gradient">
+              <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+            <div class="action-content">
+              <h3 class="action-title">Complaints</h3>
+              <p class="action-subtitle">Raise Issue</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <h2 class="section-heading">
+        <span class="heading-icon">📊</span>
+        Analytics
+      </h2>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3 class="chart-title">Vehicle Bookings</h3>
+          <canvas #vehicleChart></canvas>
+        </div>
+        <div class="chart-card">
+          <h3 class="chart-title">Events Participation</h3>
+          <canvas #eventsChart></canvas>
+        </div>
+        <div class="chart-card">
+          <h3 class="chart-title">Entity Usage</h3>
+          <canvas #entitiesChart></canvas>
+        </div>
+        <div class="chart-card">
+          <h3 class="chart-title">Activity Overview</h3>
+          <canvas #activityChart></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Latest Events Section -->
+    <div class="events-section">
+      <h2 class="section-heading">
+        <span class="heading-icon">🎉</span>
+        Latest Events
+      </h2>
+      <div class="events-grid">
+        <div *ngFor="let event of latestEvents; let i = index" 
+             class="event-card"
+             [style.animation-delay]="(i * 0.1) + 's'">
+          <div class="event-card-header">
+            <div class="event-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <span class="event-time">{{event.time}}</span>
+          </div>
+          <h3 class="event-name">{{event.name}}</h3>
+          <p class="event-description">{{event.description}}</p>
+          <div class="event-footer">
+            <span class="event-badge">Upcoming</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Chat FAB -->
+  <button class="chat-fab" (click)="toggleChatPopup()">
+    <svg class="chat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+    </svg>
+    <span class="chat-badge" *ngIf="unreadMessages > 0">{{unreadMessages}}</span>
+  </button>
+
+  <!-- Chat Popup -->
+  <div class="chat-popup" *ngIf="showChatPopup">
+    <div class="chat-popup-header">
+      <h3 class="chat-popup-title">Chat</h3>
+      <button class="chat-close-btn" (click)="toggleChatPopup()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="chat-popup-body">
+      <div class="chat-user-select">
+        <label class="chat-label">Select User</label>
+        <select class="chat-select" [(ngModel)]="selectedChatUser" (change)="loadChatMessages()">
+          <option value="">Choose a user...</option>
+          <option *ngFor="let user of chatUsers" [value]="user.id">{{user.name}} ({{user.role}})</option>
+        </select>
+      </div>
+
+      <div class="chat-messages" *ngIf="selectedChatUser && chatMessages.length > 0">
+        <div *ngFor="let msg of chatMessages" 
+             class="chat-message" 
+             [class.message-sent]="msg.sender === 'me'"
+             [class.message-received]="msg.sender === 'other'">
+          <p class="message-text">{{msg.text}}</p>
+          <span class="message-time">{{msg.time}}</span>
+        </div>
+      </div>
+
+      <div class="chat-empty" *ngIf="!selectedChatUser || chatMessages.length === 0">
+        <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+        </svg>
+        <p>Select a user to start chatting</p>
+      </div>
+    </div>
+
+    <div class="chat-popup-footer" *ngIf="selectedChatUser">
+      <input type="text" 
+             class="chat-input" 
+             placeholder="Type a message..." 
+             [(ngModel)]="chatMessage"
+             (keyup.enter)="sendMessage()" />
+      <button class="chat-send-btn" (click)="sendMessage()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+</div>

@@ -1,5 +1,5 @@
-// User Create Component Styles
-.user-create-container {
+// Village Create Component Styles (same as user-create)
+.village-create-container {
   min-height: 100vh;
   background: 
     radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3), transparent 50%),
@@ -13,7 +13,6 @@
   }
 }
 
-// Page Header
 .page-header {
   margin-bottom: 32px;
   display: flex;
@@ -35,10 +34,7 @@
     gap: 8px;
     transition: all 0.3s ease;
 
-    svg {
-      width: 20px;
-      height: 20px;
-    }
+    svg { width: 20px; height: 20px; }
 
     &:hover {
       background: rgba(255, 255, 255, 0.25);
@@ -60,9 +56,7 @@
       gap: 12px;
       text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 
-      .title-icon {
-        font-size: 40px;
-      }
+      .title-icon { font-size: 40px; }
     }
 
     .page-subtitle {
@@ -74,7 +68,6 @@
   }
 }
 
-// Form Section
 .form-section {
   max-width: 900px;
   margin: 0 auto;
@@ -84,18 +77,13 @@
   padding: 40px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 
-  @media (max-width: 768px) {
-    padding: 24px;
-  }
+  @media (max-width: 768px) { padding: 24px; }
 }
 
-// Form Group Section
 .form-group-section {
   margin-bottom: 40px;
 
-  &:last-child {
-    margin-bottom: 0;
-  }
+  &:last-child { margin-bottom: 0; }
 
   .section-title {
     font-size: 20px;
@@ -108,29 +96,21 @@
     padding-bottom: 12px;
     border-bottom: 2px solid #e2e8f0;
 
-    .section-icon {
-      font-size: 24px;
-    }
+    .section-icon { font-size: 24px; }
   }
 }
 
-// Form Row
 .form-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
   margin-bottom: 24px;
 
-  &:last-child {
-    margin-bottom: 0;
-  }
+  &:last-child { margin-bottom: 0; }
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
 }
 
-// Form Group
 .form-group {
   display: flex;
   flex-direction: column;
@@ -144,9 +124,7 @@
     align-items: center;
     gap: 4px;
 
-    .required {
-      color: #ef4444;
-    }
+    .required { color: #ef4444; }
   }
 
   .input-wrapper,
@@ -182,16 +160,18 @@
         box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
       }
 
-      &::placeholder {
-        color: #94a3b8;
-      }
+      &::placeholder { color: #94a3b8; }
 
       &.error {
         border-color: #ef4444;
 
-        &:focus {
-          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-        }
+        &:focus { box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1); }
+      }
+
+      &:disabled {
+        background: #f1f5f9;
+        cursor: not-allowed;
+        opacity: 0.6;
       }
     }
 
@@ -204,31 +184,6 @@
       background-size: 20px;
       padding-right: 40px;
     }
-
-    .toggle-password {
-      position: absolute;
-      right: 12px;
-      width: 36px;
-      height: 36px;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 8px;
-      transition: all 0.2s ease;
-
-      svg {
-        width: 20px;
-        height: 20px;
-        color: #64748b;
-      }
-
-      &:hover {
-        background: #f1f5f9;
-      }
-    }
   }
 
   .error-message {
@@ -238,7 +193,6 @@
   }
 }
 
-// Checkbox Label
 .checkbox-label {
   display: flex;
   align-items: flex-start;
@@ -282,7 +236,6 @@
   }
 }
 
-// Form Actions
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -291,9 +244,7 @@
   padding-top: 32px;
   border-top: 2px solid #e2e8f0;
 
-  @media (max-width: 768px) {
-    flex-direction: column-reverse;
-  }
+  @media (max-width: 768px) { flex-direction: column-reverse; }
 
   .btn {
     padding: 14px 32px;
@@ -309,10 +260,7 @@
     border: none;
     min-width: 150px;
 
-    svg {
-      width: 20px;
-      height: 20px;
-    }
+    svg { width: 20px; height: 20px; }
 
     &.btn-secondary {
       background: white;
@@ -336,9 +284,7 @@
         box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
       }
 
-      &:active:not(:disabled) {
-        transform: translateY(0);
-      }
+      &:active:not(:disabled) { transform: translateY(0); }
 
       &:disabled {
         opacity: 0.6;
@@ -346,22 +292,15 @@
       }
     }
 
-    @media (max-width: 768px) {
-      width: 100%;
-    }
+    @media (max-width: 768px) { width: 100%; }
   }
 }
 
-// Spinner Animation
 .spinner {
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

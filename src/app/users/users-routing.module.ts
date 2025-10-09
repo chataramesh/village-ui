@@ -7,6 +7,7 @@ import { UserStatsComponent } from './user-stats/user-stats.component';
 const routes: Routes = [
   { path: '', component: UserListComponent },
   { path: 'create', component: UserCreateComponent },
+  { path: 'edit/:id', component: UserCreateComponent },
   { path: 'stats', component: UserStatsComponent }
 ];
 

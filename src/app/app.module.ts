@@ -6,9 +6,10 @@ import { AppComponent } from './app.component';
 import { NavbarComponent } from './shared/navbar/navbar.component';
 import { SidebarComponent } from './shared/sidebar/sidebar.component';
 import { FooterComponent } from './shared/footer/footer.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CardsComponent } from './shared/cards/cards.component';
+import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
 @NgModule({
   declarations: [
     AppComponent,
@@ -17,7 +18,13 @@ import { CardsComponent } from './shared/cards/cards.component';
     BrowserModule,
     AppRoutingModule,HttpClientModule,ReactiveFormsModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: JwtInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
