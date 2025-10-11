@@ -14,22 +14,37 @@ export class LoginComponent  implements OnInit {
     password: ['', Validators.required]
   });
 
-  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {}
-  ngOnInit() {
+  showPassword = false;
+  rememberMe = false;
+  isLoading = false;
 
+  constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {}
+  
+  ngOnInit() {
+    // Check if user is already logged in
+    // You can add auto-redirect logic here if needed
+  }
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
   }
 
   onSubmit(): void {
     if (this.loginForm.invalid) return;
   
+    this.isLoading = true;
+    
     this.auth.login(this.loginForm.value as { email: string; password: string }).subscribe({
       next: () => {
         console.log('Login successful');
+        this.isLoading = false;
         this.router.navigate(['/dashboard']);
       },
-      error: () => alert('Invalid credentials')
+      error: (err) => {
+        console.error('Login error:', err);
+        this.isLoading = false;
+        alert('Invalid credentials. Please try again.');
+      }
     });
   }
-  
-  
 }

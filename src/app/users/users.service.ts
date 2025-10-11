@@ -3,14 +3,39 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
+export enum Role {
+  SUPER_ADMIN = 'SUPER_ADMIN',
+  VILLAGE_ADMIN = 'VILLAGE_ADMIN',
+  VILLAGER = 'VILLAGER'
+}
+
 export interface User {
   id?: string;
   name: string;
   email: string;
   phone: string;
   passwordHash?: string;
-  role: string;
-  village: string;
+  role: Role;
+  village?: {
+    id: string;
+    name: string;
+    mandal?: {
+      id: string;
+      name: string;
+      district?: {
+        id: string;
+        name: string;
+        state?: {
+          id: string;
+          name: string;
+          country?: {
+            id: string;
+            name: string;
+          };
+        };
+      };
+    };
+  };
   isActive: boolean;
   createdDate?: Date;
   lastLogin?: Date;
@@ -23,9 +48,13 @@ export interface UserStats {
   villageAdmins: number;
 }
 export interface UserCountResponse {
-  userCount: number;
-  userActiveCount: number;
-  userInactiveCount: number;
+  totalVillageAdmins: number;
+  activeVillageAdmins: number;
+  inactiveVillageAdmins: number;
+
+  totalVillagers: number;
+  activeVillagers: number;
+  inactiveVillagers: number;
 }
 
 @Injectable({
@@ -49,7 +78,7 @@ export class UsersService {
 
   // Create new user
   createUser(user: User): Observable<User> {
-    return this.http.post<User>(this.apiUrl, user);
+    return this.http.post<User>(`${this.apiUrl}/create`, user);
   }
 
   // Update existing user

@@ -109,8 +109,15 @@ export class VillageAdminComponent implements OnInit, AfterViewInit {
     this.router.navigate(['/entities/create']);
   }
 
-  navigateToUserCreate() {
-    this.router.navigate(['/users/create']);
+  navigateToVillagers() {
+    console.log('navigateToVillagers called');
+    console.log('Navigating to Villagers with role: VILLAGER');
+    this.router.navigate(['/users'], { queryParams: { role: 'VILLAGER' } }).then((result) => {
+      console.log('Navigation result:', result);
+      console.log('Current URL after navigation:', this.router.url);
+    }).catch(error => {
+      console.error('Navigation error:', error);
+    });
   }
 
   navigateToEventCreate() {

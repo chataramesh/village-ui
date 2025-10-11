@@ -1,18 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { UsersService, User, Role } from '../users.service';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  role: string;
-  status: 'active' | 'inactive';
-  village: string;
-  address: string;
-  joinedDate: Date;
-  lastLogin: Date;
-}
 
 @Component({
   selector: 'app-user-list',
@@ -22,14 +11,18 @@ interface User {
 export class UserListComponent implements OnInit {
   
   // Stats
-  totalVillagers: number = 0;
-  activeVillagers: number = 0;
-  inactiveVillagers: number = 0;
+  totalUsers: number = 0;
+  activeUsers: number = 0;
+  inactiveUsers: number = 0;
 
   // Search and Filter
   searchTerm: string = '';
   statusFilter: string = 'all';
   roleFilter: string = 'all';
+  contextRole: Role | null = null; // Role from query params
+  
+  // Expose Role enum to template
+  Role = Role;
 
   // Users Data
   users: User[] = [];
@@ -38,121 +31,62 @@ export class UserListComponent implements OnInit {
   // Expanded Row
   expandedUserId: string | null = null;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private usersService: UsersService
+  ) {}
 
   ngOnInit(): void {
-    this.loadUsers();
+    // Check for role filter from query params
+    this.route.queryParams.subscribe(params => {
+      const roleParam = params['role'];
+      if (roleParam) {
+        this.contextRole = roleParam as Role;
+        this.roleFilter = this.contextRole;
+      }
+      this.loadUsers();
+    });
   }
 
   loadUsers(): void {
-    // Mock data - Replace with actual API call
-    this.users = [
-      {
-        id: 'USR001',
-        name: 'Rajesh Kumar',
-        email: 'rajesh.kumar@example.com',
-        phone: '+91 98765 43210',
-        role: 'villager',
-        status: 'active',
-        village: 'Greenfield Village',
-        address: '123 Main Street, Greenfield',
-        joinedDate: new Date('2024-01-15'),
-        lastLogin: new Date('2025-10-08 14:30')
-      },
-      {
-        id: 'USR002',
-        name: 'Priya Sharma',
-        email: 'priya.sharma@example.com',
-        phone: '+91 98765 43211',
-        role: 'village_admin',
-        status: 'active',
-        village: 'Greenfield Village',
-        address: '456 Oak Avenue, Greenfield',
-        joinedDate: new Date('2024-02-20'),
-        lastLogin: new Date('2025-10-09 10:15')
-      },
-      {
-        id: 'USR003',
-        name: 'Amit Patel',
-        email: 'amit.patel@example.com',
-        phone: '+91 98765 43212',
-        role: 'villager',
-        status: 'active',
-        village: 'Riverside Village',
-        address: '789 River Road, Riverside',
-        joinedDate: new Date('2024-03-10'),
-        lastLogin: new Date('2025-10-07 16:45')
-      },
-      {
-        id: 'USR004',
-        name: 'Sunita Reddy',
-        email: 'sunita.reddy@example.com',
-        phone: '+91 98765 43213',
-        role: 'villager',
-        status: 'inactive',
-        village: 'Hillside Village',
-        address: '321 Hill Street, Hillside',
-        joinedDate: new Date('2024-04-05'),
-        lastLogin: new Date('2025-09-15 09:20')
-      },
-      {
-        id: 'USR005',
-        name: 'Vikram Singh',
-        email: 'vikram.singh@example.com',
-        phone: '+91 98765 43214',
-        role: 'villager',
-        status: 'active',
-        village: 'Greenfield Village',
-        address: '654 Pine Lane, Greenfield',
-        joinedDate: new Date('2024-05-12'),
-        lastLogin: new Date('2025-10-09 11:30')
-      },
-      {
-        id: 'USR006',
-        name: 'Anjali Desai',
-        email: 'anjali.desai@example.com',
-        phone: '+91 98765 43215',
-        role: 'village_admin',
-        status: 'active',
-        village: 'Riverside Village',
-        address: '987 Lake View, Riverside',
-        joinedDate: new Date('2024-06-18'),
-        lastLogin: new Date('2025-10-08 15:00')
-      },
-      {
-        id: 'USR007',
-        name: 'Manoj Gupta',
-        email: 'manoj.gupta@example.com',
-        phone: '+91 98765 43216',
-        role: 'villager',
-        status: 'inactive',
-        village: 'Hillside Village',
-        address: '147 Valley Road, Hillside',
-        joinedDate: new Date('2024-07-22'),
-        lastLogin: new Date('2025-08-20 12:10')
-      },
-      {
-        id: 'USR008',
-        name: 'Kavita Joshi',
-        email: 'kavita.joshi@example.com',
-        phone: '+91 98765 43217',
-        role: 'villager',
-        status: 'active',
-        village: 'Greenfield Village',
-        address: '258 Garden Street, Greenfield',
-        joinedDate: new Date('2024-08-30'),
-        lastLogin: new Date('2025-10-09 08:45')
-      }
-    ];
-
-    this.updateStats();
-    this.applyFilters();
+    // Load users based on context role
+    if (this.contextRole) {
+      this.usersService.getUsersByRole(this.contextRole as string).subscribe({
+        next: (data) => {
+          this.users = data;
+          this.updateStats();
+          this.applyFilters();
+        },
+        error: (err) => {
+          console.error('Error loading users:', err);
+          this.users = [];
+          this.updateStats();
+          this.applyFilters();
+        }
+      });
+    } else {
+      // Load all users
+      this.usersService.getAllUsers().subscribe({
+        next: (data) => {
+          this.users = data;
+          this.updateStats();
+          this.applyFilters();
+        },
+        error: (err) => {
+          console.error('Error loading users:', err);
+          this.users = [];
+          this.updateStats();
+          this.applyFilters();
+        }
+      });
+    }
   }
 
   updateStats(): void {
-    this.totalVillagers = this.users.length;
-    this.activeVillagers = this.users.filter(u => u.status === 'active').length;
-    this.inactiveVillagers = this.users.filter(u => u.status === 'inactive').length;
+    this.totalUsers = this.users.length;
+    this.activeUsers = this.users.filter(u => u.isActive).length;
+    this.inactiveUsers = this.users.filter(u => !u.isActive).length;
   }
 
   onSearch(): void {
@@ -183,7 +117,8 @@ export class UserListComponent implements OnInit {
 
     // Apply status filter
     if (this.statusFilter !== 'all') {
-      filtered = filtered.filter(user => user.status === this.statusFilter);
+      const isActive = this.statusFilter === 'active';
+      filtered = filtered.filter(user => user.isActive === isActive);
     }
 
     // Apply role filter
@@ -199,7 +134,15 @@ export class UserListComponent implements OnInit {
   }
 
   navigateToCreate(): void {
-    this.router.navigate(['/users/create']);
+    // Pass context role to create page
+    if (this.contextRole) {
+      this.router.navigate(['/users/create'], {
+        queryParams: { role: this.contextRole },
+        replaceUrl: true // Replace current history entry
+      });
+    } else {
+      this.router.navigate(['/users/create'], { replaceUrl: true });
+    }
   }
 
   editUser(userId: string): void {
@@ -208,12 +151,52 @@ export class UserListComponent implements OnInit {
   }
 
   deleteUser(userId: string): void {
-    console.log('Delete user:', userId);
-    // Add confirmation dialog and delete logic
     if (confirm('Are you sure you want to delete this user?')) {
-      this.users = this.users.filter(u => u.id !== userId);
-      this.updateStats();
-      this.applyFilters();
+      this.usersService.deleteUser(userId).subscribe({
+        next: () => {
+          this.loadUsers();
+        },
+        error: (err) => {
+          console.error('Error deleting user:', err);
+          alert('Failed to delete user');
+        }
+      });
     }
+  }
+
+  getPageTitle(): string {
+    if (this.contextRole === Role.VILLAGE_ADMIN) {
+      return 'Village Admins';
+    } else if (this.contextRole === Role.VILLAGER) {
+      return 'Villagers';
+    }
+    return 'User Management';
+  }
+
+  getCreateButtonText(): string {
+    if (this.contextRole === Role.VILLAGE_ADMIN) {
+      return 'Create Admin';
+    } else if (this.contextRole === Role.VILLAGER) {
+      return 'Create Villager';
+    }
+    return 'Create User';
+  }
+
+  getStatsLabel(): string {
+    if (this.contextRole === Role.VILLAGE_ADMIN) {
+      return 'Admins';
+    } else if (this.contextRole === Role.VILLAGER) {
+      return 'Villagers';
+    }
+    return 'Users';
+  }
+
+  getSubtitle(): string {
+    if (this.contextRole === Role.VILLAGE_ADMIN) {
+      return 'Manage and monitor village admins in the system';
+    } else if (this.contextRole === Role.VILLAGER) {
+      return 'Manage and monitor villagers in the system';
+    }
+    return 'Manage and monitor all users in the system';
   }
 }

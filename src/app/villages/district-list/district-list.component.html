@@ -1,13 +1,13 @@
-<div class="village-list-container">
+<div class="list-container">
   
   <!-- Header -->
   <div class="page-header">
     <div class="header-content">
       <h1 class="page-title">
-        <span class="title-icon">🏘️</span>
-        Village Management
+        <span class="title-icon">📍</span>
+        District Management
       </h1>
-      <p class="page-subtitle">Manage and monitor all villages in the system</p>
+      <p class="page-subtitle">Manage and monitor all districts in the system</p>
     </div>
   </div>
 
@@ -17,12 +17,14 @@
       <div class="stat-icon-wrapper">
         <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
         </svg>
       </div>
       <div class="stat-content">
-        <h3 class="stat-value">{{totalVillages}}</h3>
-        <p class="stat-label">Total Villages</p>
+        <h3 class="stat-value">{{totalDistricts}}</h3>
+        <p class="stat-label">Total Districts</p>
       </div>
     </div>
 
@@ -34,8 +36,8 @@
         </svg>
       </div>
       <div class="stat-content">
-        <h3 class="stat-value">{{activeVillages}}</h3>
-        <p class="stat-label">Active Villages</p>
+        <h3 class="stat-value">{{activeDistricts}}</h3>
+        <p class="stat-label">Active Districts</p>
       </div>
     </div>
 
@@ -47,8 +49,8 @@
         </svg>
       </div>
       <div class="stat-content">
-        <h3 class="stat-value">{{inactiveVillages}}</h3>
-        <p class="stat-label">Inactive Villages</p>
+        <h3 class="stat-value">{{inactiveDistricts}}</h3>
+        <p class="stat-label">Inactive Districts</p>
       </div>
     </div>
   </div>
@@ -59,14 +61,14 @@
     <!-- Table Header with Controls -->
     <div class="table-header">
       <div class="table-title-section">
-        <h2 class="table-title">All Villages</h2>
-        <span class="table-count">{{filteredVillages.length}} villages</span>
+        <h2 class="table-title">All Districts</h2>
+        <span class="table-count">{{filteredDistricts.length}} districts</span>
       </div>
       <button class="create-btn" (click)="openCreateModal()">
         <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
-        Create Village
+        Create District
       </button>
     </div>
 
@@ -80,7 +82,7 @@
         <input 
           type="text" 
           class="search-input" 
-          placeholder="Search by village name, mandal, or district..."
+          placeholder="Search by district name..."
           [(ngModel)]="searchTerm"
           (input)="onSearch()">
         <button class="clear-search" *ngIf="searchTerm" (click)="clearSearch()">
@@ -89,57 +91,44 @@
           </svg>
         </button>
       </div>
-
-      <div class="filter-group">
-        <select class="filter-select" [(ngModel)]="stateFilter" (change)="onFilterChange()">
-          <option value="all">All States</option>
-          <option *ngFor="let state of states" [value]="state">{{state}}</option>
-        </select>
-
-        <select class="filter-select" [(ngModel)]="districtFilter" (change)="onFilterChange()">
-          <option value="all">All Districts</option>
-          <option *ngFor="let district of districts" [value]="district">{{district}}</option>
-        </select>
-      </div>
     </div>
 
     <!-- Table -->
     <div class="table-wrapper">
-      <table class="villages-table">
+      <table class="data-table">
         <thead>
           <tr>
-            <th>Village Name</th>
-            <th>Mandal</th>
+            <th>District Name</th>
+            <th>State</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <ng-container *ngFor="let village of filteredVillages; let i = index">
-            <!-- Main Row -->
-            <tr class="village-row">
+          <ng-container *ngFor="let district of filteredDistricts">
+            <tr class="data-row">
               <td>
-                <div class="village-info">
-                  <div class="village-avatar">{{village.name.charAt(0).toUpperCase()}}</div>
-                  <span class="village-name">{{village.name}}</span>
+                <div class="item-info">
+                  <div class="item-avatar">{{district.name.charAt(0).toUpperCase()}}</div>
+                  <span class="item-name">{{district.name}}</span>
                 </div>
               </td>
-              <td>{{getMandalName(village)}}</td>
+              <td>{{district.state.name}}</td>
               <td>
-                <span class="status-badge" [class.active]="village.isActive" [class.inactive]="!village.isActive">
+                <span class="status-badge active">
                   <span class="status-dot"></span>
-                  {{village.isActive ? 'Active' : 'Inactive'}}
+                  Active
                 </span>
               </td>
               <td>
                 <div class="action-buttons">
-                  <button class="action-btn edit-btn" (click)="editVillage(village)" title="Edit">
+                  <button class="action-btn edit-btn" (click)="openEditModal(district)" title="Edit">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>
                   </button>
-                  <button class="action-btn delete-btn" (click)="deleteVillage(village.id!)" title="Delete">
+                  <button class="action-btn delete-btn" (click)="deleteDistrict(district.id!)" title="Delete">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -151,15 +140,15 @@
           </ng-container>
 
           <!-- Empty State -->
-          <tr *ngIf="filteredVillages.length === 0" class="empty-row">
+          <tr *ngIf="filteredDistricts.length === 0" class="empty-row">
             <td colspan="4">
               <div class="empty-state">
                 <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                         d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
                 </svg>
-                <p class="empty-text">No villages found</p>
-                <p class="empty-subtext">Try adjusting your search or filters</p>
+                <p class="empty-text">No districts found</p>
+                <p class="empty-subtext">Try adjusting your search</p>
               </div>
             </td>
           </tr>
@@ -167,41 +156,15 @@
       </table>
     </div>
 
-    <!-- Pagination Placeholder -->
-    <div class="pagination-section">
-      <div class="pagination-info">
-        Showing {{filteredVillages.length}} of {{totalVillages}} villages
-      </div>
-      <div class="pagination-controls">
-        <button class="pagination-btn" disabled>
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-          </svg>
-          Previous
-        </button>
-        <div class="page-numbers">
-          <button class="page-number active">1</button>
-          <button class="page-number">2</button>
-          <button class="page-number">3</button>
-        </div>
-        <button class="pagination-btn">
-          Next
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
-
   </div>
 
 </div>
 
-<!-- Create/Edit Village Modal -->
+<!-- Create/Edit Modal -->
 <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h2 class="modal-title">{{isEditMode ? 'Edit Village' : 'Create New Village'}}</h2>
+      <h2 class="modal-title">{{isEditMode ? 'Edit District' : 'Create New District'}}</h2>
       <button class="modal-close" (click)="closeModal()">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -209,31 +172,24 @@
       </button>
     </div>
     
-    <form class="modal-form" (ngSubmit)="saveVillage()">
+    <form class="modal-form" (ngSubmit)="saveDistrict()">
       <div class="form-group">
-        <label class="form-label">Village Name *</label>
+        <label class="form-label">District Name *</label>
         <input 
           type="text" 
           class="form-input" 
           [(ngModel)]="formData.name" 
           name="name"
-          placeholder="Enter village name"
+          placeholder="Enter district name"
           required>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Mandal *</label>
-        <select class="form-input" [(ngModel)]="formData.mandalId" name="mandalId" required>
-          <option value="">Select Mandal</option>
-          <option *ngFor="let mandal of mandals" [value]="mandal.id">{{mandal.name}}</option>
+        <label class="form-label">State *</label>
+        <select class="form-input" [(ngModel)]="formData.state.id" name="stateId" required>
+          <option value="">Select State</option>
+          <option *ngFor="let state of states" [value]="state.id">{{state.name}}</option>
         </select>
-      </div>
-
-      <div class="form-group">
-        <label class="checkbox-label">
-          <input type="checkbox" [(ngModel)]="formData.isActive" name="isActive">
-          <span>Active</span>
-        </label>
       </div>
 
       <div class="modal-actions">

@@ -5,9 +5,9 @@
     <div class="header-content">
       <h1 class="page-title">
         <span class="title-icon">👥</span>
-        User Management
+        {{getPageTitle()}}
       </h1>
-      <p class="page-subtitle">Manage and monitor all villagers in the system</p>
+      <p class="page-subtitle">{{getSubtitle()}}</p>
     </div>
   </div>
 
@@ -21,8 +21,8 @@
         </svg>
       </div>
       <div class="stat-content">
-        <h3 class="stat-value">{{totalVillagers}}</h3>
-        <p class="stat-label">Total Villagers</p>
+        <h3 class="stat-value">{{totalUsers}}</h3>
+        <p class="stat-label">Total {{getStatsLabel()}}</p>
       </div>
     </div>
 
@@ -34,8 +34,8 @@
         </svg>
       </div>
       <div class="stat-content">
-        <h3 class="stat-value">{{activeVillagers}}</h3>
-        <p class="stat-label">Active Villagers</p>
+        <h3 class="stat-value">{{activeUsers}}</h3>
+        <p class="stat-label">Active {{getStatsLabel()}}</p>
       </div>
     </div>
 
@@ -47,8 +47,8 @@
         </svg>
       </div>
       <div class="stat-content">
-        <h3 class="stat-value">{{inactiveVillagers}}</h3>
-        <p class="stat-label">Inactive Villagers</p>
+        <h3 class="stat-value">{{inactiveUsers}}</h3>
+        <p class="stat-label">Inactive {{getStatsLabel()}}</p>
       </div>
     </div>
   </div>
@@ -59,14 +59,14 @@
     <!-- Table Header with Controls -->
     <div class="table-header">
       <div class="table-title-section">
-        <h2 class="table-title">All Users</h2>
-        <span class="table-count">{{filteredUsers.length}} users</span>
+        <h2 class="table-title">{{getPageTitle()}}</h2>
+        <span class="table-count">{{filteredUsers.length}} {{getStatsLabel().toLowerCase()}}</span>
       </div>
       <button class="create-btn" (click)="navigateToCreate()">
         <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
-        Create User
+        {{getCreateButtonText()}}
       </button>
     </div>
 
@@ -122,7 +122,7 @@
         <tbody>
           <ng-container *ngFor="let user of filteredUsers; let i = index">
             <!-- Main Row -->
-            <tr class="user-row" [class.expanded]="expandedUserId === user.id" (click)="toggleUserDetails(user.id)">
+            <tr class="user-row" [class.expanded]="expandedUserId === user.id" (click)="user.id && toggleUserDetails(user.id)">
               <td>
                 <div class="user-info">
                   <div class="user-avatar">{{user.name.charAt(0).toUpperCase()}}</div>
@@ -135,21 +135,21 @@
                 <span class="role-badge" [class]="'role-' + user.role">{{user.role | titlecase}}</span>
               </td>
               <td>
-                <span class="status-badge" [class.active]="user.status === 'active'" [class.inactive]="user.status === 'inactive'">
+                <span class="status-badge" [class.active]="user.isActive" [class.inactive]="!user.isActive">
                   <span class="status-dot"></span>
-                  {{user.status | titlecase}}
+                  {{user.isActive ? 'Active' : 'Inactive'}}
                 </span>
               </td>
-              <td>{{user.joinedDate | date:'MMM dd, yyyy'}}</td>
+              <td>{{user.createdDate | date:'MMM dd, yyyy'}}</td>
               <td>
                 <div class="action-buttons" (click)="$event.stopPropagation()">
-                  <button class="action-btn edit-btn" (click)="editUser(user.id)" title="Edit">
+                  <button class="action-btn edit-btn" (click)="user.id && editUser(user.id)" title="Edit">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                             d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>
                   </button>
-                  <button class="action-btn delete-btn" (click)="deleteUser(user.id)" title="Delete">
+                  <button class="action-btn delete-btn" (click)="user.id && deleteUser(user.id)" title="Delete">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -181,16 +181,8 @@
                       <span class="detail-value">{{user.role | titlecase}}</span>
                     </div>
                     <div class="detail-item">
-                      <span class="detail-label">Village</span>
-                      <span class="detail-value">{{user.village}}</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">Address</span>
-                      <span class="detail-value">{{user.address}}</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">Joined Date</span>
-                      <span class="detail-value">{{user.joinedDate | date:'MMMM dd, yyyy'}}</span>
+                      <span class="detail-label">Created Date</span>
+                      <span class="detail-value">{{user.createdDate | date:'MMMM dd, yyyy'}}</span>
                     </div>
                     <div class="detail-item">
                       <span class="detail-label">Last Login</span>
@@ -199,9 +191,9 @@
                     <div class="detail-item">
                       <span class="detail-label">Account Status</span>
                       <span class="detail-value">
-                        <span class="status-badge" [class.active]="user.status === 'active'" [class.inactive]="user.status === 'inactive'">
+                        <span class="status-badge" [class.active]="user.isActive" [class.inactive]="!user.isActive">
                           <span class="status-dot"></span>
-                          {{user.status | titlecase}}
+                          {{user.isActive ? 'Active' : 'Inactive'}}
                         </span>
                       </span>
                     </div>
@@ -235,7 +227,7 @@
     <!-- Pagination Placeholder -->
     <div class="pagination-section">
       <div class="pagination-info">
-        Showing {{filteredUsers.length}} of {{totalVillagers}} users
+        Showing {{filteredUsers.length}} of {{totalUsers}} {{getStatsLabel().toLowerCase()}}
       </div>
       <div class="pagination-controls">
         <button class="pagination-btn" disabled>

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
 import { UsersService } from 'src/app/users/users.service';
 import { VillagerService } from '../villager/villager.service';
+import { VillagesService } from 'src/app/villages/services/villages.service';
 
 Chart.register(...registerables);
 
@@ -19,9 +20,6 @@ export class SuperAdminComponent implements OnInit, AfterViewInit {
 
   // Counts with detailed breakdown
   counts = {
-    totalUsers: 1295,
-    activeUsers: 1180,
-    inactiveUsers: 115,
     villagers: 1250,
     activeVillagers: 1150,
     inactiveVillagers: 100,
@@ -58,32 +56,38 @@ export class SuperAdminComponent implements OnInit, AfterViewInit {
     private tokenService: TokenService,
     private router: Router,
     private userService: UsersService,
-    private villagerService: VillagerService
+    private villagerService: VillagerService,
+    private villageService: VillagesService
   ) {}
 
   ngOnInit() {
     this.userService.getUsersCount().subscribe({
       next: (res) => {
-        this.counts.totalUsers=res.userCount;
-        this.counts.activeUsers=res.userActiveCount;
-        this.counts.inactiveUsers=res.userInactiveCount;
+        this.counts.villagers=res.totalVillagers;
+        this.counts.activeVillagers=res.activeVillagers;
+        this.counts.inactiveVillagers=res.inactiveVillagers;
+
+        this.counts.villageAdmins=res.totalVillageAdmins;
+        this.counts.activeVillageAdmins=res.activeVillageAdmins;
+        this.counts.inactiveVillageAdmins=res.inactiveVillageAdmins;
       },
       error: (err) => {
         console.error('Error:', err);
         alert('Error: ' + JSON.stringify(err));
       }
     });
-   
- 
-    // this.villagerService.getVillagers().subscribe((res: any) => {
-    //   console.log(res);
-    // });
-    // this.villagerService.getActiveVillagers().subscribe((res: any) => {
-    //   console.log(res);
-    // });
-    // this.villagerService.getInActiveVillagers().subscribe((res: any) => {
-    //   console.log(res);
-    // });
+  
+    this.villageService.getVillagesCount().subscribe({
+      next: (res) => {
+        this.counts.villages=res.totalVillages;
+        this.counts.activeVillages=res.activeVillages;
+        this.counts.inactiveVillages=res.inactiveVillages;
+      },
+      error: (err) => {
+        console.error('Error:', err);
+        alert('Error: ' + JSON.stringify(err));
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -129,12 +133,49 @@ export class SuperAdminComponent implements OnInit, AfterViewInit {
 
   // Navigation Methods
   navigateToUserCreate() {
-    
     this.router.navigate(['/users/']);
+  }
+
+  navigateToVillageAdmins() {
+    console.log('navigateToVillageAdmins called');
+    console.log('Navigating to Village Admins with role: VILLAGE_ADMIN');
+    this.router.navigate(['/users'], { queryParams: { role: 'VILLAGE_ADMIN' } }).then((result) => {
+      console.log('Navigation result:', result);
+      console.log('Current URL after navigation:', this.router.url);
+    }).catch(error => {
+      console.error('Navigation error:', error);
+    });
+  }
+
+  navigateToVillagers() {
+    console.log('navigateToVillagers called');
+    console.log('Navigating to Villagers with role: VILLAGER');
+    this.router.navigate(['/users'], { queryParams: { role: 'VILLAGER' } }).then((result) => {
+      console.log('Navigation result:', result);
+      console.log('Current URL after navigation:', this.router.url);
+    }).catch(error => {
+      console.error('Navigation error:', error);
+    });
   }
 
   navigateToVillagesTree() {
     this.router.navigate(['/villages/']);
+  }
+
+  navigateToCountries() {
+    this.router.navigate(['/villages/countries']);
+  }
+
+  navigateToStates() {
+    this.router.navigate(['/villages/states']);
+  }
+
+  navigateToDistricts() {
+    this.router.navigate(['/villages/districts']);
+  }
+
+  navigateToMandals() {
+    this.router.navigate(['/villages/mandals']);
   }
 
   // Chat Methods

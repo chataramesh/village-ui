@@ -6,12 +6,20 @@ import { HttpClientModule } from '@angular/common/http';
 import { VillagesRoutingModule } from './villages-routing.module';
 import { VillageTreeComponent } from './village-tree/village-tree.component';
 import { VillageCreateComponent } from './village-create/village-create.component';
+import { CountryListComponent } from './country-list/country-list.component';
+import { StateListComponent } from './state-list/state-list.component';
+import { DistrictListComponent } from './district-list/district-list.component';
+import { MandalListComponent } from './mandal-list/mandal-list.component';
 
 
 @NgModule({
   declarations: [
     VillageTreeComponent,
-    VillageCreateComponent
+    VillageCreateComponent,
+    CountryListComponent,
+    StateListComponent,
+    DistrictListComponent,
+    MandalListComponent
   ],
   imports: [
     CommonModule,
