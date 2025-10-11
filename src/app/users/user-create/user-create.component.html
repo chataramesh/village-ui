@@ -148,7 +148,7 @@
         </div>
       </div>
 
-      <!--   Role & Access -->
+      <!-- Role & Access -->
       <div class="form-group-section">
         <h2 class="section-title">
           <span class="section-icon">🔐</span>
@@ -185,325 +185,153 @@
               Role is required
             </span>
           </div>
+        </div>
 
-          <div class="form-group" *ngIf="showVillageDropdown">
-            <label for="country" class="form-label">
-              Country <span class="required">*</span>
-            </label>
-            <div class="select-wrapper">
-              <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <select
-                id="country"
-                name="country"
-                class="form-select"
-                [(ngModel)]="selectedCountryId"
-                (change)="loadStates(selectedCountryId)"
-                required>
-                <option value="" disabled>Select a country</option>
-                <option *ngFor="let country of countries" [value]="country.id">
-                  {{country.name}}
-                </option>
-              </select>
+        <!-- Location Selection Section -->
+        <div class="form-group">
+          <label class="form-label">
+            Location Selection <span class="required" *ngIf="showVillageDropdown">*</span>
+          </label>
+
+          <!-- Country Selection -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="country" class="form-label">Country</label>
+              <div class="select-wrapper">
+                <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <select
+                  id="country"
+                  name="country"
+                  class="form-select"
+                  [(ngModel)]="selectedCountryId"
+                  (change)="onCountryChange()"
+                  #countryField="ngModel">
+                  <option value="" disabled>Select a country</option>
+                  <option *ngFor="let country of countries" [value]="country.id">
+                    {{country.name}}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- State Selection -->
+            <div class="form-group">
+              <label for="state" class="form-label">State</label>
+              <div class="select-wrapper">
+                <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                </svg>
+                <select
+                  id="state"
+                  name="state"
+                  class="form-select"
+                  [(ngModel)]="selectedStateId"
+                  (change)="onStateChange()"
+                  [disabled]="!selectedCountryId || states.length === 0"
+                  #stateField="ngModel">
+                  <option value="" disabled *ngIf="selectedCountryId && states.length === 0">Loading states...</option>
+                  <option value="" disabled *ngIf="!selectedCountryId">Select country first</option>
+                  <option *ngFor="let state of states" [value]="state.id">
+                    {{state.name}}
+                  </option>
+                </select>
+              </div>
             </div>
           </div>
 
-          <div class="form-group" *ngIf="showVillageDropdown && selectedCountryId">
-            <label for="state" class="form-label">
-              State <span class="required">*</span>
-            </label>
-            <div class="select-wrapper">
-              <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-              </svg>
-              <select
-                id="state"
-                name="state"
-                class="form-select"
-                [(ngModel)]="selectedStateId"
-                (change)="loadDistricts(selectedStateId)"
-                required>
-                <option value="" disabled>Select a state</option>
-                <option *ngFor="let state of states" [value]="state.id">
-                  {{state.name}}
-                </option>
-              </select>
+          <!-- District Selection -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="district" class="form-label">District</label>
+              <div class="select-wrapper">
+                <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <select
+                  id="district"
+                  name="district"
+                  class="form-select"
+                  [(ngModel)]="selectedDistrictId"
+                  (change)="onDistrictChange()"
+                  [disabled]="!selectedStateId || districts.length === 0"
+                  #districtField="ngModel">
+                  <option value="" disabled *ngIf="selectedStateId && districts.length === 0">Loading districts...</option>
+                  <option value="" disabled *ngIf="!selectedStateId">Select state first</option>
+                  <option *ngFor="let district of districts" [value]="district.id">
+                    {{district.name}}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Mandal Selection -->
+            <div class="form-group">
+              <label for="mandal" class="form-label">Mandal</label>
+              <div class="select-wrapper">
+                <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+                <select
+                  id="mandal"
+                  name="mandal"
+                  class="form-select"
+                  [(ngModel)]="selectedMandalId"
+                  (change)="onMandalChange()"
+                  [disabled]="!selectedDistrictId || mandals.length === 0"
+                  #mandalField="ngModel">
+                  <option value="" disabled *ngIf="selectedDistrictId && mandals.length === 0">Loading mandals...</option>
+                  <option value="" disabled *ngIf="!selectedDistrictId">Select district first</option>
+                  <option *ngFor="let mandal of mandals" [value]="mandal.id">
+                    {{mandal.name}}
+                  </option>
+                </select>
+              </div>
             </div>
           </div>
 
-          <div class="form-group" *ngIf="showVillageDropdown && selectedStateId">
-            <label for="district" class="form-label">
-              District <span class="required">*</span>
-            </label>
-            <div class="select-wrapper">
-              <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-              </svg>
-              <select
-                id="district"
-                name="district"
-                class="form-select"
-                [(ngModel)]="selectedDistrictId"
-                (change)="loadMandals(selectedDistrictId)"
-                required>
-                <option value="" disabled>Select a district</option>
-                <option *ngFor="let district of districts" [value]="district.id">
-                  {{district.name}}
-                </option>
-              </select>
+          <!-- Village Selection -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="village" class="form-label">Village</label>
+              <div class="select-wrapper">
+                <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <select
+                  id="village"
+                  name="village"
+                  class="form-select"
+                  [(ngModel)]="selectedVillageId"
+                  (change)="onVillageChange()"
+                  [disabled]="!selectedMandalId || villages.length === 0"
+                  #villageField="ngModel">
+                  <option value="" disabled *ngIf="selectedMandalId && villages.length === 0">Loading villages...</option>
+                  <option value="" disabled *ngIf="!selectedMandalId">Select mandal first</option>
+                  <option *ngFor="let village of villages" [value]="village.id">
+                    {{village.name}}
+                  </option>
+                </select>
+              </div>
             </div>
-          </div>
-
-          <div class="form-group" *ngIf="showVillageDropdown && selectedDistrictId">
-            <label for="mandal" class="form-label">
-              Mandal <span class="required">*</span>
-            </label>
-            <div class="select-wrapper">
-              <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-              </svg>
-              <select
-                id="mandal"
-                name="mandal"
-                class="form-select"
-                [(ngModel)]="selectedMandalId"
-                (change)="loadVillagesByMandal(selectedMandalId)"
-                required>
-                <option value="" disabled>Select a mandal</option>
-                <option *ngFor="let mandal of mandals" [value]="mandal.id">
-                  {{mandal.name}}
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group" *ngIf="showVillageDropdown && selectedMandalId">
-            <label for="village" class="form-label">
-              Village <span class="required">*</span>
-            </label>
-            <div class="select-wrapper">
-              <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-              </svg>
-              <select
-                id="village"
-                name="village"
-                class="form-select"
-                [(ngModel)]="user.village"
-                [required]="showVillageDropdown"
-                #villageField="ngModel"
-                [class.error]="villageField.invalid && villageField.touched">
-                <option value="" disabled>Select a village</option>
-                <option *ngFor="let village of availableVillages" [value]="village.name">
-                  {{village.name}}
-                </option>
-              </select>
-            </div>
-            <span class="error-message" *ngIf="villageField.invalid && villageField.touched">
-              Village is required for this role
-            </span>
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label class="checkbox-label">
-              <input 
-                type="checkbox" 
-                name="isActive"
-                class="form-checkbox"
-                [(ngModel)]="user.isActive">
-              <span class="checkbox-text">
-                <span class="checkbox-title">Active User</span>
-                <span class="checkbox-description">User can login and access the system</span>
-              </span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-       <!-- Location -->
-       <div class="form-group-section">
-        <h2 class="section-title">
-          <span class="section-icon">🔐</span>
-         Location
-        </h2>
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label for="role" class="form-label">
-              User Location <span class="required">*</span>
-            </label>
-            <div class="select-wrapper">
-              <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-              </svg>
-              <select 
-                id="role" 
-                name="role"
-                class="form-select"
-                [(ngModel)]="user.role"
-                (change)="onRoleChange()"
-                required
-                #roleField="ngModel"
-                [class.error]="roleField.invalid && roleField.touched"
-                [disabled]="contextRole !== null">
-                <option value="" disabled>Select a role</option>
-                <option *ngFor="let role of availableRoles" [value]="role">
-                  {{role === Role.VILLAGE_ADMIN ? 'Village Admin' : (role === Role.VILLAGER ? 'Villager' : 'Super Admin')}}
-                </option>
-              </select>
-            </div>
-            <span class="error-message" *ngIf="roleField.invalid && roleField.touched">
-              Role is required
-            </span>
-          </div>
-
-          <div class="form-group" *ngIf="showVillageDropdown">
-            <label for="country" class="form-label">
-              Country <span class="required">*</span>
-            </label>
-            <div class="select-wrapper">
-              <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <select
-                id="country"
-                name="country"
-                class="form-select"
-                [(ngModel)]="selectedCountryId"
-                (change)="loadStates(selectedCountryId)"
-                required>
-                <option value="" disabled>Select a country</option>
-                <option *ngFor="let country of countries" [value]="country.id">
-                  {{country.name}}
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group" *ngIf="showVillageDropdown && selectedCountryId">
-            <label for="state" class="form-label">
-              State <span class="required">*</span>
-            </label>
-            <div class="select-wrapper">
-              <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-              </svg>
-              <select
-                id="state"
-                name="state"
-                class="form-select"
-                [(ngModel)]="selectedStateId"
-                (change)="loadDistricts(selectedStateId)"
-                required>
-                <option value="" disabled>Select a state</option>
-                <option *ngFor="let state of states" [value]="state.id">
-                  {{state.name}}
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group" *ngIf="showVillageDropdown && selectedStateId">
-            <label for="district" class="form-label">
-              District <span class="required">*</span>
-            </label>
-            <div class="select-wrapper">
-              <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-              </svg>
-              <select
-                id="district"
-                name="district"
-                class="form-select"
-                [(ngModel)]="selectedDistrictId"
-                (change)="loadMandals(selectedDistrictId)"
-                required>
-                <option value="" disabled>Select a district</option>
-                <option *ngFor="let district of districts" [value]="district.id">
-                  {{district.name}}
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group" *ngIf="showVillageDropdown && selectedDistrictId">
-            <label for="mandal" class="form-label">
-              Mandal <span class="required">*</span>
-            </label>
-            <div class="select-wrapper">
-              <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-              </svg>
-              <select
-                id="mandal"
-                name="mandal"
-                class="form-select"
-                [(ngModel)]="selectedMandalId"
-                (change)="loadVillagesByMandal(selectedMandalId)"
-                required>
-                <option value="" disabled>Select a mandal</option>
-                <option *ngFor="let mandal of mandals" [value]="mandal.id">
-                  {{mandal.name}}
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group" *ngIf="showVillageDropdown && selectedMandalId">
-            <label for="village" class="form-label">
-              Village <span class="required">*</span>
-            </label>
-            <div class="select-wrapper">
-              <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-              </svg>
-              <select
-                id="village"
-                name="village"
-                class="form-select"
-                [(ngModel)]="user.village"
-                [required]="showVillageDropdown"
-                #villageField="ngModel"
-                [class.error]="villageField.invalid && villageField.touched">
-                <option value="" disabled>Select a village</option>
-                <option *ngFor="let village of availableVillages" [value]="village.name">
-                  {{village.name}}
-                </option>
-              </select>
-            </div>
-            <span class="error-message" *ngIf="villageField.invalid && villageField.touched">
-              Village is required for this role
-            </span>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 name="isActive"
                 class="form-checkbox"
                 [(ngModel)]="user.isActive">
@@ -520,14 +348,14 @@
       <div class="form-actions">
         <button type="button" class="btn btn-secondary" (click)="onReset()">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
           </svg>
           Reset
         </button>
         <button type="submit" class="btn btn-primary" [disabled]="userForm.invalid || isSubmitting">
           <svg *ngIf="!isSubmitting" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M5 13l4 4L19 7"></path>
           </svg>
           <svg *ngIf="isSubmitting" class="spinner" fill="none" viewBox="0 0 24 24">

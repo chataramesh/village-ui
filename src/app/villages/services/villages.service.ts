@@ -68,4 +68,9 @@ export class VillagesService {
   getMandalsByDistrict(districtid: string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/mandals-by-district/${districtid}`);
   }
+
+  // Get villages by mandal
+  getVillagesByMandal(mandalid: string): Observable<Village[]> {
+    return this.http.get<Village[]>(`${this.apiUrl}/villages-by-mandal/${mandalid}`);
+  }
 }

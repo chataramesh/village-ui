@@ -1,0 +1,125 @@
+<div class="village-create-container">
+  <div class="page-header">
+    <button class="back-btn" (click)="goBack()">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      Back
+    </button>
+    <div class="header-content">
+      <h1 class="page-title">
+        <span class="title-icon">{{ isEditMode ? '✏️' : '➕' }}</span>
+        {{ isEditMode ? 'Edit Village' : 'Create New Village' }}
+      </h1>
+      <p class="page-subtitle">{{ isEditMode ? 'Update village information' : 'Add a new village to the system' }}</p>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <form #villageForm="ngForm" (ngSubmit)="onSubmit()">
+
+      <!-- Basic Information -->
+      <div class="form-group-section">
+        <h2 class="section-title">
+          <span class="section-icon">🏘️</span>
+          Village Information
+        </h2>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="villageName" class="form-label">
+              Village Name <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+              </svg>
+              <input
+                id="villageName"
+                name="villageName"
+                type="text"
+                class="form-input"
+                placeholder="Enter village name"
+                [(ngModel)]="village.name"
+                required
+                minlength="2"
+                #villageNameField="ngModel"
+                [class.error]="villageNameField.invalid && villageNameField.touched">
+            </div>
+            <span class="error-message" *ngIf="villageNameField.invalid && villageNameField.touched">
+              Village name is required and must be at least 2 characters
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="mandal" class="form-label">
+              Mandal <span class="required">*</span>
+            </label>
+            <div class="select-wrapper">
+              <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <select
+                id="mandal"
+                name="mandal"
+                class="form-select"
+                [(ngModel)]="village.mandal.id"
+                required
+                #mandalField="ngModel"
+                [class.error]="mandalField.invalid && mandalField.touched">
+                <option value="" disabled>Select a mandal</option>
+                <option *ngFor="let mandal of mandals" [value]="mandal.id">
+                  {{mandal.name}}
+                </option>
+              </select>
+            </div>
+            <span class="error-message" *ngIf="mandalField.invalid && mandalField.touched">
+              Mandal selection is required
+            </span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                name="isActive"
+                class="form-checkbox"
+                [(ngModel)]="village.isActive">
+              <span class="checkbox-text">
+                <span class="checkbox-title">Active Village</span>
+                <span class="checkbox-description">Village is active and operational</span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="goBack()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="villageForm.invalid || isSubmitting">
+          <svg *ngIf="!isSubmitting" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <svg *ngIf="isSubmitting" class="spinner" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update Village' : 'Create Village') }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

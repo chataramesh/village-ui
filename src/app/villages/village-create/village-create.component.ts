@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { VillagesService } from '../services/villages.service';
+import { MandalService, Mandal } from '../services/mandal.service';
 
 export interface Village {
   id?: string;
@@ -10,47 +11,8 @@ export interface Village {
   mandal: {
     id: string;
     name: string;
-    district?: {
-      id: string;
-      name: string;
-      state?: {
-        id: string;
-        name: string;
-        country?: {
-          id: string;
-          name: string;
-        };
-      };
-    };
   };
-  isActive: boolean;  // Changed back to match backend
-}
-
-// For form submission
-export interface VillageCreateRequest {
-  name: string;
-  mandalId: string;
-  isActive: boolean;  // Changed back to match backend
-}
-
-export  interface Mandal {
-  id: string;
-  name: string;
-}
-
-export interface District {
-  id: string;
-  name: string;
-}
-
-export interface State {
-  id: string;
-  name: string;
-}
-
-export interface Country {
-  id: string;
-  name: string;
+  isActive: boolean;
 }
 
 @Component({
@@ -59,14 +21,17 @@ export interface Country {
   styleUrls: ['./village-create.component.scss']
 })
 export class VillageCreateComponent implements OnInit {
-  
-  
-  // Dropdown options
-  countries: Country[] = [];
-  states: State[] = [];
-  districts: District[] = [];
-  mandals: Mandal[] = [];
 
+  village: Village = {
+    name: '',
+    mandal: {
+      id: '',
+      name: ''
+    },
+    isActive: true
+  };
+
+  mandals: Mandal[] = [];
   isEditMode: boolean = false;
   isSubmitting: boolean = false;
   villageId: string | null = null;
@@ -77,7 +42,8 @@ export class VillageCreateComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private http: HttpClient,
-    private villageService: VillagesService
+    private villageService: VillagesService,
+    private mandalService: MandalService
   ) {}
 
   ngOnInit(): void {
@@ -85,53 +51,16 @@ export class VillageCreateComponent implements OnInit {
     this.villageId = this.route.snapshot.paramMap.get('id');
     this.isEditMode = !!this.villageId;
 
-    // Load countries on init
-    this.loadCountries();
+    // Load mandals for dropdown
+    this.loadMandals();
 
     if (this.isEditMode && this.villageId) {
       this.loadVillage(this.villageId);
     }
   }
 
-  loadCountries(): void {
-    this.villageService.getCoutries().subscribe({
-      next: (data) => {
-        this.countries = data;
-      },
-      error: (err) => {
-        console.error('Error loading countries:', err);
-      }
-    });
-  }
-
-  loadVillage(villageId: string): void {
-    
-  }
-
-  loadStates(countryId: string): void {
-    this.villageService.getStatesByCountry(countryId).subscribe({
-      next: (data) => {
-        this.states = data;
-      },
-      error: (err) => {
-        console.error('Error loading states:', err);
-      }
-    });
-  }
-
-  loadDistricts(stateId: string): void {
-    this.villageService.getDistrictsByState(stateId).subscribe({
-      next: (data) => {
-        this.districts = data;
-      },
-      error: (err) => {
-        console.error('Error loading districts:', err);
-      }
-    });
-  }
-
-  loadMandals(districtId: string): void {
-    this.villageService.getMandalsByDistrict(districtId).subscribe({
+  loadMandals(): void {
+    this.mandalService.getAllMandals().subscribe({
       next: (data) => {
         this.mandals = data;
       },
@@ -141,22 +70,57 @@ export class VillageCreateComponent implements OnInit {
     });
   }
 
-  onCountryChange(): void {
-    // Reset dependent fields
-   
-   
-  }
-
-  onStateChange(): void {
-    // Reset dependent fields
-   
-  }
-
-  onDistrictChange(): void {
-    // Reset dependent fields
-   
+  loadVillage(villageId: string): void {
+    this.http.get<Village>(`${this.apiUrl}/village/${villageId}`).subscribe({
+      next: (data) => {
+        this.village = data;
+      },
+      error: (err) => {
+        console.error('Error loading village:', err);
+        alert('Failed to load village data');
+      }
+    });
   }
 
   onSubmit(): void {
+    if (this.isSubmitting) return;
+
+    this.isSubmitting = true;
+
+    if (this.isEditMode && this.villageId) {
+      // Update existing village
+      this.villageService.updateVillage(this.villageId, this.village).subscribe({
+        next: (response) => {
+          console.log('Village updated successfully:', response);
+          alert('Village updated successfully!');
+          this.isSubmitting = false;
+          this.router.navigate(['/villages']);
+        },
+        error: (error) => {
+          console.error('Error updating village:', error);
+          alert('Failed to update village');
+          this.isSubmitting = false;
+        }
+      });
+    } else {
+      // Create new village
+      this.villageService.createVillage(this.village).subscribe({
+        next: (response) => {
+          console.log('Village created successfully:', response);
+          alert('Village created successfully!');
+          this.isSubmitting = false;
+          this.router.navigate(['/villages']);
+        },
+        error: (error) => {
+          console.error('Error creating village:', error);
+          alert('Failed to create village. Please try again.');
+          this.isSubmitting = false;
+        }
+      });
+    }
+  }
+
+  goBack(): void {
+    this.router.navigate(['/villages']);
   }
 }

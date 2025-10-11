@@ -11,7 +11,6 @@ import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   declarations: [CardsComponent,NavbarComponent,
-      NavbarComponent,
       SidebarComponent,
       FooterComponent,],
   imports: [

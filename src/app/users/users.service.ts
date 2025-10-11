@@ -16,26 +16,6 @@ export interface User {
   phone: string;
   passwordHash?: string;
   role: Role;
-  village?: {
-    id: string;
-    name: string;
-    mandal?: {
-      id: string;
-      name: string;
-      district?: {
-        id: string;
-        name: string;
-        state?: {
-          id: string;
-          name: string;
-          country?: {
-            id: string;
-            name: string;
-          };
-        };
-      };
-    };
-  };
   isActive: boolean;
   createdDate?: Date;
   lastLogin?: Date;

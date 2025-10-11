@@ -4,10 +4,6 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { UsersService, Role, User } from '../users.service';
 import { VillagesService } from 'src/app/villages/services/villages.service';
-import { CountryService, Country } from 'src/app/villages/services/country.service';
-import { StateService, State } from 'src/app/villages/services/state.service';
-import { DistrictService, District } from 'src/app/villages/services/district.service';
-import { MandalService, Mandal } from 'src/app/villages/services/mandal.service';
 
 interface Village {
   id?: string;
@@ -27,26 +23,11 @@ export class UserCreateComponent implements OnInit {
     phone: '',
     passwordHash: '',
     role: '',
-    village: '',
+    village: { id: '', name: '' },
     isActive: true
   };
 
-  // Dropdown options for cascading selection
-  countries: Country[] = [];
-  states: State[] = [];
-  districts: District[] = [];
-  mandals: Mandal[] = [];
-
-  // Selected values for cascading dropdowns
-  selectedCountryId: string = '';
-  selectedStateId: string = '';
-  selectedDistrictId: string = '';
-  selectedMandalId: string = '';
-  selectedVillageId: string = '';
-
-  // Villages for the final dropdown
-  availableVillages: any[] = [];
-
+  villages: Village[] = [];
   availableRoles: Role[] = [];
   contextRole: Role | null = null;
   showVillageDropdown: boolean = false;
@@ -54,6 +35,19 @@ export class UserCreateComponent implements OnInit {
   isEditMode: boolean = false;
   isSubmitting: boolean = false;
   userId: string | null = null;
+
+  // Hierarchical location data
+  countries: any[] = [];
+  states: any[] = [];
+  districts: any[] = [];
+  mandals: any[] = [];
+
+  // Selected location IDs
+  selectedCountryId: string = '';
+  selectedStateId: string = '';
+  selectedDistrictId: string = '';
+  selectedMandalId: string = '';
+  selectedVillageId: string = '';
 
   // Expose Role enum to template
   Role = Role;
@@ -65,11 +59,7 @@ export class UserCreateComponent implements OnInit {
     private route: ActivatedRoute,
     private http: HttpClient,
     private usersService: UsersService,
-    private villagesService: VillagesService,
-    private countryService: CountryService,
-    private stateService: StateService,
-    private districtService: DistrictService,
-    private mandalService: MandalService
+    private villagesService: VillagesService
   ) {}
 
   ngOnInit(): void {
@@ -90,11 +80,6 @@ export class UserCreateComponent implements OnInit {
     if (this.isEditMode && this.userId) {
       this.loadUser(this.userId);
     }
-
-    // Load villages for dropdown (fallback when no mandal is selected)
-    this.loadAllVillages();
-
-    // Load countries for cascading dropdown
     this.loadCountries();
   }
 
@@ -109,6 +94,15 @@ export class UserCreateComponent implements OnInit {
     }
   }
 
+  getCreateButtonText(): string {
+    if (this.contextRole === Role.VILLAGE_ADMIN) {
+      return 'Create Village Admin';
+    } else if (this.contextRole === Role.VILLAGER) {
+      return 'Create Villager';
+    }
+    return 'Create User';
+  }
+
   getPageTitle(): string {
     if (this.isEditMode) {
       if (this.contextRole === Role.VILLAGE_ADMIN) {
@@ -119,123 +113,162 @@ export class UserCreateComponent implements OnInit {
       return 'Edit User';
     } else {
       if (this.contextRole === Role.VILLAGE_ADMIN) {
-        return 'Create New Village Admin';
+        return 'Create Village Admin';
       } else if (this.contextRole === Role.VILLAGER) {
-        return 'Create New Villager';
+        return 'Create Villager';
       }
-      return 'Create New User';
+      return 'Create User';
     }
-  }
-
-  getCreateButtonText(): string {
-    if (this.contextRole === Role.VILLAGE_ADMIN) {
-      return 'Create Admin';
-    } else if (this.contextRole === Role.VILLAGER) {
-      return 'Create Villager';
-    }
-    return 'Create User';
   }
 
   loadUser(userId: string): void {
     this.http.get<User>(`${this.apiUrl}/users/${userId}`).subscribe({
       next: (data) => {
         this.user = { ...data };
-        this.onRoleChange(); // Update village dropdown visibility
+        console.log("data==> "+JSON.stringify(data));
+        console.log('User loaded:', data);
+        console.log('User role:', this.user.role);
+
+        // Trigger role change logic after loading user
+        this.onRoleChange();
+
+        // If user has village data in edit mode, just load countries (don't auto-select)
+        if (this.isEditMode && this.user.village && this.user.village.id && this.showVillageDropdown) {
+          console.log('Edit mode: Loading countries only');
+          this.loadCountries();
+        }
+
+        console.log('showVillageDropdown after load:', this.showVillageDropdown);
       },
       error: (error) => {
         console.error('Error loading user:', error);
+        alert('Failed to load user data');
       }
     });
   }
 
   loadCountries(): void {
-    this.countryService.getAllCountries().subscribe({
+    this.villagesService.getCoutries().subscribe({
       next: (data) => {
         this.countries = data;
+        console.log('Countries loaded:', this.countries);
       },
       error: (error) => {
         console.error('Error loading countries:', error);
+        // Fallback to mock data for testing
+        console.log('Using fallback countries:', this.countries);
       }
     });
   }
 
+  // Helper method for edit mode state loading
+  loadStatesForEditMode(): void {
+    if (this.selectedCountryId) {
+      this.loadStates(this.selectedCountryId);
+    }
+  }
+
   loadStates(countryId: string): void {
-    this.stateService.getStatesByCountry(countryId).subscribe({
+    console.log('Loading states for country ID:', countryId);
+    this.villagesService.getStatesByCountry(countryId).subscribe({
       next: (data) => {
         this.states = data;
-        // Clear dependent fields
-        this.districts = [];
+        this.districts = []; // Reset dependent fields
         this.mandals = [];
-        this.availableVillages = [];
+        this.villages = [];
         this.selectedStateId = '';
         this.selectedDistrictId = '';
         this.selectedMandalId = '';
         this.selectedVillageId = '';
+
+        console.log('States loaded:', this.states);
       },
       error: (error) => {
         console.error('Error loading states:', error);
+        // Fallback to mock data
+        this.states = [
+          { id: '1', name: 'Telangana', country: { id: '1', name: 'India' } },
+          { id: '2', name: 'Andhra Pradesh', country: { id: '1', name: 'India' } }
+        ];
       }
     });
+  }
+
+  // Helper method for edit mode district loading
+  loadDistrictsForEditMode(): void {
+    if (this.selectedStateId) {
+      this.loadDistricts(this.selectedStateId);
+    }
   }
 
   loadDistricts(stateId: string): void {
-    this.districtService.getDistrictsByState(stateId).subscribe({
+    this.villagesService.getDistrictsByState(stateId).subscribe({
       next: (data) => {
         this.districts = data;
-        // Clear dependent fields
-        this.mandals = [];
-        this.availableVillages = [];
+        this.mandals = []; // Reset dependent fields
+        this.villages = [];
         this.selectedDistrictId = '';
         this.selectedMandalId = '';
         this.selectedVillageId = '';
+
+        console.log('Districts loaded:', this.districts);
       },
       error: (error) => {
         console.error('Error loading districts:', error);
+        // Fallback to mock data
+        this.districts = [
+          { id: '1', name: 'Hyderabad', state: { id: '1', name: 'Telangana' } },
+          { id: '2', name: 'Warangal', state: { id: '1', name: 'Telangana' } }
+        ];
       }
     });
+  }
+
+  // Helper method for edit mode mandal loading
+  loadMandalsForEditMode(): void {
+    if (this.selectedDistrictId) {
+      this.loadMandals(this.selectedDistrictId);
+    }
   }
 
   loadMandals(districtId: string): void {
-    this.mandalService.getMandalsByDistrict(districtId).subscribe({
+    this.villagesService.getMandalsByDistrict(districtId).subscribe({
       next: (data) => {
         this.mandals = data;
-        // Clear dependent fields
-        this.availableVillages = [];
+        this.villages = []; // Reset dependent fields
         this.selectedMandalId = '';
         this.selectedVillageId = '';
+
+        console.log('Mandals loaded:', this.mandals);
       },
       error: (error) => {
         console.error('Error loading mandals:', error);
+        // Fallback to mock data
+        this.mandals = [
+          { id: '1', name: 'Mandal 1', district: { id: '1', name: 'Hyderabad' } },
+          { id: '2', name: 'Mandal 2', district: { id: '1', name: 'Hyderabad' } }
+        ];
       }
     });
+  }
+
+  // Helper method for edit mode village loading
+  loadVillagesForEditMode(): void {
+    if (this.selectedMandalId) {
+      this.loadVillagesByMandal(this.selectedMandalId);
+    }
   }
 
   loadVillagesByMandal(mandalId: string): void {
-    // Filter villages by mandal - this would need a service method
-    // For now, we'll use a simple filter if we have all villages loaded
-    this.villagesService.getAllVillages().subscribe({
+    this.villagesService.getVillagesByMandal(mandalId).subscribe({
       next: (data) => {
-        this.availableVillages = data.filter((village: any) =>
-          village.mandal && village.mandal.id === mandalId
-        );
+        this.villages = data;
         this.selectedVillageId = '';
-      },
-      error: (error) => {
-        console.error('Error loading villages:', error);
-      }
-    });
-  }
-
-  loadAllVillages(): void {
-    // Replace with actual API call
-    this.villagesService.getAllVillages().subscribe({
-      next: (data) => {
-        this.availableVillages = data;
       },
       error: (error) => {
         console.error('Error loading villages:', error);
         // Fallback to mock data
-        this.availableVillages = [
+        this.villages = [
           { id: '1', name: 'Village 1' },
           { id: '2', name: 'Village 2' },
           { id: '3', name: 'Village 3' }
@@ -245,13 +278,92 @@ export class UserCreateComponent implements OnInit {
   }
 
   onRoleChange(): void {
-    // Show village dropdown only for VILLAGER and VILLAGE_ADMIN roles
+    console.log('Role changed to:', this.user.role);
     this.showVillageDropdown =
-      this.user.role === 'VILLAGER' || this.user.role === 'VILLAGE_ADMIN';
+      this.user.role === Role.VILLAGER || this.user.role === Role.VILLAGE_ADMIN;
 
-    // Clear village if not needed
+    console.log('showVillageDropdown:', this.showVillageDropdown);
+
     if (!this.showVillageDropdown) {
-      this.user.village = '';
+      this.user.village = { id: '', name: '' };
+      // Reset all location selections
+      this.selectedCountryId = '';
+      this.selectedStateId = '';
+      this.selectedDistrictId = '';
+      this.selectedMandalId = '';
+      this.selectedVillageId = '';
+      this.countries = [];
+      this.states = [];
+      this.districts = [];
+      this.mandals = [];
+      this.villages = [];
+    } else {
+      // Load countries when village dropdown should be shown
+      this.loadCountries();
+    }
+  }
+
+
+  // Hierarchical location change handlers
+  onCountryChange(): void {
+    console.log('Country changed - selectedCountryId:', this.selectedCountryId);
+    console.log('Available countries:', this.countries);
+    console.log('Selected country object:', this.countries.find(c => c.id === this.selectedCountryId));
+
+    if (this.selectedCountryId) {
+      this.loadStates(this.selectedCountryId);
+    } else {
+      this.states = [];
+      this.districts = [];
+      this.mandals = [];
+      this.selectedStateId = '';
+      this.selectedDistrictId = '';
+      this.selectedMandalId = '';
+    }
+  }
+
+  onStateChange(): void {
+    if (this.selectedStateId) {
+      this.loadDistricts(this.selectedStateId);
+    } else {
+      this.districts = [];
+      this.mandals = [];
+      this.selectedDistrictId = '';
+      this.selectedMandalId = '';
+    }
+  }
+
+  onDistrictChange(): void {
+    if (this.selectedDistrictId) {
+      this.loadMandals(this.selectedDistrictId);
+    } else {
+      this.mandals = [];
+      this.villages = [];
+      this.selectedMandalId = '';
+      this.selectedVillageId = '';
+    }
+  }
+
+  onMandalChange(): void {
+    if (this.selectedMandalId) {
+      this.loadVillagesByMandal(this.selectedMandalId);
+      // Note: Don't set user.village here - only set it when actual village is selected
+    } else {
+      this.villages = [];
+      this.selectedVillageId = '';
+      this.user.village = { id: '', name: '' };
+    }
+  }
+
+  onVillageChange(): void {
+    if (this.selectedVillageId) {
+      // Find the selected village to update the user.village object
+      const selectedVillage = this.villages.find(v => v.id === this.selectedVillageId);
+      if (selectedVillage) {
+        this.user.village = { id: selectedVillage.id, name: selectedVillage.name };
+      }
+    } else {
+      this.user.village = { id: '', name: '' };
     }
   }
 
@@ -308,13 +420,6 @@ export class UserCreateComponent implements OnInit {
         }
       });
     }
-
-    // Mock success for testing (remove when API is ready)
-    // setTimeout(() => {
-    //   console.log('User data:', this.user);
-    //   alert(this.isEditMode ? 'User updated successfully!' : 'User created successfully!');
-    //   this.router.navigate(['/users']);
-    // }, 1000);
   }
 
   onReset(): void {
@@ -328,23 +433,10 @@ export class UserCreateComponent implements OnInit {
           phone: '',
           passwordHash: '',
           role: '',
-          village: '',
+          village: { id: '', name: '' },
           isActive: true
         };
         this.showVillageDropdown = false;
-
-        // Reset cascading dropdown selections
-        this.selectedCountryId = '';
-        this.selectedStateId = '';
-        this.selectedDistrictId = '';
-        this.selectedMandalId = '';
-        this.selectedVillageId = '';
-
-        // Clear dropdown options
-        this.states = [];
-        this.districts = [];
-        this.mandals = [];
-        this.availableVillages = [];
       }
     }
   }

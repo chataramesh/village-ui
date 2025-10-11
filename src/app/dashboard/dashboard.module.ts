@@ -12,23 +12,24 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { MatCardModule } from '@angular/material/card';
-import { UsersModule } from '../users/users.module';
 import { FormsModule } from '@angular/forms';
-import { ProjectFilterPipe } from '../shared/pipes/project-filter.pipe';
-import { SearchPipe } from '../shared/pipes/search.pipe';
 
 @NgModule({
   declarations: [
     SuperAdminComponent,
     VillageAdminComponent,
     VillagerComponent,
-    DashboardLandingComponent,
-    ProjectFilterPipe,SearchPipe
+    DashboardLandingComponent
   ],
   imports: [
     CommonModule,
-    DashboardRoutingModule,SharedModule,UsersModule,MatTooltipModule,
-    MatProgressBarModule,NgApexchartsModule,MatCardModule,FormsModule
+    DashboardRoutingModule,
+    SharedModule,
+    MatTooltipModule,
+    MatProgressBarModule,
+    NgApexchartsModule,
+    MatCardModule,
+    FormsModule
   ]
 })
 export class DashboardModule { }
