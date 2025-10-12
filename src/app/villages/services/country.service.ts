@@ -18,7 +18,7 @@ export interface CountryStats {
   providedIn: 'root'
 })
 export class CountryService {
-  private apiUrl = `${environment.villageUrl}/country`;
+  private apiUrl = `${environment.apiUrl}/country`;
 
   constructor(private http: HttpClient) { }
 

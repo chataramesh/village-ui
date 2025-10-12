@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, HostListener }
 import { Router } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
 import { TokenService } from 'src/app/core/services/token.service';
+import { UsersService, User } from 'src/app/users/users.service';
 
 Chart.register(...registerables);
 
@@ -12,7 +13,7 @@ Chart.register(...registerables);
 })
 export class VillageAdminComponent implements OnInit, AfterViewInit {
   
-  villageName = 'Green Valley Village';
+  villageName :any= 'Green Valley Village';
   userImage = 'assets/people.png'; // Default user image
   
   // User Menu
@@ -55,11 +56,54 @@ export class VillageAdminComponent implements OnInit, AfterViewInit {
 
   private charts: Chart[] = [];
 
-  constructor(private router: Router,private tokenService: TokenService) {}
+  // Current user information
+  currentUser: User | null = null;
+  currentUserVillageId: string | null = null;
+  currentUserVillageName: string | null = null;
+
+  constructor(private router: Router, private tokenService: TokenService, private usersService: UsersService) {}
 
   ngOnInit(): void {
-    // Load village data
+    // Load current user details and village data
+    this.loadCurrentUser();
     this.startEventMessagesScroll();
+    this.usersService.getUserById(this.tokenService.getCurrentUser()!.userId!).subscribe({
+      next: (user) => {
+        this.villageName = user!.village!.name;
+        console.log('Current village-admin user loaded:', user);
+      },
+      error: (error) => {
+        console.error('Error loading current user details:', error);
+      }
+    });
+  }
+
+  // Load current user details from API using userId from token
+  loadCurrentUser(): void {
+    const tokenUser = this.tokenService.getCurrentUser();
+    if (tokenUser && tokenUser.userId) {
+      this.usersService.getUserById(tokenUser.userId).subscribe({
+        next: (user) => {
+          this.currentUser = user;
+          console.log('Current village-admin user loaded:', user);
+
+          // Extract village information
+          if (user.village && user.village.id) {
+            this.currentUserVillageId = user.village.id;
+            this.currentUserVillageName = user.village.name || null;
+            console.log('Village-admin village ID:', this.currentUserVillageId);
+            console.log('Village-admin village name:', this.currentUserVillageName);
+          } else {
+            console.warn('Village-admin user has no village information');
+          }
+        },
+        error: (error) => {
+          console.error('Error loading current user details:', error);
+        }
+      });
+    } else {
+      console.warn('No userId found in token');
+    }
   }
 
   ngAfterViewInit(): void {
@@ -111,13 +155,29 @@ export class VillageAdminComponent implements OnInit, AfterViewInit {
 
   navigateToVillagers() {
     console.log('navigateToVillagers called');
-    console.log('Navigating to Villagers with role: VILLAGER');
-    this.router.navigate(['/users'], { queryParams: { role: 'VILLAGER' } }).then((result) => {
-      console.log('Navigation result:', result);
-      console.log('Current URL after navigation:', this.router.url);
-    }).catch(error => {
-      console.error('Navigation error:', error);
-    });
+    console.log('Current village-admin village ID:', this.currentUserVillageId);
+    console.log('Current village-admin village name:', this.currentUserVillageName);
+
+    if (this.currentUserVillageId) {
+      // Navigate to villagers filtered by the village-admin's village
+      console.log('Navigating to Villagers filtered by village ID:', this.currentUserVillageId);
+      this.router.navigate(['/users'], {
+        queryParams: {
+          role: 'VILLAGER',
+          villageId: this.currentUserVillageId,
+          villageName: this.currentUserVillageName
+        }
+      }).then((result) => {
+        console.log('Navigation result:', result);
+        console.log('Current URL after navigation:', this.router.url);
+      }).catch(error => {
+        console.error('Navigation error:', error);
+      });
+    } else {
+      // Fallback to general villagers view if no village info
+      console.warn('No village information found for current user, using general villagers view');
+      this.router.navigate(['/users'], { queryParams: { role: 'VILLAGER' } });
+    }
   }
 
   navigateToEventCreate() {

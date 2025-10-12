@@ -132,10 +132,10 @@ export class UserCreateComponent implements OnInit {
         // Trigger role change logic after loading user
         this.onRoleChange();
 
-        // If user has village data in edit mode, just load countries (don't auto-select)
+        // If user has village data in edit mode, populate location hierarchy and set selections
         if (this.isEditMode && this.user.village && this.user.village.id && this.showVillageDropdown) {
-          console.log('Edit mode: Loading countries only');
-          this.loadCountries();
+          console.log('Edit mode: Loading location hierarchy and setting selections');
+          this.loadCountriesForEdit();
         }
 
         console.log('showVillageDropdown after load:', this.showVillageDropdown);
@@ -145,6 +145,180 @@ export class UserCreateComponent implements OnInit {
         alert('Failed to load user data');
       }
     });
+  }
+
+  // Enhanced method to load countries and set selections for edit mode
+  loadCountriesForEdit(): void {
+    this.villagesService.getCoutries().subscribe({
+      next: (data) => {
+        this.countries = data;
+        console.log('Countries loaded for edit:', this.countries);
+
+        // Set the user's country selection
+        if (this.user.village?.mandal?.district?.state?.country?.id) {
+          this.selectedCountryId = this.user.village.mandal.district.state.country.id;
+          console.log('Set country selection:', this.selectedCountryId);
+
+          // Load states for the selected country
+          setTimeout(() => {
+            this.loadStatesForEdit();
+          }, 100);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading countries:', error);
+        // Even with error, try to continue with mock data
+        this.countries = [
+          { id: '1', name: 'India' }
+        ];
+        console.log('Using fallback countries');
+
+        // Try to set country selection even with fallback data
+        if (this.user.village?.mandal?.district?.state?.country?.id) {
+          this.selectedCountryId = this.user.village.mandal.district.state.country.id;
+          setTimeout(() => {
+            this.loadStatesForEdit();
+          }, 100);
+        }
+      }
+    });
+  }
+
+  // Enhanced method to load states and set selections for edit mode
+  loadStatesForEdit(): void {
+    if (this.selectedCountryId) {
+      this.villagesService.getStatesByCountry(this.selectedCountryId).subscribe({
+        next: (data) => {
+          this.states = data;
+          console.log('States loaded for edit:', this.states);
+
+          // Set the user's state selection
+          if (this.user.village?.mandal?.district?.state?.id) {
+            this.selectedStateId = this.user.village.mandal.district.state.id;
+            console.log('Set state selection:', this.selectedStateId);
+
+            // Load districts for the selected state
+            setTimeout(() => {
+              this.loadDistrictsForEdit();
+            }, 100);
+          }
+        },
+        error: (error) => {
+          console.error('Error loading states:', error);
+          this.states = [
+            { id: '1', name: 'Telangana', country: { id: '1', name: 'India' } }
+          ];
+
+          if (this.user.village?.mandal?.district?.state?.id) {
+            this.selectedStateId = this.user.village.mandal.district.state.id;
+            setTimeout(() => {
+              this.loadDistrictsForEdit();
+            }, 100);
+          }
+        }
+      });
+    }
+  }
+
+  // Enhanced method to load districts and set selections for edit mode
+  loadDistrictsForEdit(): void {
+    if (this.selectedStateId) {
+      this.villagesService.getDistrictsByState(this.selectedStateId).subscribe({
+        next: (data) => {
+          this.districts = data;
+          console.log('Districts loaded for edit:', this.districts);
+
+          // Set the user's district selection
+          if (this.user.village?.mandal?.district?.id) {
+            this.selectedDistrictId = this.user.village.mandal.district.id;
+            console.log('Set district selection:', this.selectedDistrictId);
+
+            // Load mandals for the selected district
+            setTimeout(() => {
+              this.loadMandalsForEdit();
+            }, 100);
+          }
+        },
+        error: (error) => {
+          console.error('Error loading districts:', error);
+          this.districts = [
+            { id: '1', name: 'Hyderabad', state: { id: '1', name: 'Telangana' } }
+          ];
+
+          if (this.user.village?.mandal?.district?.id) {
+            this.selectedDistrictId = this.user.village.mandal.district.id;
+            setTimeout(() => {
+              this.loadMandalsForEdit();
+            }, 100);
+          }
+        }
+      });
+    }
+  }
+
+  // Enhanced method to load mandals and set selections for edit mode
+  loadMandalsForEdit(): void {
+    if (this.selectedDistrictId) {
+      this.villagesService.getMandalsByDistrict(this.selectedDistrictId).subscribe({
+        next: (data) => {
+          this.mandals = data;
+          console.log('Mandals loaded for edit:', this.mandals);
+
+          // Set the user's mandal selection
+          if (this.user.village?.mandal?.id) {
+            this.selectedMandalId = this.user.village.mandal.id;
+            console.log('Set mandal selection:', this.selectedMandalId);
+
+            // Load villages for the selected mandal
+            setTimeout(() => {
+              this.loadVillagesForEdit();
+            }, 100);
+          }
+        },
+        error: (error) => {
+          console.error('Error loading mandals:', error);
+          this.mandals = [
+            { id: '1', name: 'Mandal 1', district: { id: '1', name: 'Hyderabad' } }
+          ];
+
+          if (this.user.village?.mandal?.id) {
+            this.selectedMandalId = this.user.village.mandal.id;
+            setTimeout(() => {
+              this.loadVillagesForEdit();
+            }, 100);
+          }
+        }
+      });
+    }
+  }
+
+  // Enhanced method to load villages and set selections for edit mode
+  loadVillagesForEdit(): void {
+    if (this.selectedMandalId) {
+      this.villagesService.getVillagesByMandal(this.selectedMandalId).subscribe({
+        next: (data) => {
+          this.villages = data;
+          console.log('Villages loaded for edit:', this.villages);
+
+          // Set the user's village selection
+          if (this.user.village?.id) {
+            this.selectedVillageId = this.user.village.id;
+            console.log('Set village selection:', this.selectedVillageId);
+          }
+        },
+        error: (error) => {
+          console.error('Error loading villages:', error);
+          this.villages = [
+            { id: '1', name: 'Village 1' },
+            { id: '2', name: 'Village 2' }
+          ];
+
+          if (this.user.village?.id) {
+            this.selectedVillageId = this.user.village.id;
+          }
+        }
+      });
+    }
   }
 
   loadCountries(): void {
@@ -194,7 +368,7 @@ export class UserCreateComponent implements OnInit {
     });
   }
 
-  // Helper method for edit mode district loading
+  // Helper method for edit mode district loading (legacy - not used in new implementation)
   loadDistrictsForEditMode(): void {
     if (this.selectedStateId) {
       this.loadDistricts(this.selectedStateId);
@@ -222,13 +396,6 @@ export class UserCreateComponent implements OnInit {
         ];
       }
     });
-  }
-
-  // Helper method for edit mode mandal loading
-  loadMandalsForEditMode(): void {
-    if (this.selectedDistrictId) {
-      this.loadMandals(this.selectedDistrictId);
-    }
   }
 
   loadMandals(districtId: string): void {

@@ -20,7 +20,9 @@ export class UserListComponent implements OnInit {
   statusFilter: string = 'all';
   roleFilter: string = 'all';
   contextRole: Role | null = null; // Role from query params
-  
+  contextVillageId: string | null = null; // Village ID from query params
+  contextVillageName: string | null = null; // Village name from query params
+
   // Expose Role enum to template
   Role = Role;
 
@@ -38,20 +40,48 @@ export class UserListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Check for role filter from query params
+    // Check for role and village filters from query params
     this.route.queryParams.subscribe(params => {
       const roleParam = params['role'];
+      const villageIdParam = params['villageId'];
+      const villageNameParam = params['villageName'];
+
       if (roleParam) {
         this.contextRole = roleParam as Role;
         this.roleFilter = this.contextRole;
       }
+
+      if (villageIdParam) {
+        this.contextVillageId = villageIdParam;
+      }
+
+      if (villageNameParam) {
+        this.contextVillageName = villageNameParam;
+      }
+
       this.loadUsers();
     });
   }
 
   loadUsers(): void {
-    // Load users based on context role
-    if (this.contextRole) {
+    // Priority: village filter > role filter > all users
+    if (this.contextVillageId) {
+      // Load users by village (for village-admin filtering)
+      this.usersService.getUsersByVillage(this.contextVillageId,this.roleFilter).subscribe({
+        next: (data) => {
+          this.users = data;
+          this.updateStats();
+          this.applyFilters();
+        },
+        error: (err) => {
+          console.error('Error loading users by village:', err);
+          this.users = [];
+          this.updateStats();
+          this.applyFilters();
+        }
+      });
+    } else if (this.contextRole) {
+      // Load users by role (existing functionality)
       this.usersService.getUsersByRole(this.contextRole as string).subscribe({
         next: (data) => {
           this.users = data;
@@ -66,7 +96,7 @@ export class UserListComponent implements OnInit {
         }
       });
     } else {
-      // Load all users
+      // Load all users (existing functionality)
       this.usersService.getAllUsers().subscribe({
         next: (data) => {
           this.users = data;
@@ -134,15 +164,22 @@ export class UserListComponent implements OnInit {
   }
 
   navigateToCreate(): void {
-    // Pass context role to create page
+    // Pass context role and village to create page
+    const queryParams: any = {};
+
     if (this.contextRole) {
-      this.router.navigate(['/users/create'], {
-        queryParams: { role: this.contextRole },
-        replaceUrl: true // Replace current history entry
-      });
-    } else {
-      this.router.navigate(['/users/create'], { replaceUrl: true });
+      queryParams.role = this.contextRole;
     }
+
+    if (this.contextVillageId) {
+      queryParams.villageId = this.contextVillageId;
+      queryParams.villageName = this.contextVillageName;
+    }
+
+    this.router.navigate(['/users/create'], {
+      queryParams,
+      replaceUrl: true // Replace current history entry
+    });
   }
 
   editUser(userId: string): void {
@@ -165,7 +202,9 @@ export class UserListComponent implements OnInit {
   }
 
   getPageTitle(): string {
-    if (this.contextRole === Role.VILLAGE_ADMIN) {
+    if (this.contextVillageId) {
+      return `${this.contextVillageName || 'Village'} Villagers`;
+    } else if (this.contextRole === Role.VILLAGE_ADMIN) {
       return 'Village Admins';
     } else if (this.contextRole === Role.VILLAGER) {
       return 'Villagers';
@@ -174,7 +213,9 @@ export class UserListComponent implements OnInit {
   }
 
   getCreateButtonText(): string {
-    if (this.contextRole === Role.VILLAGE_ADMIN) {
+    if (this.contextVillageId) {
+      return 'Create Villager';
+    } else if (this.contextRole === Role.VILLAGE_ADMIN) {
       return 'Create Admin';
     } else if (this.contextRole === Role.VILLAGER) {
       return 'Create Villager';
@@ -183,7 +224,9 @@ export class UserListComponent implements OnInit {
   }
 
   getStatsLabel(): string {
-    if (this.contextRole === Role.VILLAGE_ADMIN) {
+    if (this.contextVillageId) {
+      return 'Villagers';
+    } else if (this.contextRole === Role.VILLAGE_ADMIN) {
       return 'Admins';
     } else if (this.contextRole === Role.VILLAGER) {
       return 'Villagers';
@@ -192,7 +235,9 @@ export class UserListComponent implements OnInit {
   }
 
   getSubtitle(): string {
-    if (this.contextRole === Role.VILLAGE_ADMIN) {
+    if (this.contextVillageId) {
+      return `Manage villagers in ${this.contextVillageName || 'your village'}`;
+    } else if (this.contextRole === Role.VILLAGE_ADMIN) {
       return 'Manage and monitor village admins in the system';
     } else if (this.contextRole === Role.VILLAGER) {
       return 'Manage and monitor villagers in the system';

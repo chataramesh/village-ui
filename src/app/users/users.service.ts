@@ -19,6 +19,10 @@ export interface User {
   isActive: boolean;
   createdDate?: Date;
   lastLogin?: Date;
+  village?: {
+    id?: string;
+    name?: string;
+  };
 }
 
 export interface UserStats {
@@ -82,8 +86,8 @@ export class UsersService {
   }
 
   // Get users by village
-  getUsersByVillage(village: string): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiUrl}/village/${village}`);
+  getUsersByVillage(villageId: string, role:string): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/village/${villageId}/${role}`);
   }
 
   // Get active users

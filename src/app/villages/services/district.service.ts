@@ -22,7 +22,7 @@ export interface DistrictStats {
   providedIn: 'root'
 })
 export class DistrictService {
-  private apiUrl = `${environment.villageUrl}/district`;
+  private apiUrl = `${environment.apiUrl}/district`;
 
   constructor(private http: HttpClient) { }
 

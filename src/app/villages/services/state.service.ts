@@ -22,7 +22,7 @@ export interface StateStats {
   providedIn: 'root'
 })
 export class StateService {
-  private apiUrl = `${environment.villageUrl}/state`;
+  private apiUrl = `${environment.apiUrl}/state`;
 
   constructor(private http: HttpClient) { }
 

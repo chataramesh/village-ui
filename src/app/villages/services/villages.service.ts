@@ -16,7 +16,7 @@ export interface VillageCountResponse {
 export class VillagesService {
   
  
-  private apiUrl = `${environment.villageUrl}/village`;
+  private apiUrl = `${environment.apiUrl}/village`;
   constructor(private http: HttpClient) { }
   
   // Get all villages

@@ -22,7 +22,7 @@ export interface MandalStats {
   providedIn: 'root'
 })
 export class MandalService {
-  private apiUrl = `${environment.villageUrl}/mandal`;
+  private apiUrl = `${environment.apiUrl}/mandal`;
 
   constructor(private http: HttpClient) { }
 
