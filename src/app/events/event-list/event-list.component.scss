@@ -1,0 +1,162 @@
+// Import shared styles from state-list pattern
+@import '../../villages/country-list/country-list.component.scss';
+
+// Event-specific customizations
+.list-container {
+  background:
+    radial-gradient(circle at 20% 50%, rgba(236, 72, 153, 0.3), transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.3), transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(59, 130, 246, 0.3), transparent 50%),
+    linear-gradient(135deg, #ec4899 0%, #a855f7 25%, #3b82f6 50%, #10b981 75%, #f59e0b 100%) !important;
+}
+
+// Event-specific stats card customizations
+.stat-card {
+  &.total-card::before { background: linear-gradient(90deg, #ec4899, #db2777) !important; }
+  &.total-card .stat-icon-wrapper { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%) !important; }
+  &.total-card .stat-value { color: #ec4899 !important; }
+
+  &.active-card::before { background: linear-gradient(90deg, #10b981, #059669) !important; }
+  &.active-card .stat-icon-wrapper { background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; }
+  &.active-card .stat-value { color: #10b981 !important; }
+
+  &.upcoming-card::before { background: linear-gradient(90deg, #f59e0b, #d97706) !important; }
+  &.upcoming-card .stat-icon-wrapper { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important; }
+  &.upcoming-card .stat-value { color: #f59e0b !important; }
+
+  &.past-card::before { background: linear-gradient(90deg, #6b7280, #4b5563) !important; }
+  &.past-card .stat-icon-wrapper { background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important; }
+  &.past-card .stat-value { color: #6b7280 !important; }
+}
+
+// Event-specific table customizations
+.page-header .header-content .page-title {
+  .title-icon {
+    animation: eventBounce 2s ease-in-out infinite !important;
+  }
+}
+
+@keyframes eventBounce {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(5deg); }
+}
+
+// Event-specific status badges
+.status-badge {
+  &.active {
+    background: rgba(16, 185, 129, 0.1) !important;
+    color: #10b981 !important;
+    border: 1px solid rgba(16, 185, 129, 0.2) !important;
+  }
+
+  &.inactive {
+    background: rgba(239, 68, 68, 0.1) !important;
+    color: #ef4444 !important;
+    border: 1px solid rgba(239, 68, 68, 0.2) !important;
+  }
+
+  &.upcoming {
+    background: rgba(245, 158, 11, 0.1) !important;
+    color: #f59e0b !important;
+    border: 1px solid rgba(245, 158, 11, 0.2) !important;
+  }
+
+  &.past {
+    background: rgba(107, 114, 128, 0.1) !important;
+    color: #6b7280 !important;
+    border: 1px solid rgba(107, 114, 128, 0.2) !important;
+  }
+}
+
+// Event-specific modal customizations
+.modal-overlay {
+  background: rgba(139, 92, 246, 0.6) !important;
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+}
+
+.modal-form {
+  .form-input {
+    &:focus {
+      border-color: #8b5cf6 !important;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1) !important;
+    }
+  }
+
+  .modal-actions {
+    .btn-primary {
+      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3) !important;
+
+      &:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4) !important;
+      }
+    }
+  }
+}
+
+// Event-specific empty state
+.empty-state {
+  .empty-icon {
+    animation: eventFloat 3s ease-in-out infinite !important;
+  }
+}
+
+@keyframes eventFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(-3deg); }
+}
+
+// Event-specific item avatars
+.item-avatar {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  animation: avatarPulse 3s ease-in-out infinite !important;
+}
+
+@keyframes avatarPulse {
+  0%, 100% { box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
+  50% { box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5); }
+}
+
+// Enhanced hover effects for events
+.data-row {
+  &:hover {
+    background: linear-gradient(90deg, rgba(236, 72, 153, 0.03) 0%, rgba(168, 85, 247, 0.03) 100%) !important;
+
+    &::after {
+      background: linear-gradient(90deg, #ec4899 0%, #a855f7 100%) !important;
+      height: 2px !important;
+    }
+  }
+}
+
+// Event-specific responsive enhancements
+@media (max-width: 768px) {
+  .list-container {
+    padding: 20px !important;
+  }
+
+  .page-header .header-content .page-title {
+    font-size: 28px !important;
+
+    .title-icon {
+      font-size: 32px !important;
+    }
+  }
+
+  .stat-card {
+    padding: 20px !important;
+
+    .stat-icon-wrapper {
+      width: 56px !important;
+      height: 56px !important;
+    }
+
+    .stat-content .stat-value {
+      font-size: 28px !important;
+    }
+  }
+}

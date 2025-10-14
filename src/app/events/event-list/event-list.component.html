@@ -1,0 +1,270 @@
+<div class="list-container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <span class="title-icon">📅</span>
+        Event Management
+      </h1>
+      <p class="page-subtitle">Manage and monitor all events in the system</p>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card total-card">
+      <div class="stat-icon-wrapper">
+        <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-value">{{totalEvents}}</h3>
+        <p class="stat-label">Total Events</p>
+      </div>
+    </div>
+
+    <div class="stat-card active-card">
+      <div class="stat-icon-wrapper">
+        <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-value">{{activeEvents}}</h3>
+        <p class="stat-label">Active Events</p>
+      </div>
+    </div>
+
+    <div class="stat-card upcoming-card">
+      <div class="stat-icon-wrapper">
+        <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-value">{{upcomingEvents}}</h3>
+        <p class="stat-label">Upcoming Events</p>
+      </div>
+    </div>
+
+    <div class="stat-card past-card">
+      <div class="stat-icon-wrapper">
+        <svg class="stat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-value">{{pastEvents}}</h3>
+        <p class="stat-label">Past Events</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  <div class="table-section">
+
+    <!-- Table Header with Controls -->
+    <div class="table-header">
+      <div class="table-title-section">
+        <h2 class="table-title">All Events</h2>
+        <span class="table-count">{{filteredEvents.length}} events</span>
+      </div>
+      <button class="create-btn" (click)="openCreateModal()">
+        <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Create Event
+      </button>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="table-controls">
+      <div class="search-wrapper">
+        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search by event name, description, or place..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()">
+        <button class="clear-search" *ngIf="searchTerm" (click)="clearSearch()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Event Name</th>
+            <th>Place</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let event of filteredEvents">
+            <tr class="data-row">
+              <td>
+                <div class="item-info">
+                  <div class="item-avatar">{{event.name.charAt(0).toUpperCase()}}</div>
+                  <div class="item-details">
+                    <span class="item-name">{{event.name}}</span>
+                    <span class="item-subtitle" *ngIf="event.description">{{event.description}}</span>
+                  </div>
+                </div>
+              </td>
+              <td>{{event.place}}</td>
+              <td>{{formatDateTime(event.startTime)}}</td>
+              <td>{{formatDateTime(event.endTime)}}</td>
+              <td>
+                <span class="status-badge" [ngClass]="getStatusBadgeClass(event)">
+                  <span class="status-dot"></span>
+                  {{getStatusText(event)}}
+                </span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="action-btn edit-btn" (click)="openEditModal(event)" title="Edit">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                  </button>
+                  <button class="action-btn toggle-btn" (click)="toggleEventStatus(event)" [title]="event.isActive ? 'Deactivate' : 'Activate'">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" *ngIf="event.isActive"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" *ngIf="!event.isActive"></path>
+                    </svg>
+                  </button>
+                  <button class="action-btn delete-btn" (click)="deleteEvent(event.id!)" title="Delete">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+
+          <!-- Empty State -->
+          <tr *ngIf="filteredEvents.length === 0" class="empty-row">
+            <td colspan="6">
+              <div class="empty-state">
+                <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <p class="empty-text">No events found</p>
+                <p class="empty-subtext">Try adjusting your search</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Create/Edit Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">{{isEditMode ? 'Edit Event' : 'Create New Event'}}</h2>
+      <button class="modal-close" (click)="closeModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <form class="modal-form" (ngSubmit)="saveEvent()">
+      <div class="form-group">
+        <label class="form-label">Event Name *</label>
+        <input
+          type="text"
+          class="form-input"
+          [(ngModel)]="formData.name"
+          name="name"
+          placeholder="Enter event name"
+          required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea
+          class="form-input form-textarea"
+          [(ngModel)]="formData.description"
+          name="description"
+          placeholder="Enter event description"
+          rows="3"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Start Time *</label>
+          <input
+            type="datetime-local"
+            class="form-input"
+            [(ngModel)]="formData.startTime"
+            name="startTime"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">End Time *</label>
+          <input
+            type="datetime-local"
+            class="form-input"
+            [(ngModel)]="formData.endTime"
+            name="endTime"
+            required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Place *</label>
+        <input
+          type="text"
+          class="form-input"
+          [(ngModel)]="formData.place"
+          name="place"
+          placeholder="Enter event place"
+          required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-input" [(ngModel)]="formData.isActive" name="isActive">
+          <option [value]="true">Active</option>
+          <option [value]="false">Inactive</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">{{isEditMode ? 'Update' : 'Create'}}</button>
+      </div>
+    </form>
+  </div>
+</div>

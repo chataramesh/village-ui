@@ -1,0 +1,194 @@
+<div class="entity-list-container">
+  <!-- Header -->
+  <div class="entity-list-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="goBack()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to Dashboard
+      </button>
+      <div class="header-info">
+        <h1 class="page-title">Village Entities</h1>
+        <p class="page-subtitle">Browse and subscribe to available services</p>
+      </div>
+    </div>
+    <button class="refresh-btn" (click)="refresh()">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+      </svg>
+      Refresh
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label class="filter-label">Village</label>
+        <select class="filter-select" [(ngModel)]="selectedVillage" (change)="onVillageFilterChange()">
+          <option value="">All Villages</option>
+          <option *ngFor="let village of villages" [value]="village.id">{{village.name}}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Entity Type</label>
+        <select class="filter-select" [(ngModel)]="selectedEntityType" (change)="onTypeFilterChange()">
+          <option value="">All Types</option>
+          <option *ngFor="let type of entityTypes" [value]="type">{{type}}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-toggle">
+          <input type="checkbox" [(ngModel)]="showSubscribedOnly" (change)="onSubscriptionFilterChange()">
+          <span class="toggle-slider"></span>
+          Subscribed Only
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Loading entities...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="error && !loading">
+    <div class="error-icon">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+      </svg>
+    </div>
+    <h3>Failed to Load Entities</h3>
+    <p>{{error}}</p>
+    <button class="retry-btn" (click)="refresh()">Try Again</button>
+  </div>
+
+  <!-- Entities Table -->
+  <div class="entities-table-section" *ngIf="!loading && !error">
+    <div class="table-header">
+      <div class="table-info">
+        <h2 class="table-title">Available Entities</h2>
+        <span class="table-count">{{filteredEntities.length}} entities</span>
+      </div>
+      <div class="table-actions">
+        <button class="action-btn export-btn">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l4-4m-4 4l-4-4m-6 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+          Export
+        </button>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="entities-table">
+        <thead>
+          <tr>
+            <th>Entity</th>
+            <th>Type</th>
+            <th>Village</th>
+            <th>Status</th>
+            <th>Timings</th>
+            <th>Available Slots</th>
+            <th>Subscription</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let entity of filteredEntities; let i = index"
+              class="entity-row"
+              [class.subscribed]="entity.isSubscribed"
+              [style.animation-delay]="(i * 0.05) + 's'">
+            <td class="entity-info">
+              <div class="entity-avatar">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+              </div>
+              <div class="entity-details">
+                <span class="entity-name">{{entity.name}}</span>
+                <span class="entity-owner">by {{entity.ownerName}}</span>
+              </div>
+            </td>
+            <td>
+              <span class="entity-type-badge" [class]="entity.type.toLowerCase().replace(' ', '-')">
+                {{entity.type}}
+              </span>
+            </td>
+            <td>
+              <span class="village-name">
+                {{getVillageName(entity.villageId)}}
+              </span>
+            </td>
+            <td>
+              <span class="status-badge" [class.open]="entity.isOpen" [class.closed]="!entity.isOpen">
+                <span class="status-dot"></span>
+                {{entity.isOpen ? 'Open' : 'Closed'}}
+              </span>
+            </td>
+            <td>
+              <span class="timings">{{entity.openingTime}} - {{entity.closingTime}}</span>
+            </td>
+            <td>
+              <span class="slots-count" [class.available]="entity.availableSlots > 0" [class.full]="entity.availableSlots === 0">
+                {{entity.availableSlots}}
+              </span>
+            </td>
+            <td>
+              <span class="subscription-status" [class.subscribed]="entity.isSubscribed">
+                {{entity.isSubscribed ? 'Subscribed' : 'Not Subscribed'}}
+              </span>
+            </td>
+            <td class="actions-cell">
+              <div class="action-buttons">
+                <button *ngIf="!entity.isSubscribed"
+                        class="action-btn subscribe-btn"
+                        (click)="subscribeToEntity(entity)">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Subscribe
+                </button>
+                <button *ngIf="entity.isSubscribed"
+                        class="action-btn unsubscribe-btn"
+                        (click)="unsubscribeFromEntity(entity)">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                  Unsubscribe
+                </button>
+                <button class="action-btn view-btn"
+                        (click)="viewEntityDetails(entity)">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                  View
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredEntities.length === 0">
+        <div class="empty-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+        </div>
+        <h3>No Entities Found</h3>
+        <p>Try adjusting your filters or check back later for new entities.</p>
+        <button class="clear-filters-btn" (click)="clearFilters()">Clear Filters</button>
+      </div>
+    </div>
+  </div>
+</div>

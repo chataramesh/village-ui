@@ -1,0 +1,96 @@
+// Import shared styles from state-list (which imports from country-list)
+@import '../../villages/state-list/state-list.component.scss';
+
+// Entity-specific styles and overrides
+.list-container {
+  .page-header {
+    .header-content {
+      .page-title {
+        .title-icon {
+          animation: bounce 2s ease-in-out infinite;
+        }
+      }
+    }
+  }
+
+  .table-section {
+    .table-header {
+      .create-btn {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+
+        &:hover {
+          box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+        }
+      }
+    }
+  }
+}
+
+// Entity-specific table styling
+.table-wrapper {
+  .data-table {
+    tbody {
+      .data-row {
+        &:hover {
+          background: linear-gradient(90deg, rgba(139, 92, 246, 0.03) 0%, rgba(59, 130, 246, 0.03) 100%);
+
+          &::after {
+            background: linear-gradient(90deg, #8b5cf6 0%, #3b82f6 100%);
+            height: 2px;
+          }
+        }
+      }
+    }
+  }
+}
+
+.item-info {
+  .item-avatar {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  }
+}
+
+.status-badge {
+  &.active {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+
+    .status-dot {
+      background: #10b981;
+    }
+  }
+
+  &.inactive {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+
+    .status-dot {
+      background: #ef4444;
+    }
+  }
+}
+
+.action-buttons {
+  .action-btn {
+    &.edit-btn {
+      background: rgba(59, 130, 246, 0.1);
+      color: #3b82f6;
+
+      &:hover {
+        background: rgba(59, 130, 246, 0.2);
+      }
+    }
+
+    &.delete-btn {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+
+      &:hover {
+        background: rgba(239, 68, 68, 0.2);
+      }
+    }
+  }
+}

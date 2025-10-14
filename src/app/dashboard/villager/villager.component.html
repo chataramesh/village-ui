@@ -27,6 +27,14 @@
               </svg>
               View Profile
             </button>
+            <button class="dropdown-item" (click)="viewNotifications()">
+              <svg class="dropdown-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 17h5l-5 5-5-5h5V12h-5l5-5 5 5h-5v5zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
+              </svg>
+              Notifications
+              <span class="notification-badge" *ngIf="notificationsCount > 0">{{notificationsCount}}</span>
+            </button>
             <button class="dropdown-item" (click)="viewSubscriptions()">
               <svg class="dropdown-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -56,11 +64,11 @@
       <div class="actions-grid">
         
         <!-- ENTITIES Card -->
-        <div class="action-card entities-card" [class.expanded]="showEntitiesDropdown">
-          <div class="action-card-header" (click)="toggleEntitiesDropdown()">
-            <div class="action-icon-wrapper entities-gradient">
+        <div class="action-card entities-card">
+          <div class="action-card-header" (click)="navigateToEntities()">
+            <div class="action-icon-wrapper">
               <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
               </svg>
             </div>
@@ -68,100 +76,21 @@
               <h3 class="action-title">Entities</h3>
               <p class="action-subtitle">{{subscribedEntities.length}} Available</p>
             </div>
-            <svg class="expand-icon" [class.rotated]="showEntitiesDropdown" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
-          
-          <!-- Entities Dropdown -->
-          <div class="action-dropdown" *ngIf="showEntitiesDropdown">
-            <div class="entity-grid">
-              <button *ngFor="let entity of subscribedEntities" 
-                      class="entity-card-item" 
-                      (click)="selectEntity(entity)">
-                <div class="entity-card-icon">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                  </svg>
-                </div>
-                <span class="entity-card-name">{{entity.name}}</span>
-                <span class="entity-card-type">{{entity.type}}</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Selected Entity Details -->
-          <div class="entity-details-modal" *ngIf="selectedEntity">
-            <div class="modal-overlay" (click)="closeEntityDetails()"></div>
-            <div class="modal-content">
-              <div class="modal-header">
-                <h4>{{selectedEntity.name}}</h4>
-                <button class="modal-close" (click)="closeEntityDetails()">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                  </svg>
-                </button>
-              </div>
-              <div class="modal-body">
-                <div class="detail-row">
-                  <span class="detail-label">Type</span>
-                  <span class="detail-value">{{selectedEntity.type}}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">Owner</span>
-                  <span class="detail-value">{{selectedEntity.ownerName}}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">Status</span>
-                  <span class="detail-value status" [class.open]="selectedEntity.isOpen" [class.closed]="!selectedEntity.isOpen">
-                    <span class="status-dot"></span>
-                    {{selectedEntity.isOpen ? 'Open' : 'Closed'}}
-                  </span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">Timings</span>
-                  <span class="detail-value">{{selectedEntity.openingTime}} - {{selectedEntity.closingTime}}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">Available Slots</span>
-                  <span class="detail-value slots">{{selectedEntity.availableSlots}}</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
         <!-- VEHICLE Card -->
-        <div class="action-card vehicle-card" [class.expanded]="showVehicleDropdown">
-          <div class="action-card-header" (click)="toggleVehicleDropdown()">
-            <div class="action-icon-wrapper vehicle-gradient">
+        <div class="action-card vehicle-card">
+          <div class="action-card-header" >
+            <div class="action-icon-wrapper">
               <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
               </svg>
             </div>
             <div class="action-content">
               <h3 class="action-title">Vehicle</h3>
               <p class="action-subtitle">Book Now</p>
-            </div>
-            <svg class="expand-icon" [class.rotated]="showVehicleDropdown" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
-          
-          <!-- Vehicle Types Dropdown -->
-          <div class="action-dropdown" *ngIf="showVehicleDropdown">
-            <div class="vehicle-grid">
-              <button *ngFor="let type of vehicleTypes" 
-                      class="vehicle-type-card" 
-                      (click)="selectVehicleType(type)">
-                <svg class="vehicle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                </svg>
-                <span>{{type}}</span>
-              </button>
             </div>
           </div>
         </div>

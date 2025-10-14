@@ -13,13 +13,15 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
+import { VillagerEntityListComponent } from './villager/villager-entity-list/villager-entity-list.component';
 
 @NgModule({
   declarations: [
     SuperAdminComponent,
     VillageAdminComponent,
     VillagerComponent,
-    DashboardLandingComponent
+    DashboardLandingComponent,
+    VillagerEntityListComponent
   ],
   imports: [
     CommonModule,

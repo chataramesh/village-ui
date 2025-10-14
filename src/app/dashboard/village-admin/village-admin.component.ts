@@ -150,7 +150,7 @@ export class VillageAdminComponent implements OnInit, AfterViewInit {
 
   // Navigation Methods
   navigateToEntityCreate() {
-    this.router.navigate(['/entities/create']);
+    this.router.navigate(['/entities']);
   }
 
   navigateToVillagers() {
@@ -181,7 +181,7 @@ export class VillageAdminComponent implements OnInit, AfterViewInit {
   }
 
   navigateToEventCreate() {
-    this.router.navigate(['/events/create']);
+    this.router.navigate(['/events']);
   }
 
   navigateToImageCreate() {

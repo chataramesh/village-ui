@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
+import { TokenService } from 'src/app/core/services/token.service';
 
 Chart.register(...registerables);
 
@@ -80,6 +81,16 @@ export class VillagerComponent implements OnInit, AfterViewInit {
     { name: 'New Entity Added', time: 'Yesterday', description: 'Community Hall added to village entities' }
   ];
 
+  // Notifications
+  notificationsCount = 5;
+  notifications = [
+    { id: 1, title: 'New Entity Added', message: 'Primary Health Center has been added to your village', time: '2 hours ago', read: false },
+    { id: 2, title: 'Event Reminder', message: 'Village cleanup drive is tomorrow at 7 AM', time: '5 hours ago', read: false },
+    { id: 3, title: 'Subscription Update', message: 'You have been subscribed to Community Hall', time: '1 day ago', read: true },
+    { id: 4, title: 'Water Supply Notice', message: 'Water supply timing changed to 6 AM - 9 AM', time: '2 days ago', read: true },
+    { id: 5, title: 'Health Camp', message: 'Free health checkup camp on Oct 15', time: '3 days ago', read: true }
+  ];
+
   // Chat
   showChatPopup = false;
   unreadMessages = 3;
@@ -92,8 +103,6 @@ export class VillagerComponent implements OnInit, AfterViewInit {
     { id: '4', name: 'Amit Patel', role: 'Villager' }
   ];
   chatMessages: any[] = [];
-
-  // Chart References
   @ViewChild('vehicleChart') vehicleChartRef!: ElementRef;
   @ViewChild('eventsChart') eventsChartRef!: ElementRef;
   @ViewChild('entitiesChart') entitiesChartRef!: ElementRef;
@@ -101,7 +110,7 @@ export class VillagerComponent implements OnInit, AfterViewInit {
 
   private charts: Chart[] = [];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router,private tokenService: TokenService) {}
 
   ngOnInit(): void {
     // Load villager data
@@ -137,24 +146,35 @@ export class VillagerComponent implements OnInit, AfterViewInit {
     this.router.navigate(['/profile']);
   }
 
+  viewNotifications() {
+    console.log('Viewing notifications...');
+    this.closeUserMenu();
+    // Navigate to notifications page or show notifications modal
+    // For now, just mark all as read
+    this.notifications.forEach(notification => notification.read = true);
+    this.notificationsCount = 0;
+  }
+
   viewSubscriptions() {
     console.log('Viewing subscriptions...');
     this.closeUserMenu();
-    // Implement subscriptions view
   }
 
   handleLogout() {
     this.closeUserMenu();
     console.log('Logging out...');
-    this.router.navigate(['/login']);
+    this.tokenService.logout();
   }
 
-  // Entities Methods
-  toggleEntitiesDropdown() {
-    this.showEntitiesDropdown = !this.showEntitiesDropdown;
-    if (this.showEntitiesDropdown) {
-      this.showVehicleDropdown = false;
-    }
+  navigateToEntities() {
+    console.log('Navigating to entities...');
+    this.closeUserMenu();
+    this.router.navigate(['/dashboard/villager/entities']);
+  }
+
+  navigateToVehicleBooking() {
+    console.log('Navigating to vehicle booking...');
+    this.router.navigate(['/vehicle-booking']);
   }
 
   selectEntity(entity: any) {
