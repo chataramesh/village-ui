@@ -659,14 +659,32 @@
   }
 }
 
+.no-messages {
+  text-align: center;
+  padding: 40px 20px;
+  color: #94a3b8;
+
+  .empty-icon {
+    width: 32px;
+    height: 32px;
+    margin: 0 auto 16px;
+    opacity: 0.5;
+  }
+
+  p {
+    font-size: 14px;
+    margin: 0;
+  }
+}
+
 .chat-empty {
   text-align: center;
   padding: 40px 20px;
   color: #94a3b8;
 
   .empty-icon {
-    width: 48px;
-    height: 48px;
+    width: 32px;        // ← Smaller icon (consistent with no-messages)
+    height: 32px;       // ← Smaller icon (consistent with no-messages)
     margin: 0 auto 16px;
     opacity: 0.5;
   }
@@ -725,3 +743,4 @@
     }
   }
 }
+

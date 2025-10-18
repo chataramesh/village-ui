@@ -1,7 +1,11 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, HostListener } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
+import { HttpClient } from '@angular/common/http';
 import { TokenService } from 'src/app/core/services/token.service';
+import { UsersService, User } from 'src/app/users/users.service';
+import { ChatService } from 'src/app/core/services/chat.service';
+import { WebsocketService } from 'src/app/core/services/websocket.service';
 
 Chart.register(...registerables);
 
@@ -10,7 +14,7 @@ Chart.register(...registerables);
   templateUrl: './villager.component.html',
   styleUrls: ['./villager.component.scss']
 })
-export class VillagerComponent implements OnInit, AfterViewInit {
+export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
   
   userName = 'Ramesh';
   userImage = 'assets/people.png';
@@ -91,18 +95,21 @@ export class VillagerComponent implements OnInit, AfterViewInit {
     { id: 5, title: 'Health Camp', message: 'Free health checkup camp on Oct 15', time: '3 days ago', read: true }
   ];
 
-  // Chat
+  // Chat properties
   showChatPopup = false;
   unreadMessages = 3;
-  selectedChatUser = '';
-  chatMessage = '';
-  chatUsers = [
-    { id: '1', name: 'Village Admin', role: 'Admin' },
-    { id: '2', name: 'Rajesh Kumar', role: 'Villager' },
-    { id: '3', name: 'Priya Sharma', role: 'Villager' },
-    { id: '4', name: 'Amit Patel', role: 'Villager' }
-  ];
+  selectedChatUser: string = '';
+  chatMessage: string = '';
+  chatUsers: User[] = [];
   chatMessages: any[] = [];
+  currentUserId: string | null = null;
+  isLoadingUsers = false;
+  isConnected = false;
+  private lastSentMessage: string = '';
+  private lastSentTime: number = 0;
+
+  // Chat Context Management
+  private activeConversationPartner: string | null = null;
   @ViewChild('vehicleChart') vehicleChartRef!: ElementRef;
   @ViewChild('eventsChart') eventsChartRef!: ElementRef;
   @ViewChild('entitiesChart') entitiesChartRef!: ElementRef;
@@ -110,20 +117,73 @@ export class VillagerComponent implements OnInit, AfterViewInit {
 
   private charts: Chart[] = [];
 
-  constructor(private router: Router,private tokenService: TokenService) {}
+  constructor(
+    private router: Router,
+    private tokenService: TokenService,
+    private usersService: UsersService,
+    private chatService: ChatService,
+    private websocketService: WebsocketService
+  ) {}
 
   ngOnInit(): void {
-    // Load villager data
+    this.loadCurrentUser();
+
+    // Setup WebSocket message handling with chat context filtering
+    this.websocketService.messages$.subscribe(message => {
+      if (message) {
+        console.log(`Villager received message:`, message);
+
+        // Filter out echo messages (messages we just sent) to prevent duplicates
+        const now = Date.now();
+        if (message.content === this.lastSentMessage &&
+            message.senderId === this.currentUserId &&
+            (now - this.lastSentTime) < 5000) {
+          console.log('Filtering out echo message (duplicate)');
+          return;
+        }
+
+        // Only display message if it belongs to current active conversation
+        if (this.shouldDisplayMessage(message)) {
+          // Convert WebSocket message format to chat UI format
+          const uiMessage = {
+            sender: message.senderId === this.currentUserId ? 'me' : 'other',
+            content: message.content,
+            timestamp: new Date(message.timestamp || new Date())
+          };
+
+          console.log('Adding message to chat UI:', uiMessage);
+          this.chatMessages.push(uiMessage);
+        }
+
+        // Clear the tracking variables after successfully adding a non-echo message
+        this.lastSentMessage = '';
+        this.lastSentTime = 0;
+      }
+    });
+
+    // Subscribe to connection status observable to monitor connection status
+    this.websocketService.connectionStatus$.subscribe(connected => {
+      this.isConnected = connected;
+      if (connected) {
+        console.log('WebSocket connection established');
+      }
+    });
   }
 
-  ngAfterViewInit(): void {
-    // Initialize charts after view is ready
-    setTimeout(() => {
-      this.initializeCharts();
-    }, 100);
+  ngOnDestroy() {
+    // Clean up charts
+    this.charts.forEach(chart => chart.destroy());
   }
 
-  // User Menu Methods
+  // Load current user details
+  loadCurrentUser(): void {
+    const tokenUser = this.tokenService.getCurrentUser();
+    if (tokenUser && tokenUser.userId) {
+      this.currentUserId = tokenUser.userId;
+      this.userName = tokenUser.name || 'Ramesh';
+      console.log('Current villager user loaded:', this.currentUserId);
+    }
+  }
   toggleUserMenu() {
     this.showUserMenu = !this.showUserMenu;
   }
@@ -209,43 +269,138 @@ export class VillagerComponent implements OnInit, AfterViewInit {
     this.router.navigate(['/complaints/create']);
   }
 
+  ngAfterViewInit(): void {
+    // Initialize charts after view is ready
+    setTimeout(() => {
+      this.initializeCharts();
+    }, 100);
+  }
+
   // Chat Methods
   toggleChatPopup() {
     this.showChatPopup = !this.showChatPopup;
     if (this.showChatPopup) {
       this.unreadMessages = 0;
+      if (this.currentUserId) {
+        this.loadChatUsers();
+      }
+      if (!this.isConnected && this.currentUserId) {
+        console.log('Connecting to WebSocket for chat functionality');
+        this.connect();
+      }
     }
+  }
+
+  loadChatUsers(): void {
+    if (!this.currentUserId) {
+      console.log('Current user not loaded yet, cannot load chat users');
+      return;
+    }
+
+    this.isLoadingUsers = true;
+    this.usersService.getAllUsers().subscribe({
+      next: (users) => {
+        this.chatUsers = users.filter(user => user.id !== this.currentUserId);
+        console.log('Chat users loaded:', this.chatUsers.length, 'users');
+        this.isLoadingUsers = false;
+      },
+      error: (error) => {
+        console.error('Error loading chat users:', error);
+        this.isLoadingUsers = false;
+      }
+    });
   }
 
   loadChatMessages() {
-    // Load messages for selected user
     if (this.selectedChatUser) {
-      this.chatMessages = [
-        { sender: 'other', text: 'Hello! How can I help you?', time: '10:30 AM' },
-        { sender: 'me', text: 'I need some information about the health camp.', time: '10:32 AM' },
-        { sender: 'other', text: 'Sure, the health camp is on Oct 15 at 9 AM.', time: '10:33 AM' }
-      ];
+      // Set active conversation context
+      this.setActiveConversation(this.selectedChatUser);
+
+      console.log('Loading chat messages for user:', this.selectedChatUser);
+      if (!this.isConnected && this.currentUserId) {
+        console.log('Connecting to WebSocket for real-time messaging');
+        this.connect();
+      }
+
+      this.chatService.getChatMessages(this.selectedChatUser, this.currentUserId!).subscribe({
+        next: (messages) => {
+          console.log('Received initial messages from API:', messages);
+          this.chatMessages = messages.map((msg: any) => {
+            return {
+              sender: msg.senderId === this.currentUserId ? 'me' : 'other',
+              content: msg.content,
+              timestamp: new Date(msg.timestamp)
+            };
+          });
+          console.log('Loaded initial chat messages:', this.chatMessages);
+        },
+        error: (error) => {
+          console.error('Error loading chat messages:', error);
+        }
+      });
+    } else {
+      this.chatMessages = [];
+      this.activeConversationPartner = null;
     }
   }
 
-  sendMessage() {
-    if (this.chatMessage.trim() && this.selectedChatUser) {
-      this.chatMessages.push({
+  sendMessage(): void {
+    if (this.chatMessage.trim() && this.selectedChatUser && this.currentUserId) {
+      const messageContent = this.chatMessage.trim();
+
+      // Immediately add the message to the UI
+      const sentMessage = {
         sender: 'me',
-        text: this.chatMessage,
-        time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-      });
+        content: messageContent,
+        timestamp: new Date()
+      };
+      this.chatMessages.push(sentMessage);
+
+      // Track what we just sent to prevent duplicates
+      this.lastSentMessage = messageContent;
+      this.lastSentTime = Date.now();
+
+      // Prepare message data for WebSocket
+      const message = {
+        senderId: this.currentUserId,
+        receiverId: this.selectedChatUser,
+        content: messageContent,
+        timestamp: new Date().toISOString(),
+        token: this.tokenService.getToken()
+      };
+
+      console.log('Sending WebSocket message:', message);
+
+      // Send via WebSocket
+      this.websocketService.sendMessage(message);
+
+      // Clear input
       this.chatMessage = '';
-      
-      // Simulate response
-      setTimeout(() => {
-        this.chatMessages.push({
-          sender: 'other',
-          text: 'Thank you for your message. I will get back to you soon.',
-          time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-        });
-      }, 1000);
     }
+  }
+
+  connect() {
+    console.log('Connecting to WebSocket with user ID:', this.currentUserId);
+    this.websocketService.connect(this.currentUserId!);
+  }
+
+  // Chat Context Management Methods
+  private setActiveConversation(partnerId: string): void {
+    this.activeConversationPartner = partnerId;
+    console.log('Active conversation set to:', partnerId);
+  }
+
+  private shouldDisplayMessage(message: any): boolean {
+    if (!this.activeConversationPartner) {
+      return false;
+    }
+
+    // Display message if it belongs to current active conversation
+    // Message should be shown if:
+    // 1. Current user is sender and partner is receiver
+    // 2. Current user is receiver and partner is sender
+    return (message.senderId === this.currentUserId && message.receiverId === this.activeConversationPartner) ||
+           (message.receiverId === this.currentUserId && message.senderId === this.activeConversationPartner);
   }
 
   // Chart Initialization
@@ -394,8 +549,5 @@ export class VillagerComponent implements OnInit, AfterViewInit {
     }
   }
 
-  ngOnDestroy() {
-    // Clean up charts
-    this.charts.forEach(chart => chart.destroy());
-  }
 }
+

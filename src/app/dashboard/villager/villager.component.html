@@ -220,8 +220,8 @@
              class="chat-message" 
              [class.message-sent]="msg.sender === 'me'"
              [class.message-received]="msg.sender === 'other'">
-          <p class="message-text">{{msg.text}}</p>
-          <span class="message-time">{{msg.time}}</span>
+          <p class="message-text">{{msg.content}}</p>
+          <span class="message-time">{{msg.timestamp | date:'short'}}</span>
         </div>
       </div>
 
@@ -249,3 +249,4 @@
   </div>
 
 </div>
+
