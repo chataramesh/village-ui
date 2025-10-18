@@ -5,7 +5,6 @@ import { HttpClient } from '@angular/common/http';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UsersService, User } from 'src/app/users/users.service';
 import { ChatService } from 'src/app/core/services/chat.service';
-import { WebsocketService } from 'src/app/core/services/websocket.service';
 
 Chart.register(...registerables);
 
@@ -47,13 +46,6 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   chatMessages: any[] = [];
   private currentUserId: string | null = null;
   isLoadingUsers = false;
-  private chatPollingInterval: any;
-  private lastSentMessage: string = '';
-  private lastSentTime: number = 0;
-  private lastMessageTimestamp: Date | null = null;
-  private isChatActive: boolean = false;
-  private lastPollTime: number = 0;
-  private minPollInterval: number = 5000; // Minimum 5 seconds between polls
 
   // Chart References
   @ViewChild('entitiesChart') entitiesChartRef!: ElementRef;
@@ -73,16 +65,8 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
     private tokenService: TokenService,
     private usersService: UsersService,
     private http: HttpClient,
-    private chatService: ChatService,
-    private websocketService: WebsocketService
+    private chatService: ChatService
   ) {}
-
-  title = 'frontend';
-  username: string = '';  // Stores the username entered by the user
-  message: string = '';  // Stores the message being typed by the user
-  messages: any[] = [];  // Stores all the chat messages
-  isConnected = false;  // Tracks whether the user is connected to the WebSocket
-  connectingMessage = 'Connecting...';  // Message to show while connecting
 
   ngOnInit(): void {
     // Load current user details and village data
@@ -96,50 +80,6 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error loading current user details:', error);
-      }
-    });
-
-
-
-     // Subscribe to messages observable to receive messages from the WebSocket service
-     this.websocketService.messages$.subscribe(message => {
-      if (message) {
-        // Log and add the received message to the array of messages
-        console.log(`Message received from ${message.sender}: ${message.content}`);
-
-        // Filter out echo messages (messages we just sent) to prevent duplicates
-        const now = Date.now();
-        const isEchoMessage = message.content === this.lastSentMessage &&
-                           message.senderId === this.currentUserId &&
-                           (now - this.lastSentTime) < 5000; // Within 5 seconds
-
-        if (isEchoMessage) {
-          console.log('Filtering out echo message (duplicate)');
-          return;
-        }
-
-        // Convert WebSocket message format to chat UI format
-        const uiMessage = {
-          sender: message.senderId === this.currentUserId ? 'me' : 'other',
-          content: message.content,
-          timestamp: new Date(message.timestamp || new Date())
-        };
-
-        this.chatMessages.push(uiMessage);
-        console.log('Added message to chat UI:', uiMessage);
-
-        // Clear the tracking variables after successfully adding a non-echo message
-        this.lastSentMessage = '';
-        this.lastSentTime = 0;
-      }
-    });
-
-    // Subscribe to connection status observable to monitor connection status
-    this.websocketService.connectionStatus$.subscribe(connected => {
-      this.isConnected = connected;  // Update the connection status
-      if (connected) {
-        this.connectingMessage = '';  // Clear the connecting message once connected
-        console.log('WebSocket connection established');
       }
     });
   }
@@ -163,11 +103,6 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
           } else {
             console.warn('Village-admin user has no village information');
           }
-
-          // If chat popup is open and users haven't been loaded yet, load them now
-          if (this.showChatPopup && this.chatUsers.length === 0) {
-            this.loadChatUsers();
-          }
         },
         error: (error) => {
           console.error('Error loading current user details:', error);
@@ -175,25 +110,17 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     } else {
       console.warn('No userId found in token');
-    }
   }
 
   loadChatUsers(): void {
-    if (!this.currentUserId) {
-      console.log('Current user not loaded yet, cannot load chat users');
-      return;
-    }
-
     this.isLoadingUsers = true;
-    // Fetch all users from backend API when chat is opened
-    this.usersService.getAllUsers().subscribe({
-      next: (users) => {
-        this.chatUsers = users.filter(user => user.id !== this.currentUserId);
+    this.chatService.getAllUsers().subscribe({
+      next: (users: User[]) => {
+        this.chatUsers = users.filter((user: User) => user.id !== this.currentUserId);
         console.log('Chat users loaded:', this.chatUsers.length, 'users');
-        console.log('Current user ID for filtering:', this.currentUserId);
         this.isLoadingUsers = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading chat users:', error);
         this.isLoadingUsers = false;
       }
@@ -201,7 +128,6 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    // Initialize charts after view is ready
     setTimeout(() => {
       this.initializeCharts();
     }, 100);
@@ -295,147 +221,21 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showChatPopup = !this.showChatPopup;
     if (this.showChatPopup) {
       this.unreadMessages = 0;
-      // Load users when chat popup is opened, but only if current user is loaded
-      if (this.currentUserId) {
-        this.loadChatUsers();
-      } else {
-        console.log('Current user not loaded yet, users will be loaded when current user loads');
-      }
-      // Connect to WebSocket if not already connected
-      if (!this.isConnected && this.currentUser?.id) {
-        console.log('Connecting to WebSocket for chat functionality');
-        this.connect();
-      }
-    } else {
-      // Stop polling when chat is closed
-      this.stopChatPolling();
-      this.isChatActive = false;
-    }
-  }
-
-  // startSmartChatPolling() {
-  //   this.stopChatPolling(); // Clear any existing intervals
-
-  //   this.isChatActive = true;
-
-  //   // Only start polling if a user is selected
-  //   if (!this.selectedChatUser) {
-  //     console.log('No user selected, waiting for user selection before starting polling');
-  //     return;
-  //   }
-
-  //   // Initial load
-  //   this.loadChatMessages();
-
-  //   // Start with less frequent polling (every 8 seconds) when chat is active but idle
-  //   this.chatPollingInterval = setInterval(() => {
-  //     this.smartPollForMessages();
-  //   }, 8000); // Increased from 5 seconds
-
-  //   // Set up activity listeners to increase polling frequency during active use
-  //   this.setupChatActivityListeners();
-  // }
-
-  stopChatPolling() {
-    if (this.chatPollingInterval) {
-      clearInterval(this.chatPollingInterval);
-      this.chatPollingInterval = null;
-    }
-    this.isChatActive = false;
-    this.removeChatActivityListeners();
-  }
-
-  setupChatActivityListeners() {
-    // Listen for user activity in the chat area
-    const chatContainer = document.querySelector('.chat-popup');
-    if (chatContainer) {
-      // Increase polling frequency during active typing or clicking
-      const activityEvents = ['mousedown', 'keydown', 'focus'];
-
-      activityEvents.forEach(event => {
-        chatContainer.addEventListener(event, (event) => {
-          this.onChatActivity();
-        }, { passive: true });
-      });
-    }
-  }
-  removeChatActivityListeners() {
-    const chatContainer = document.querySelector('.chat-popup');
-    if (chatContainer) {
-      const activityEvents = ['mousedown', 'keydown', 'focus'];
-      activityEvents.forEach(event => {
-        chatContainer.removeEventListener(event, this.onChatActivity);
-      });
-    }
-  }
-
-  smartPollForMessages() {
-    const now = Date.now();
-
-    // Enforce minimum interval between polls to prevent excessive API calls
-    if (now - this.lastPollTime < this.minPollInterval) {
-      return;
-    }
-
-    this.lastPollTime = now;
-
-    if (this.selectedChatUser && this.currentUserId && this.isChatActive) {
-      this.loadChatMessages();
-    }
-  }
-
-  onChatActivity() {
-    if (this.isChatActive && this.chatPollingInterval) {
-      console.log('Chat activity detected, increasing polling frequency');
-
-      // Temporarily increase polling frequency during active use
-      clearInterval(this.chatPollingInterval);
-      this.chatPollingInterval = setInterval(() => {
-        console.log('Active polling - checking for new messages');
-        this.smartPollForMessages();
-      }, 3000); // Poll every 3 seconds during active use (increased from 2)
-
-      // Reset to normal frequency after 45 seconds of inactivity (increased from 30)
-      setTimeout(() => {
-        if (this.chatPollingInterval) {
-          console.log('Activity timeout, resetting to normal polling frequency');
-          clearInterval(this.chatPollingInterval);
-          this.chatPollingInterval = setInterval(() => {
-            this.smartPollForMessages();
-          }, 8000); // Back to 8 seconds
-        }
-      }, 45000); // Increased timeout
+      // Load users when chat popup is opened
+      this.loadChatUsers();
     }
   }
 
   loadChatMessages(): void {
     if (this.selectedChatUser) {
-      console.log('Loading chat messages for user:', this.selectedChatUser);
-      console.log('Current user ID:', this.currentUser?.id);
-      console.log('Current user:', this.currentUser);
-
-      // Connect to WebSocket if not already connected
-      if (!this.isConnected && this.currentUser?.id) {
-        console.log('Connecting to WebSocket for real-time messaging');
-        this.connect();
-      }
-
-      // Fetch initial chat history from REST API for context
-      this.chatService.getChatMessages(this.selectedChatUser, this.currentUser!.id!).subscribe({
+      // Fetch chat history from backend using ChatService
+      this.chatService.getChatMessages(this.selectedChatUser).subscribe({
         next: (messages) => {
-          console.log('Received initial messages from API:', messages);
-
-          // Clear existing messages and load fresh from API
-          this.chatMessages = messages.map((msg: any) => {
-            console.log('Processing initial message:', msg);
-            return {
-              sender: msg.senderId === this.currentUserId ? 'me' : 'other',
-              content: msg.content,
-              timestamp: new Date(msg.timestamp)
-            };
-          });
-
-          console.log('Loaded initial chat messages:', this.chatMessages);
+          this.chatMessages = messages.map(msg => ({
+            sender: msg.senderId === this.currentUserId ? 'me' : 'other',
+            content: msg.content,
+            timestamp: new Date(msg.timestamp)
+          }));
         },
         error: (error) => {
           console.error('Error loading chat messages:', error);
@@ -446,53 +246,40 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private hasMessagesChanged(newMessages: any[]): boolean {
-    // If no current messages or different count, definitely changed
-    if (!this.chatMessages || newMessages.length !== this.chatMessages.length) {
-      return newMessages.length > 0; // Only return true if there are actually new messages
-    }
-
-    // Compare each message - be more strict about what constitutes a change
-    for (let i = 0; i < newMessages.length; i++) {
-      const newMsg = newMessages[i];
-      const currentMsg = this.chatMessages[i];
-
-      // Check if any key properties are different
-      if (newMsg.content !== currentMsg.content ||
-          newMsg.senderId !== currentMsg.senderId ||
-          new Date(newMsg.timestamp).getTime() !== new Date(currentMsg.timestamp).getTime()) {
-        return true;
-      }
-    }
-
-    return false; // No changes detected
-  }
-
   sendMessage(): void {
     if (this.chatMessage.trim() && this.selectedChatUser && this.currentUserId) {
       const messageContent = this.chatMessage.trim();
 
-      // Track what we just sent to prevent duplicates
-      this.lastSentMessage = messageContent;
-      this.lastSentTime = Date.now();
+      // Add message to local chat immediately for better UX
+      const newMessage = {
+        sender: 'me',
+        content: messageContent,
+        timestamp: new Date()
+      };
+      this.chatMessages.push(newMessage);
 
-      // Prepare message data for WebSocket
-      const message = {
+      // Prepare message data for API
+      const message: any = {
         senderId: this.currentUserId,
         receiverId: this.selectedChatUser,
         content: messageContent,
         timestamp: new Date().toISOString()
       };
 
-      // Send via WebSocket
-      this.websocketService.sendMessage(message);
+      // Send via REST API
+      this.chatService.sendMessage(message).subscribe({
+        next: (response) => {
+          console.log('Message sent successfully:', response);
+        },
+        error: (error) => {
+          console.error('Error sending message:', error);
+          // Remove the message from local chat if sending failed
+          this.chatMessages.pop();
+        }
+      });
 
       // Clear input
       this.chatMessage = '';
-
-      // Clear the tracking variables after sending
-      this.lastSentMessage = '';
-      this.lastSentTime = 0;
     }
   }
 
@@ -645,31 +432,8 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy() {
     // Clean up charts
     this.charts.forEach(chart => chart.destroy());
-    // Stop chat polling and remove listeners
-    this.stopChatPolling();
     // if (this.stompClient) {
     //   this.stompClient.deactivate();
     // }
-  }
-
-
-
-  connect(){
-
-    console.log('Attempting to connect to WebSocket at http://localhost:8080/ws with username:', this.currentUser!.id!);
-    this.websocketService.connect(this.currentUser!.id!);  // Call the WebSocket service to connect
-  }
-
-  sendMessages(){
-    if (this.chatMessage.trim()) {
-      const message = {
-        senderId: this.currentUserId,
-        receiverId: this.selectedChatUser,
-        content: this.chatMessage.trim(),
-        timestamp: new Date().toISOString()
-      };
-      this.websocketService.sendMessage(message);  // Send the message via WebSocket service
-      this.chatMessage = '';  // Clear the message input after sending
-    }
   }
 }

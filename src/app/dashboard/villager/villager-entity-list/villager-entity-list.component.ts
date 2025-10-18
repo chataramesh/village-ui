@@ -52,7 +52,7 @@ export class VillagerEntityListComponent implements OnInit {
     'Government'
   ];
 
-  constructor(private router: Router, private http: HttpClient,private entityService:EntityService) {}
+  constructor(private router: Router, private http: HttpClient, private entityService: EntityService) {}
 
   ngOnInit(): void {
     this.loadEntities();

@@ -676,4 +676,11 @@
     }
   }
 }
+
+// Chat loading state
+.chat-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f8fafc;
+}
   

@@ -58,7 +58,7 @@
         </div>
         <div class="count-card-content">
           <p class="count-card-label">Entities</p>
-          <p class="count-card-value">{{counts.entities}}</p>
+          <p class="count-card-value">18</p>
         </div>
       </div>
 
@@ -71,7 +71,7 @@
         </div>
         <div class="count-card-content">
           <p class="count-card-label">Villagers</p>
-          <p class="count-card-value">{{counts.villagers}}</p>
+          <p class="count-card-value">245</p>
         </div>
       </div>
 
@@ -84,7 +84,7 @@
         </div>
         <div class="count-card-content">
           <p class="count-card-label">Events</p>
-          <p class="count-card-value">{{counts.events}}</p>
+          <p class="count-card-value">7</p>
         </div>
       </div>
     </div>
@@ -209,9 +209,12 @@
       <!-- User Selection -->
       <div class="chat-user-select">
         <label class="chat-label">Select User to Chat</label>
-        <select class="chat-select" [(ngModel)]="selectedChatUser" (change)="loadChatMessages()">
-          <option value="">Choose a user...</option>
-          <option *ngFor="let user of chatUsers" [value]="user.id">{{user.name}} - {{user.role}}</option>
+        <select class="chat-select" [(ngModel)]="selectedChatUser" (change)="loadChatMessages()" [disabled]="isLoadingUsers">
+          <option value="" *ngIf="!isLoadingUsers">Choose a user...</option>
+          <option value="" *ngIf="isLoadingUsers">Loading users...</option>
+          <option *ngFor="let user of chatUsers" [value]="user.id">
+            {{user.name}} - {{user.role}}
+          </option>
         </select>
       </div>
 
@@ -221,8 +224,8 @@
              [class.message-sent]="message.sender === 'me'"
              [class.message-received]="message.sender !== 'me'"
              class="chat-message">
-          <p class="message-text">{{message.text}}</p>
-          <span class="message-time">{{message.time}}</span>
+          <p class="message-text">{{message.content}}</p>
+          <span class="message-time">{{message.timestamp | date:'short'}}</span>
         </div>
       </div>
 
