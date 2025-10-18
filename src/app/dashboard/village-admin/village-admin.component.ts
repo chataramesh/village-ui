@@ -481,7 +481,8 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
         senderId: this.currentUserId,
         receiverId: this.selectedChatUser,
         content: messageContent,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        token: this.tokenService.getToken()
       };
 
       // Send via WebSocket
