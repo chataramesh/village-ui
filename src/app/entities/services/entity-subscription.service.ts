@@ -1,8 +1,31 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { EntitySubscription } from './entity.service';
+
+export interface SubscriptionResponse {
+  id: string;
+  entityId: string;
+  entityName: string;
+  entityType: string;
+  subscriptionType: string;
+  subscribedAt: string;
+  isActive: boolean;
+}
+
+export interface NotificationResponse {
+  id: string;
+  entityId: string;
+  entityName: string;
+  title: string;
+  message: string;
+  notificationType: string;
+  priority: string;
+  createdAt: string;
+  scheduledFor: string;
+  isRead: boolean;
+  isActive: boolean;
+}
 
 export interface SubscriptionStats {
   totalSubscriptions: number;
@@ -16,67 +39,124 @@ export interface SubscriptionStats {
 })
 export class EntitySubscriptionService {
 
-  private apiUrl = `${environment.apiUrl}/entity-subscriptions`;
+  private apiUrl = `${environment.apiUrl}`;
 
   constructor(private http: HttpClient) { }
 
-  // Get all subscriptions
-  getAllSubscriptions(): Observable<EntitySubscription[]> {
-    return this.http.get<EntitySubscription[]>(`${this.apiUrl}/all`);
+  // Subscribe to Entity
+  subscribeToEntity(entityId: string, userId: string, subscriptionType: string = 'GENERAL'): Observable<SubscriptionResponse> {
+    const params = new HttpParams()
+      .set('userId', userId)
+      .set('subscriptionType', subscriptionType);
+
+    console.log('Making subscribe request to:', `${this.apiUrl}/subscriptions/${entityId}/subscribe`);
+    console.log('With params:', params.toString());
+
+    return this.http.post<SubscriptionResponse>(`${this.apiUrl}/subscriptions/${entityId}/subscribe`, {}, { params });
   }
 
-  // Get subscription by ID
-  getSubscriptionById(id: string): Observable<EntitySubscription> {
-    return this.http.get<EntitySubscription>(`${this.apiUrl}/${id}`);
+  // Unsubscribe from Entity
+  unsubscribeFromEntity(entityId: string, userId: string): Observable<string> {
+    const params = new HttpParams().set('userId', userId);
+
+    console.log('Making unsubscribe request to:', `${this.apiUrl}/subscriptions/${entityId}/unsubscribe`);
+    console.log('With params:', params.toString());
+
+    return this.http.delete<string>(`${this.apiUrl}/subscriptions/${entityId}/unsubscribe`, { params });
   }
 
-  // Get subscriptions by user
-  getSubscriptionsByUser(userId: string): Observable<EntitySubscription[]> {
-    return this.http.get<EntitySubscription[]>(`${this.apiUrl}/user/${userId}`);
+  // Get User Subscriptions
+  getUserSubscriptions(userId: string): Observable<SubscriptionResponse[]> {
+    const params = new HttpParams().set('userId', userId);
+    return this.http.get<SubscriptionResponse[]>(`${this.apiUrl}/subscriptions/my-subscriptions`, { params });
   }
 
-  // Get subscriptions by entity
-  getSubscriptionsByEntity(entityId: string): Observable<EntitySubscription[]> {
-    return this.http.get<EntitySubscription[]>(`${this.apiUrl}/entity/${entityId}`);
+  // Check Subscription Status
+  checkSubscriptionStatus(entityId: string, userId: string): Observable<boolean> {
+    const params = new HttpParams().set('userId', userId);
+    return this.http.get<boolean>(`${this.apiUrl}/subscriptions/${entityId}/is-subscribed`, { params });
   }
 
-  // Get subscriptions by type
-  getSubscriptionsByType(type: string): Observable<EntitySubscription[]> {
-    return this.http.get<EntitySubscription[]>(`${this.apiUrl}/type/${type}`);
+  // Get User Notifications
+  getUserNotifications(userId: string, page: number = 0, size: number = 20): Observable<NotificationResponse[]> {
+    const params = new HttpParams()
+      .set('userId', userId)
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<NotificationResponse[]>(`${this.apiUrl}/notifications/my-notifications`, { params });
   }
 
-  // Create new subscription
-  createSubscription(subscription: Omit<EntitySubscription, 'id' | 'subscribedAt'>): Observable<EntitySubscription> {
-    return this.http.post<EntitySubscription>(`${this.apiUrl}/create`, subscription);
+  // Get Unread Notification Count
+  getUnreadNotificationCount(userId: string): Observable<number> {
+    const params = new HttpParams().set('userId', userId);
+    return this.http.get<number>(`${this.apiUrl}/notifications/unread-count`, { params });
   }
 
-  // Update subscription
-  updateSubscription(id: string, subscription: Partial<EntitySubscription>): Observable<EntitySubscription> {
-    return this.http.put<EntitySubscription>(`${this.apiUrl}/${id}`, subscription);
+  // Mark Notification as Read
+  markNotificationAsRead(notificationId: string): Observable<string> {
+    return this.http.put<string>(`${this.apiUrl}/notifications/${notificationId}/read`, {});
   }
 
-  // Delete subscription
+  // Broadcast to Entity Subscribers (Admin only)
+  broadcastToEntitySubscribers(
+    entityId: string,
+    title: string,
+    message: string,
+    notificationType: string = 'GENERAL',
+    priority: string = 'NORMAL'
+  ): Observable<string> {
+    const body = {
+      title,
+      message,
+      notificationType,
+      priority
+    };
+    return this.http.post<string>(`${this.apiUrl}/notifications/entity/${entityId}/broadcast`, body);
+  }
+
+  // Legacy methods (keeping for backward compatibility)
+  getAllSubscriptions(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/subscriptions/all`);
+  }
+
+  getSubscriptionById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/subscriptions/${id}`);
+  }
+
+  getSubscriptionsByUser(userId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/subscriptions/user/${userId}`);
+  }
+
+  getSubscriptionsByEntity(entityId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/subscriptions/entity/${entityId}`);
+  }
+
+  createSubscription(subscription: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/subscriptions/create`, subscription);
+  }
+
+  updateSubscription(id: string, subscription: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/subscriptions/${id}`, subscription);
+  }
+
   deleteSubscription(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/subscriptions/${id}`);
   }
 
-  // Toggle subscription status
-  toggleSubscriptionStatus(id: string): Observable<EntitySubscription> {
-    return this.http.patch<EntitySubscription>(`${this.apiUrl}/${id}/toggle-status`, {});
+  toggleSubscriptionStatus(id: string): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/subscriptions/${id}/toggle-status`, {});
   }
 
-  // Update subscription type
-  updateSubscriptionType(id: string, subscriptionType: string): Observable<EntitySubscription> {
-    return this.http.patch<EntitySubscription>(`${this.apiUrl}/${id}/type`, { subscriptionType });
+  updateSubscriptionType(id: string, subscriptionType: string): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/subscriptions/${id}/type`, { subscriptionType });
   }
 
-  // Get subscription statistics
   getSubscriptionStats(): Observable<SubscriptionStats> {
-    return this.http.get<SubscriptionStats>(`${this.apiUrl}/stats`);
+    return this.http.get<SubscriptionStats>(`${this.apiUrl}/subscriptions/stats`);
   }
 
-  // Check if user is subscribed to entity
   isUserSubscribedToEntity(userId: string, entityId: string): Observable<boolean> {
-    return this.http.get<boolean>(`${this.apiUrl}/check-subscription/${userId}/${entityId}`);
+    return this.http.get<boolean>(`${this.apiUrl}/subscriptions/check-subscription/${userId}/${entityId}`);
   }
 }

@@ -1,0 +1,249 @@
+<div class="incident-list-container">
+  <!-- Header Section -->
+  <div class="incidents-header">
+    <div class="header-left">
+      <h1 class="page-title">Incident Management</h1>
+      <p class="page-subtitle">Track and manage village infrastructure incidents</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="create-btn" (click)="navigateToCreate()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+        Report New Incident
+      </button>
+    </div>
+  </div>
+
+  <!-- Dashboard Summary Cards -->
+  <div class="dashboard-summary" *ngIf="dashboardSummary">
+    <div class="summary-card total">
+      <div class="card-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+      </div>
+      <div class="card-content">
+        <h3>{{dashboardSummary.totalIncidents}}</h3>
+        <p>Total Incidents</p>
+      </div>
+    </div>
+
+    <div class="summary-card open">
+      <div class="card-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <div class="card-content">
+        <h3>{{dashboardSummary.openIncidents}}</h3>
+        <p>Open Incidents</p>
+      </div>
+    </div>
+
+    <div class="summary-card in-progress">
+      <div class="card-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+      </div>
+      <div class="card-content">
+        <h3>{{dashboardSummary.inProgressIncidents}}</h3>
+        <p>In Progress</p>
+      </div>
+    </div>
+
+    <div class="summary-card escalated">
+      <div class="card-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <div class="card-content">
+        <h3>{{dashboardSummary.escalatedIncidents}}</h3>
+        <p>Escalated</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filters-container">
+      <div class="filter-group">
+        <label>Status:</label>
+        <select [(ngModel)]="selectedStatus" (change)="applyFilters()">
+          <option value="">All Statuses</option>
+          <option *ngFor="let status of statuses" [value]="status">
+            {{getStatusDisplayName(status)}}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Category:</label>
+        <select [(ngModel)]="selectedCategory" (change)="applyFilters()">
+          <option value="">All Categories</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{getCategoryDisplayName(category)}}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Priority:</label>
+        <select [(ngModel)]="selectedPriority" (change)="applyFilters()">
+          <option value="">All Priorities</option>
+          <option *ngFor="let priority of priorities" [value]="priority">
+            {{getPriorityDisplayName(priority)}}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Location Type:</label>
+        <select [(ngModel)]="selectedLocationType" (change)="applyFilters()">
+          <option value="">All Types</option>
+          <option *ngFor="let type of locationTypes" [value]="type">
+            {{type.replace('_', ' ')}}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group search">
+        <label>Search:</label>
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          (keyup.enter)="onSearch()"
+          placeholder="Search by title, description, or location...">
+      </div>
+
+      <div class="filter-actions">
+        <button class="clear-btn" (click)="clearFilters()">Clear Filters</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Loading incidents...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error && !loading">
+    <div class="error-icon">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+      </svg>
+    </div>
+    <h3>Oops! Something went wrong</h3>
+    <p>{{error}}</p>
+    <button class="retry-btn" (click)="loadIncidents()">Try Again</button>
+  </div>
+
+  <!-- Incidents Table -->
+  <div class="incidents-content" *ngIf="!loading && !error">
+    <div class="table-container" *ngIf="incidents.length > 0; else noIncidents">
+      <table class="incidents-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Location</th>
+            <th>Reported By</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let incident of filteredIncidents" class="incident-row">
+            <td class="incident-title">
+              <strong>{{incident.title}}</strong>
+              <p class="incident-description">{{incident.description}}</p>
+            </td>
+            <td>
+              <span class="category-badge">{{getCategoryDisplayName(incident.category)}}</span>
+            </td>
+            <td>
+              <span class="priority-badge" [style.background-color]="getPriorityColor(incident.priority)">
+                {{getPriorityDisplayName(incident.priority)}}
+              </span>
+            </td>
+            <td>
+              <select
+                class="status-select"
+                [style.background-color]="incident.status ? getStatusColor(incident.status) : '#3b82f6'"
+                [value]="incident.status"
+                (change)="updateStatus(incident, $any($event.target).value)">
+                <option *ngFor="let status of statuses" [value]="status">
+                  {{getStatusDisplayName(status)}}
+                </option>
+              </select>
+            </td>
+            <td>{{incident.location}}</td>
+            <td>{{incident.reportedBy}}</td>
+            <td>{{incident.createdAt | date:'short'}}</td>
+            <td class="actions-cell">
+              <button class="action-btn edit-btn" (click)="navigateToEdit(incident.id!)" title="Edit">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+              </button>
+              <button class="action-btn delete-btn" (click)="deleteIncident(incident)" title="Delete">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="incidents.length > itemsPerPage">
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage === 1"
+        (click)="onPageChange(currentPage - 1)">
+        Previous
+      </button>
+
+      <div class="pagination-pages">
+        <button
+          *ngFor="let page of getPagesArray()"
+          class="pagination-btn page-btn"
+          [class.active]="page === currentPage"
+          (click)="onPageChange(page)">
+          {{page}}
+        </button>
+      </div>
+
+      <button
+        class="pagination-btn"
+        [disabled]="currentPage === getTotalPages()"
+        (click)="onPageChange(currentPage + 1)">
+        Next
+      </button>
+    </div>
+  </div>
+
+  <!-- No Incidents State -->
+  <ng-template #noIncidents>
+    <div class="empty-state">
+      <div class="empty-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+      </div>
+      <h3>No incidents found</h3>
+      <p *ngIf="incidents.length === 0">No incidents have been reported yet.</p>
+      <p *ngIf="incidents.length > 0">No incidents match your current filters.</p>
+      <button class="create-btn" (click)="navigateToCreate()">Report First Incident</button>
+    </div>
+  </ng-template>
+</div>

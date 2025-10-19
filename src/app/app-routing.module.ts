@@ -42,10 +42,24 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'incidents',
+    loadChildren: () => import('./incidents/incidents.module').then(m => m.IncidentsModule),
+    canActivate: [AuthGuard],
+    data: { roles: ['VILLAGE_ADMIN', 'SUPER_ADMIN'] }
+  },
+  {
+    path: 'images',
+    loadChildren: () => import('./images/images.module').then(m => m.ImagesModule),
+    canActivate: [AuthGuard],
+    data: { roles: ['VILLAGE_ADMIN', 'SUPER_ADMIN'] }
+  },
+  {
     path: 'events',
     loadChildren: () => import('./events/events.module').then(m => m.EventsModule),
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
+    data: { roles: ['VILLAGE_ADMIN', 'SUPER_ADMIN'] }
   },
+ 
   {
     path: '**',
     redirectTo: 'dashboard'

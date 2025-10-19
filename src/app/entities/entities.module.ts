@@ -7,6 +7,8 @@ import { EntityListComponent } from './entity-list/entity-list.component';
 import { EntityCreateComponent } from './entity-create/entity-create.component';
 import { EntityService } from './services/entity.service';
 import { EntitySubscriptionService } from './services/entity-subscription.service';
+import { NotificationBellComponent } from '../shared/components/notification-bell.component';
+import { WebSocketNotificationService } from '../core/services/websocket-notification.service';
 
 
 @NgModule({
@@ -17,11 +19,13 @@ import { EntitySubscriptionService } from './services/entity-subscription.servic
   imports: [
     CommonModule,
     FormsModule,
-    EntitiesRoutingModule
+    EntitiesRoutingModule,
+    NotificationBellComponent
   ],
   providers: [
     EntityService,
-    EntitySubscriptionService
+    EntitySubscriptionService,
+    WebSocketNotificationService
   ]
 })
 export class EntitiesModule { }

@@ -1,0 +1,172 @@
+<div class="upload-container">
+  <!-- Header -->
+  <div class="upload-header">
+    <h2 class="upload-title">Upload Images</h2>
+    <button class="close-btn" (click)="cancel()" [disabled]="uploading">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Upload Form -->
+  <form [formGroup]="uploadForm" class="upload-form">
+    <!-- Drag & Drop Area -->
+    <div
+      class="drop-zone"
+      [class.drag-over]="isDragOver"
+      [class.disabled]="uploading"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)">
+
+      <div class="drop-zone-content">
+        <div class="drop-icon">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+          </svg>
+        </div>
+
+        <div class="drop-text">
+          <p class="drop-title">Drop images here or click to browse</p>
+          <p class="drop-subtitle">Supports JPG, PNG, GIF up to 10MB each</p>
+        </div>
+
+        <input
+          type="file"
+          multiple
+          accept="image/*"
+          class="file-input"
+          (change)="onFileSelected($event)"
+          [disabled]="uploading">
+      </div>
+    </div>
+
+    <!-- Selected Files Preview -->
+    <div class="files-preview" *ngIf="selectedFiles.length > 0">
+      <h3 class="preview-title">Selected Files ({{selectedFiles.length}})</h3>
+      <div class="files-list">
+        <div class="file-item" *ngFor="let file of selectedFiles; let i = index">
+          <div class="file-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+
+          <div class="file-info">
+            <p class="file-name">{{formatFileName(file.name)}}</p>
+            <p class="file-size">{{getFileSize(file.size)}}</p>
+          </div>
+
+          <button
+            class="remove-btn"
+            type="button"
+            (click)="removeFile(i)"
+            [disabled]="uploading"
+            title="Remove file">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload Options -->
+    <div class="upload-options" *ngIf="selectedFiles.length > 0">
+      <div class="form-group">
+        <label class="form-label">Image Name *</label>
+        <input
+          type="text"
+          formControlName="name"
+          class="form-control"
+          placeholder="Enter a name for this image..."
+          [class.error]="uploadForm.get('name')?.invalid && uploadForm.get('name')?.touched"
+          [disabled]="uploading">
+        <div class="field-error" *ngIf="uploadForm.get('name')?.invalid && uploadForm.get('name')?.touched">
+          Image name is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Description *</label>
+        <textarea
+          formControlName="description"
+          class="form-control"
+          rows="3"
+          placeholder="Describe this image..."
+          [class.error]="uploadForm.get('description')?.invalid && uploadForm.get('description')?.touched"
+          [disabled]="uploading"></textarea>
+        <div class="field-error" *ngIf="uploadForm.get('description')?.invalid && uploadForm.get('description')?.touched">
+          Description is required
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select
+            formControlName="category"
+            class="form-control"
+            [class.error]="uploadForm.get('category')?.invalid && uploadForm.get('category')?.touched"
+            [disabled]="uploading">
+            <option value="" disabled>Select a category...</option>
+            <option *ngFor="let category of categories" [value]="category">
+              {{getCategoryDisplayName(category)}}
+            </option>
+          </select>
+          <div class="field-error" *ngIf="uploadForm.get('category')?.invalid && uploadForm.get('category')?.touched">
+            Category is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Alt Text (Optional)</label>
+        <input
+          type="text"
+          formControlName="altText"
+          class="form-control"
+          placeholder="Alternative text for accessibility..."
+          [disabled]="uploading">
+        <div class="field-hint">Helps screen readers describe the image to visually impaired users</div>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="error">
+      <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+      </svg>
+      {{error}}
+    </div>
+
+    <!-- Upload Progress -->
+    <div class="upload-progress" *ngIf="uploading">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+      </div>
+      <p class="progress-text">Uploading... {{uploadProgress | number:'1.0-1'}}%</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="upload-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="cancel()"
+        [disabled]="uploading">
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="uploadImages()"
+        [disabled]="selectedFiles.length === 0 || uploading || uploadForm.invalid">
+        <span *ngIf="!uploading">Upload {{selectedFiles.length}} {{selectedFiles.length === 1 ? 'Image' : 'Images'}}</span>
+        <span *ngIf="uploading">Uploading...</span>
+      </button>
+    </div>
+  </form>
+</div>

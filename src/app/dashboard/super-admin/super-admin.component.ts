@@ -16,7 +16,8 @@ Chart.register(...registerables);
 })
 export class SuperAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   
-  // User Menu
+  userName = 'Super Admin';
+  userImage = 'assets/people.png';
   showUserMenu = false;
 
   // Counts with detailed breakdown
@@ -285,7 +286,7 @@ export class SuperAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    if (!target.closest('.user-menu-wrapper')) {
+    if (!target.closest('.user-profile-wrapper')) {
       this.closeUserMenu();
     }
   }

@@ -93,6 +93,12 @@
       height: 18px;
     }
   }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
 }
 
 /* Filters Section - Clean Design */
@@ -526,6 +532,64 @@
           .action-buttons {
             display: flex;
             gap: 0.5rem;
+
+            .subscription-buttons {
+              display: flex;
+              gap: 0.25rem;
+              margin-right: 0.5rem;
+
+              .action-btn {
+                padding: 0.5rem 0.75rem;
+                border: none;
+                border-radius: 6px;
+                font-size: 0.75rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+
+                svg {
+                  width: 14px;
+                  height: 14px;
+                }
+
+                &.subscribe-btn {
+                  background: #10b981;
+                  color: white;
+
+                  &:hover:not(:disabled) {
+                    background: #059669;
+                    transform: translateY(-1px);
+                    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+                  }
+
+                  &:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                    transform: none;
+                  }
+                }
+
+                &.unsubscribe-btn {
+                  background: #ef4444;
+                  color: white;
+
+                  &:hover:not(:disabled) {
+                    background: #dc2626;
+                    transform: translateY(-1px);
+                    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+                  }
+
+                  &:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                    transform: none;
+                  }
+                }
+              }
+            }
 
             .action-btn {
               padding: 0.5rem 1rem;

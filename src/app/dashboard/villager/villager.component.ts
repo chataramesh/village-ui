@@ -195,7 +195,7 @@ export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    if (!target.closest('.user-menu-wrapper')) {
+    if (!target.closest('.user-profile-wrapper')) {
       this.closeUserMenu();
     }
   }

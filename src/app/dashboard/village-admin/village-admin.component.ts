@@ -17,6 +17,7 @@ Chart.register(...registerables);
 export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   
   villageName: any = 'Green Valley Village';
+  userName = 'Village Admin';
   userImage = 'assets/people.png'; // Default user image
   
   // User Menu
@@ -219,7 +220,7 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    if (!target.closest('.user-menu-wrapper')) {
+    if (!target.closest('.user-profile-wrapper')) {
       this.closeUserMenu();
     }
   }
@@ -282,7 +283,12 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   navigateToImageCreate() {
-    this.router.navigate(['/images/create']);
+    this.router.navigate(['/images']);
+  }
+
+  // Coming Soon Feature
+  showIncidentsComingSoon() {
+    this.router.navigate(['/incidents']);
   }
 
   // Event Messages Auto-Scroll

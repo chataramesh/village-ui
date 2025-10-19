@@ -1,0 +1,113 @@
+<div class="images-container">
+  <!-- Header Section -->
+  <div class="images-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="goBack()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Dashboard
+      </button>
+      <div class="header-info">
+        <h1 class="page-title">Village Images</h1>
+        <p class="page-subtitle">Manage and organize village photos</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="upload-btn" (click)="openUploadModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+        Upload Images
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Loading images...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error && !loading">
+    <div class="error-icon">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+      </svg>
+    </div>
+    <h3>Oops! Something went wrong</h3>
+    <p>{{error}}</p>
+    <button class="retry-btn" (click)="loadImages()">Try Again</button>
+  </div>
+
+  <!-- Images Content -->
+  <div class="images-content" *ngIf="!loading && !error">
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="images.length === 0">
+      <div class="empty-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+      </div>
+      <h3>No images found</h3>
+      <p>Start by uploading some images to your village gallery</p>
+      <button class="upload-btn" (click)="openUploadModal()">Upload First Image</button>
+    </div>
+
+    <!-- Images by Date -->
+    <div class="images-timeline" *ngIf="images.length > 0">
+      <div class="date-section" *ngFor="let date of getDateKeys()">
+        <div class="date-header">
+          <h2 class="date-title">{{date}}</h2>
+          <div class="date-divider"></div>
+          <span class="image-count">{{(imagesByDate[date] || []).length}} {{(imagesByDate[date] || []).length === 1 ? 'image' : 'images'}}</span>
+        </div>
+
+        <div class="images-grid">
+          <div class="image-card" *ngFor="let image of imagesByDate[date] || []">
+            <div class="image-container">
+              <img [src]="'/Users/cramesh/uploads/images/4891b6e2-e66a-46c6-b793-551f6e18bea0.png'" [alt]="image.altText || image.originalFileName" class="image-preview" >
+
+              <!-- Image Overlay Actions -->
+              <div class="image-overlay">
+                <button class="action-btn download-btn" (click)="downloadImage(image)" title="Download">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l4-4m-4 4l-4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </button>
+
+                <button class="action-btn delete-btn" (click)="deleteImage(image)" title="Delete">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="image-info">
+              <p class="image-name">{{image.originalFileName}}</p>
+              <div class="image-meta">
+                <span class="image-size">{{getFileSize(image.fileSize)}}</span>
+               </div>
+              <p class="image-description" *ngIf="image.description">{{image.description}}</p>
+              <div class="image-category">
+                <span class="category-badge" [style.background-color]="getCategoryColor(image.category)">
+                  {{getCategoryDisplayName(image.category)}}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Modal -->
+  <div class="modal-overlay" *ngIf="showUploadModal" (click)="closeUploadModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <app-image-upload [villageId]="currentVillageId || undefined" (onUpload)="onImageUploaded()" (onCancel)="closeUploadModal()"></app-image-upload>
+    </div>
+  </div>
+</div>
