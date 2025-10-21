@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { ImageService, Image, ImageCategory } from 'src/app/core/services/image.service';
 import { TokenService } from 'src/app/core/services/token.service';
+import { UsersService } from '../users/users.service';
 
 @Component({
   selector: 'app-images',
@@ -12,20 +13,23 @@ import { TokenService } from 'src/app/core/services/token.service';
 export class ImagesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
+  userRole:any='';  
+
   images: Image[] = [];
   imagesByDate: { [date: string]: Image[] } = {};
   loading = true;
   error: string | null = null;
   showUploadModal = false;
 
-  currentVillageId: string | null = null;
+  currentVillageId: any='';
   private isLoadingImages = false;
 
   constructor(
     private imageService: ImageService,
     private tokenService: TokenService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private usersService: UsersService
   ) {}
 
   ngOnInit(): void {
@@ -41,9 +45,20 @@ export class ImagesComponent implements OnInit, OnDestroy {
   private loadCurrentVillage(): void {
     try {
       const tokenUser = this.tokenService.getCurrentUser();
-      if (tokenUser?.village?.id) {
-        this.currentVillageId = tokenUser.village.id;
-      }
+    
+      this.usersService.getUserById(tokenUser!.userId!)
+      .subscribe({
+        next: (user) => {
+          console.log('User loaded successfully:', user);
+          this.userRole = user.role;
+          this.currentVillageId = user.village!.id!;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error loading user:', error);
+          this.userRole = null;
+        }
+      });
     } catch (error) {
       console.error('Error loading current village:', error);
       this.currentVillageId = null;

@@ -16,7 +16,8 @@ Chart.register(...registerables);
 })
 export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
   
-  userName = 'Ramesh';
+  userName = 'NA';
+  userRole="NA";
   userImage = 'assets/people.png';
   
   // User Menu
@@ -178,9 +179,13 @@ export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
   // Load current user details
   loadCurrentUser(): void {
     const tokenUser = this.tokenService.getCurrentUser();
+   
     if (tokenUser && tokenUser.userId) {
       this.currentUserId = tokenUser.userId;
-      this.userName = tokenUser.name || 'Ramesh';
+      this.usersService.getUserById(tokenUser.userId).subscribe(user => {
+        this.userName = user.name || 'NA';
+        this.userRole = user.role || 'NA';
+      });
       console.log('Current villager user loaded:', this.currentUserId);
     }
   }
@@ -262,7 +267,7 @@ export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Navigation Methods
   navigateToImageCreate() {
-    this.router.navigate(['/images/create']);
+    this.router.navigate(['/images']);
   }
 
   navigateToComplaintCreate() {

@@ -16,8 +16,9 @@ Chart.register(...registerables);
 })
 export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   
-  villageName: any = 'Green Valley Village';
-  userName = 'Village Admin';
+  villageName: any = 'NA';
+  userRole:any= 'NA';
+  userName = 'NA';
   userImage = 'assets/people.png'; // Default user image
   
   // User Menu
@@ -93,6 +94,8 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.usersService.getUserById(this.tokenService.getCurrentUser()!.userId!).subscribe({
       next: (user) => {
         this.villageName = user!.village!.name;
+        this.userRole = user!.role;
+        this.userName = user!.name;
         console.log('Current village-admin user loaded:', user);
       },
       error: (error) => {

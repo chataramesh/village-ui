@@ -110,6 +110,7 @@
         <thead>
           <tr>
             <th>Event Name</th>
+            <th>Description</th>
             <th>Place</th>
             <th>Start Time</th>
             <th>End Time</th>
@@ -125,10 +126,10 @@
                   <div class="item-avatar">{{event.name.charAt(0).toUpperCase()}}</div>
                   <div class="item-details">
                     <span class="item-name">{{event.name}}</span>
-                    <span class="item-subtitle" *ngIf="event.description">{{event.description}}</span>
                   </div>
                 </div>
               </td>
+              <td *ngIf="event.description">{{event.description}}</td>
               <td>{{event.place}}</td>
               <td>{{formatDateTime(event.startTime)}}</td>
               <td>{{formatDateTime(event.endTime)}}</td>

@@ -18,9 +18,7 @@
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "outputPath": "dist/village-ui",
-            "allowedCommonJsDependencies": [
-              "sockjs-client"
-            ],
+            "allowedCommonJsDependencies": ["sockjs-client"],
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -48,7 +46,7 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "20kb",
+                   "maximumWarning": "20kb",
                   "maximumError": "40kb"
                 }
               ],
@@ -72,8 +70,7 @@
               "browserTarget": "village-ui:build:production"
             },
             "development": {
-              "browserTarget": "village-ui:build:development",
-              "proxyConfig": "proxy.conf.json"
+              "browserTarget": "village-ui:build:development"
             }
           },
           "defaultConfiguration": "development"

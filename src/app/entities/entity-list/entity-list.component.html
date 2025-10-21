@@ -109,6 +109,7 @@
         <thead>
           <tr>
             <th>Entity</th>
+            <th>Description</th>
             <th>Type</th>
             <th>Status</th>
             <th>Village</th>
@@ -119,14 +120,14 @@
         <tbody>
           <ng-container *ngFor="let entity of filteredEntities">
             <tr class="data-row">
+              
               <td>
-                <div class="item-info">
-                  <div class="item-avatar">{{getTypeIcon(entity.type)}}</div>
-                  <div class="item-details">
-                    <span class="item-name">{{entity.name}}</span>
-                    <span class="item-subtitle" *ngIf="entity.description">{{entity.description | slice:0:50}}...</span>
-                  </div>
-                </div>
+                <span class="item-name">{{entity.name}}</span>
+                    
+              </td>
+              <td>
+                <span class="item-subtitle" *ngIf="entity.description">{{entity.description | slice:0:50}}...</span>
+               
               </td>
               <td>
                 <span class="type-badge">{{formatEntityType(entity.type)}}</span>
