@@ -13,7 +13,7 @@ import { UsersService } from '../users/users.service';
 export class ImagesComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  userRole:any='';  
+  userRole:any='';
 
   images: Image[] = [];
   imagesByDate: { [date: string]: Image[] } = {};
@@ -22,6 +22,9 @@ export class ImagesComponent implements OnInit, OnDestroy {
   showUploadModal = false;
 
   currentVillageId: any='';
+  currentUser: any = null;
+  canEditAnyImage = false;
+  canDeleteAnyImage = false;
   private isLoadingImages = false;
 
   constructor(
@@ -34,6 +37,7 @@ export class ImagesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadCurrentVillage();
+    this.checkUserPermissions();
     this.loadImages();
   }
 
@@ -135,10 +139,22 @@ export class ImagesComponent implements OnInit, OnDestroy {
   }
 
   deleteImage(image: Image): void {
-    if (image.id && confirm('Are you sure you want to delete this image?')) {
-      this.images = this.images.filter(img => img.id !== image.id);
-      this.imagesByDate = this.imageService.getImagesGroupedByDate(this.images);
-      alert('Image deleted successfully');
+    if (image.id && this.canDeleteImage(image) && confirm('Are you sure you want to delete this image?')) {
+      this.imageService.deleteImage(image.id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.images = this.images.filter(img => img.id !== image.id);
+            this.imagesByDate = this.imageService.getImagesGroupedByDate(this.images);
+            alert('Image deleted successfully');
+          },
+          error: (error) => {
+            console.error('Error deleting image:', error);
+            alert('Failed to delete image. Please try again.');
+          }
+        });
+    } else if (!this.canDeleteImage(image)) {
+      alert('You can only delete images that you uploaded.');
     }
   }
 
@@ -167,6 +183,39 @@ export class ImagesComponent implements OnInit, OnDestroy {
   //   imgElement.src = 'assets/images/placeholder-image.png';
   //   console.warn('Failed to load image:', image.originalFileName);
   // }
+
+  private checkUserPermissions(): void {
+    const tokenUser = this.tokenService.getCurrentUser();
+    if (tokenUser) {
+      this.currentUser = tokenUser;
+      const userRole = tokenUser.role || '';
+
+      // Admins can edit/delete any image
+      if (userRole === 'VILLAGE_ADMIN' || userRole === 'SUPER_ADMIN') {
+        this.canEditAnyImage = true;
+        this.canDeleteAnyImage = true;
+      } else {
+        // Villagers can only edit/delete their own images
+        this.canEditAnyImage = false;
+        this.canDeleteAnyImage = false;
+      }
+    } else {
+      this.canEditAnyImage = false;
+      this.canDeleteAnyImage = false;
+    }
+  }
+
+  isCurrentUserOwner(image: Image): boolean {
+    return this.currentUser?.userId === image.uploadedBy;
+  }
+
+  canEditImage(image: Image): boolean {
+    return this.canEditAnyImage || this.isCurrentUserOwner(image);
+  }
+
+  canDeleteImage(image: Image): boolean {
+    return this.canDeleteAnyImage || this.isCurrentUserOwner(image);
+  }
 
   getCategoryColor(category: ImageCategory): string {
     const colors: { [key in ImageCategory]: string } = {

@@ -355,6 +355,22 @@ export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
   navigateToVehicles() {
     this.router.navigate(['/vehicles']);
   }
+
+  navigateToEvents() {
+    this.router.navigate(['/events']);
+  }
+
+  navigateToTemples() {
+    this.router.navigate(['/temples']);
+  }
+
+  navigateToSchools() {
+    this.router.navigate(['/schools']);
+  }
+
+  navigateToIncidents() {
+    this.router.navigate(['/incidents']);
+  }
   ngAfterViewInit(): void {
     // Initialize charts after view is ready
     setTimeout(() => {

@@ -342,6 +342,34 @@ export class SuperAdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/villages/mandals']);
   }
 
+  navigateToImages() {
+    this.router.navigate(['/images']);
+  }
+
+  navigateToEntities() {
+    this.router.navigate(['/entities']);
+  }
+
+  navigateToVehicles() {
+    this.router.navigate(['/vehicles']);
+  }
+
+  navigateToIncidents() {
+    this.router.navigate(['/incidents']);
+  }
+
+  navigateToEvents() {
+    this.router.navigate(['/events']);
+  }
+
+  navigateToTemples() {
+    this.router.navigate(['/temples']);
+  }
+
+  navigateToSchools() {
+    this.router.navigate(['/schools']);
+  }
+
   // Chart Initialization
   initializeCharts() {
     this.createVillageAdminsChart();

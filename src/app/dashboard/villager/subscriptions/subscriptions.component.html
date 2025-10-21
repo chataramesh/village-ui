@@ -24,7 +24,7 @@
       <h2 class="type-heading">
         <span class="type-icon">{{getTypeIcon(type)}}</span>
         {{type | titlecase}}
-        <span class="type-count">({{entitiesByType[type]?.length}} entities)</span>
+        <span class="type-count">({{entitiesByType[type]!.length}} entities)</span>
       </h2>
 
       <div class="entities-table-container">

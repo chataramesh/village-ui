@@ -46,7 +46,9 @@ export class IncidentListComponent implements OnInit, OnDestroy {
   totalItems = 0;
 
   // User permissions
+  currentUser: any = null;
   canCreateIncidents = false;
+  canEditAnyIncident = false;
 
   constructor(
     private incidentService: IncidentService,
@@ -77,11 +79,21 @@ export class IncidentListComponent implements OnInit, OnDestroy {
   private checkUserPermissions(): void {
     const tokenUser = this.tokenService.getCurrentUser();
     if (tokenUser) {
+      this.currentUser = tokenUser;
       const userRole = tokenUser.role || '';
-      // Only village-admin and super-admin can create incidents
-      this.canCreateIncidents = userRole === 'VILLAGE_ADMIN' || userRole === 'SUPER_ADMIN';
+
+      // Admins can create and edit any incident
+      if (userRole === 'VILLAGE_ADMIN' || userRole === 'SUPER_ADMIN') {
+        this.canCreateIncidents = true;
+        this.canEditAnyIncident = true;
+      } else {
+        // Villagers can only create incidents and edit their own
+        this.canCreateIncidents = true; // Villagers can create incidents
+        this.canEditAnyIncident = false; // But can only edit their own
+      }
     } else {
       this.canCreateIncidents = false;
+      this.canEditAnyIncident = false;
     }
   }
 
@@ -232,8 +244,39 @@ export class IncidentListComponent implements OnInit, OnDestroy {
     return Math.ceil(this.totalItems / this.itemsPerPage);
   }
 
+  isCurrentUserOwner(incident: Incident): boolean {
+    return this.currentUser?.userId === incident.reportedBy;
+  }
+
+  canEditIncident(incident: Incident): boolean {
+    // Admins can edit any incident, villagers can only edit their own
+    return this.canEditAnyIncident || this.isCurrentUserOwner(incident);
+  }
+
+  canDeleteIncident(incident: Incident): boolean {
+    // Admins can delete any incident, villagers can only delete their own
+    return this.canEditAnyIncident || this.isCurrentUserOwner(incident);
+  }
+
   getPagesArray(): number[] {
     const totalPages = this.getTotalPages();
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const currentPage = this.currentPage;
+    const pages: number[] = [];
+
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 4) {
+        pages.push(1, 2, 3, 4, 5, 6, totalPages);
+      } else if (currentPage >= totalPages - 3) {
+        pages.push(1, totalPages - 5, totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, currentPage - 2, currentPage - 1, currentPage, currentPage + 1, currentPage + 2, totalPages);
+      }
+    }
+
+    return pages;
   }
 }

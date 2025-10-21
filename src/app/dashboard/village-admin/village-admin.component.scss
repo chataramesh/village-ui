@@ -541,13 +541,13 @@
     }
   }
 
-  &.image-nav {
+  &.vehicle-nav {
     &:hover {
-      border-color: #8b5cf6;
+      border-color: #10b981;
     }
 
     .nav-card-icon {
-      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     }
   }
 
@@ -558,6 +558,26 @@
 
     .nav-card-icon {
       background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+  }
+
+  &.temples-nav {
+    &:hover {
+      border-color: #eab308;
+    }
+
+    .nav-card-icon {
+      background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+    }
+  }
+
+  &.schools-nav {
+    &:hover {
+      border-color: #3b82f6;
+    }
+
+    .nav-card-icon {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     }
   }
 }

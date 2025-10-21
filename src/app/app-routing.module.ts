@@ -54,14 +54,14 @@ const routes: Routes = [
   {
     path: 'images',
     loadChildren: () => import('./images/images.module').then(m => m.ImagesModule),
-    canActivate: [AuthGuard],
-    data: { roles: ['VILLAGE_ADMIN', 'SUPER_ADMIN'] }
+    canActivate: [AuthGuard]
+    // Removed role restriction - villagers can access images too
   },
   {
     path: 'events',
     loadChildren: () => import('./events/events.module').then(m => m.EventsModule),
-    canActivate: [AuthGuard],
-    data: { roles: ['VILLAGE_ADMIN', 'SUPER_ADMIN'] }
+    canActivate: [AuthGuard]
+    // Removed role restriction - villagers can access events too
   },
   
   {

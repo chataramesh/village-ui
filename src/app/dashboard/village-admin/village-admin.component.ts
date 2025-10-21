@@ -289,9 +289,20 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/images']);
   }
 
-  // Coming Soon Feature
-  showIncidentsComingSoon() {
+  navigateToVehicles() {
+    this.router.navigate(['/vehicles']);
+  }
+
+  navigateToIncidents() {
     this.router.navigate(['/incidents']);
+  }
+
+  navigateToTemples() {
+    this.router.navigate(['/temples']);
+  }
+
+  navigateToSchools() {
+    this.router.navigate(['/schools']);
   }
 
   // Event Messages Auto-Scroll

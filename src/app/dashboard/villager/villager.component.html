@@ -165,18 +165,66 @@
           </div>
         </div>
 
-        <!-- COMPLAINTS Card -->
-        <div class="action-card complaints-card" (click)="navigateToComplaintCreate()">
+        <!-- EVENTS Card -->
+        <div class="action-card events-card" (click)="navigateToEvents()">
           <div class="action-card-header">
-            <div class="action-icon-wrapper complaints-gradient">
+            <div class="action-icon-wrapper events-gradient">
               <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <div class="action-content">
+              <h3 class="action-title">Events</h3>
+              <p class="action-subtitle">View & Join</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TEMPLES Card -->
+        <div class="action-card temples-card" (click)="navigateToTemples()">
+          <div class="action-card-header">
+            <div class="action-icon-wrapper temples-gradient">
+              <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+              </svg>
+            </div>
+            <div class="action-content">
+              <h3 class="action-title">Temples</h3>
+              <p class="action-subtitle">Visit & Pray</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCHOOLS/COLLEGES Card -->
+        <div class="action-card schools-card" (click)="navigateToSchools()">
+          <div class="action-card-header">
+            <div class="action-icon-wrapper schools-gradient">
+              <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+            </div>
+            <div class="action-content">
+              <h3 class="action-title">Schools/Colleges</h3>
+              <p class="action-subtitle">Education Info</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- INCIDENTS Card -->
+        <div class="action-card incidents-card" (click)="navigateToIncidents()">
+          <div class="action-card-header">
+            <div class="action-icon-wrapper incidents-gradient">
+              <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
               </svg>
             </div>
             <div class="action-content">
-              <h3 class="action-title">Complaints</h3>
-              <p class="action-subtitle">Raise Issue</p>
+              <h3 class="action-title">Incidents</h3>
+              <p class="action-subtitle">Report & Track</p>
             </div>
           </div>
         </div>

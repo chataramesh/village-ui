@@ -103,6 +103,11 @@ export class ImageService {
     };
   }
 
+  // Delete image
+  deleteImage(id: string): Observable<void> {
+    return this.apiService.delete<void>(`images/${id}`);
+  }
+
   // Refresh images (helper method)
   refreshImages(): void {
     this.getAllActiveImages().subscribe({
