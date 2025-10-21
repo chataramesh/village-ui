@@ -1,0 +1,183 @@
+<div class="subscriptions-container">
+  <!-- Header -->
+  <div class="subscriptions-header">
+    <button class="back-button" (click)="goBack()">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      Back to Dashboard
+    </button>
+    <h1 class="page-title">Village Subscriptions</h1>
+    <p class="page-subtitle">Manage your subscriptions to village entities and services</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading entities...</p>
+    <button class="retry-button" (click)="loadEntities()">Try Again</button>
+  </div>
+
+  <!-- Entities by Type -->
+  <div *ngIf="!isLoading && !error" class="entities-section">
+    <div *ngFor="let type of getEntityTypes()" class="entity-type-group">
+      <h2 class="type-heading">
+        <span class="type-icon">{{getTypeIcon(type)}}</span>
+        {{type | titlecase}}
+        <span class="type-count">({{entitiesByType[type]?.length}} entities)</span>
+      </h2>
+
+      <div class="entities-table-container">
+        <table class="entities-table">
+          <thead>
+            <tr>
+              <th>Entity Name</th>
+              <th>Description</th>
+              <th>Operating Hours</th>
+              <th>Contact</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let entity of entitiesByType[type]">
+              <tr class="entity-row">
+                <td class="entity-name">
+                  <div class="entity-info">
+                    <h4>{{entity.name}}</h4>
+                    <p class="entity-address">{{entity.address}}</p>
+                  </div>
+                </td>
+                <td class="entity-description">
+                  <p>{{entity.description}}</p>
+                  <small class="entity-owner">by {{entity.owner.name}}</small>
+                </td>
+                <td class="entity-hours">
+                  <div class="hours-info">
+                    <span class="time">{{formatTime(entity.openingTime)}} - {{formatTime(entity.closingTime)}}</span>
+                  </div>
+                </td>
+                <td class="entity-contact">
+                  <div class="contact-info">
+                    <span class="phone">{{entity.contactNumber}}</span>
+                    <span class="email">{{entity.email}}</span>
+                  </div>
+                </td>
+                <td class="entity-status">
+                  <span class="status-badge" [ngClass]="getStatusBadgeClass(entity)">
+                    {{getStatusText(entity)}}
+                  </span>
+                </td>
+                <td class="entity-actions">
+                  <div class="action-buttons">
+                    <button class="expand-btn" (click)="toggleEntityExpansion(entity)" title="View Details">
+                      <svg [class]="getExpandIconClass(entity)" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </button>
+                    <button
+                      class="action-btn"
+                      [class.subscribe-btn]="entity.subscriptionCount === 0"
+                      [class.unsubscribe-btn]="entity.subscriptionCount > 0"
+                      (click)="toggleSubscription(entity)">
+                      {{entity.subscriptionCount > 0 ? 'Unsubscribe' : 'Subscribe'}}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Expanded Details Row -->
+              <tr *ngIf="isEntityExpanded(entity)" class="entity-details-row">
+                <td colspan="6">
+                  <div class="entity-details-content">
+                    <div class="details-grid">
+                      <div class="detail-section">
+                        <h5>Entity Information</h5>
+                        <div class="detail-item">
+                          <span class="detail-label">Type:</span>
+                          <span class="detail-value">{{entity.type | titlecase}}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Village:</span>
+                          <span class="detail-value">{{entity.villageName}}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Capacity:</span>
+                          <span class="detail-value">{{entity.capacity}} people</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Available Slots:</span>
+                          <span class="detail-value">{{entity.availableSlots}}</span>
+                        </div>
+                      </div>
+
+                      <div class="detail-section">
+                        <h5>Contact Information</h5>
+                        <div class="detail-item">
+                          <span class="detail-label">Owner:</span>
+                          <span class="detail-value">{{entity.owner.name}}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Phone:</span>
+                          <span class="detail-value">{{entity.contactNumber}}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Email:</span>
+                          <span class="detail-value">{{entity.email}}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Address:</span>
+                          <span class="detail-value">{{entity.address}}</span>
+                        </div>
+                      </div>
+
+                      <div class="detail-section">
+                        <h5>Operating Details</h5>
+                        <div class="detail-item">
+                          <span class="detail-label">Opening Time:</span>
+                          <span class="detail-value">{{formatTime(entity.openingTime)}}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Closing Time:</span>
+                          <span class="detail-value">{{formatTime(entity.closingTime)}}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Current Status:</span>
+                          <span class="detail-value">{{entity.status}}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Active:</span>
+                          <span class="detail-value">{{entity.active ? 'Yes' : 'No'}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unsubscribe Confirmation Modal -->
+  <div *ngIf="showUnsubscribeConfirm" class="modal-overlay" (click)="closeUnsubscribeConfirm()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Confirm Unsubscribe</h3>
+        <button class="modal-close" (click)="closeUnsubscribeConfirm()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to unsubscribe from <strong>{{entityToUnsubscribe?.name}}</strong>?</p>
+        <p class="warning-text">You will no longer receive updates or have access to this entity's services.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeUnsubscribeConfirm()">Cancel</button>
+        <button class="btn-danger" (click)="confirmUnsubscribe()">Unsubscribe</button>
+      </div>
+    </div>
+  </div>

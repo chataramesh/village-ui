@@ -1,13 +1,11 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, HostListener, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
-import { HttpClient } from '@angular/common/http';
 import { TokenService } from 'src/app/core/services/token.service';
-import { UsersService, User } from 'src/app/users/users.service';
+import { UsersService, User, Role } from 'src/app/users/users.service';
 import { ChatService } from 'src/app/core/services/chat.service';
 import { WebsocketService } from 'src/app/core/services/websocket.service';
-
-Chart.register(...registerables);
+import { ProfileModalComponent, UserProfile } from 'src/app/shared/components/profile-modal/profile-modal.component';
 
 @Component({
   selector: 'app-villager',
@@ -108,6 +106,9 @@ export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
   isConnected = false;
   private lastSentMessage: string = '';
   private lastSentTime: number = 0;
+  // Profile Modal
+  showProfileModal = false;
+  currentUserProfile: UserProfile | null = null;
 
   // Chat Context Management
   private activeConversationPartner: string | null = null;
@@ -208,21 +209,99 @@ export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
   viewProfile() {
     console.log('Viewing profile...');
     this.closeUserMenu();
-    this.router.navigate(['/profile']);
-  }
 
-  viewNotifications() {
-    console.log('Viewing notifications...');
-    this.closeUserMenu();
-    // Navigate to notifications page or show notifications modal
-    // For now, just mark all as read
-    this.notifications.forEach(notification => notification.read = true);
-    this.notificationsCount = 0;
+    // Call API to get user profile data
+    if (this.currentUserId) {
+      this.usersService.getUserById(this.currentUserId).subscribe({
+        next: (userData) => {
+          this.currentUserProfile = {
+            id: userData.id || this.currentUserId || '',
+            name: userData.name,
+            email: userData.email,
+            phone: userData.phone,
+            role: userData.role,
+            village: userData.village?.name || '',
+            joinDate: userData.createdDate?.toISOString() || new Date().toISOString(),
+            address: '', // User interface doesn't have address field
+            emergencyContact: '' // User interface doesn't have emergencyContact field
+          };
+          this.showProfileModal = true;
+        },
+        error: (error) => {
+          console.error('Error loading user profile:', error);
+          // Fallback to current user data if API fails
+          this.currentUserProfile = {
+            id: this.currentUserId || '',
+            name: this.userName,
+            email: `${this.userName.toLowerCase().replace(' ', '.')}@village.local`,
+            phone: '+91-9876543210',
+            role: this.userRole,
+            village: 'Village Name',
+            joinDate: new Date().toISOString(),
+            address: 'Village Address, District',
+            emergencyContact: '+91-9876543211'
+          };
+          this.showProfileModal = true;
+        }
+      });
+    }
   }
 
   viewSubscriptions() {
     console.log('Viewing subscriptions...');
     this.closeUserMenu();
+    this.router.navigate(['/dashboard/villager/subscriptions']);
+  }
+
+  // Profile Modal Methods
+  closeProfileModal(): void {
+    this.showProfileModal = false;
+    this.currentUserProfile = null;
+  }
+
+  updateUserProfile(updatedProfile: UserProfile): void {
+    console.log('Updating user profile:', updatedProfile);
+
+    // Call API to update user profile
+    if (updatedProfile.id) {
+      // First get current user data to preserve other fields
+      this.usersService.getUserById(updatedProfile.id).subscribe({
+        next: (currentUserData) => {
+          const updateData: User = {
+            ...currentUserData,
+            name: updatedProfile.name,
+            email: updatedProfile.email,
+            phone: updatedProfile.phone,
+            role: updatedProfile.role as Role
+          };
+
+          this.usersService.updateUser(updatedProfile.id, updateData).subscribe({
+            next: (updatedUser) => {
+              console.log('Profile updated successfully:', updatedUser);
+              // Update local user data
+              this.userName = updatedUser.name;
+              this.userRole = updatedUser.role;
+              this.closeProfileModal();
+            },
+            error: (error) => {
+              console.error('Error updating user profile:', error);
+              // Keep modal open for retry
+            }
+          });
+        },
+        error: (error) => {
+          console.error('Error getting current user data:', error);
+          // Keep modal open for retry
+        }
+      });
+    }
+  }
+
+  deleteUserProfile(userId: string): void {
+    console.log('Deleting user profile:', userId);
+    // Here you would typically call a service to delete the profile
+    // For now, just close the modal
+    this.closeProfileModal();
   }
 
   handleLogout() {
@@ -271,9 +350,11 @@ export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   navigateToComplaintCreate() {
-    this.router.navigate(['/complaints/create']);
+    this.router.navigate(['/incidents']);
   }
-
+  navigateToVehicles() {
+    this.router.navigate(['/vehicles']);
+  }
   ngAfterViewInit(): void {
     // Initialize charts after view is ready
     setTimeout(() => {
@@ -304,8 +385,8 @@ export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.isLoadingUsers = true;
     this.usersService.getAllUsers().subscribe({
-      next: (users) => {
-        this.chatUsers = users.filter(user => user.id !== this.currentUserId);
+      next: (users: any) => {
+        this.chatUsers = users.filter((user: any) => user.id !== this.currentUserId);
         console.log('Chat users loaded:', this.chatUsers.length, 'users');
         this.isLoadingUsers = false;
       },

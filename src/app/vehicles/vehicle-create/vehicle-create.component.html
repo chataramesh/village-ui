@@ -1,0 +1,147 @@
+<div class="vehicle-create-container">
+  <!-- Modern Header -->
+  <div class="create-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="onCancel()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to Vehicles
+      </button>
+      <div class="header-info">
+        <h1 class="page-title">{{isEditMode ? 'Edit Vehicle' : 'Register New Vehicle'}}</h1>
+        <p class="page-subtitle">{{isEditMode ? 'Update vehicle information' : 'Add a new vehicle to the registry'}}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Loading vehicle data...</p>
+  </div>
+
+  <!-- Modern Form -->
+  <div class="form-container" *ngIf="!loading">
+    <form [formGroup]="vehicleForm" (ngSubmit)="onSubmit()" class="vehicle-form">
+
+      <!-- Vehicle Basic Information -->
+      <div class="form-section">
+        <h3 class="section-title">Vehicle Information</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="vehicleNumber" class="form-label">Vehicle Number *</label>
+            <input
+              id="vehicleNumber"
+              type="text"
+              formControlName="vehicleNumber"
+              class="form-input"
+              placeholder="e.g., AB12CD3456"
+              maxlength="10"
+              style="text-transform: uppercase;"
+              [class.error]="vehicleForm.get('vehicleNumber')?.invalid && vehicleForm.get('vehicleNumber')?.touched">
+            <div class="input-hint">Format: AB12CD3456</div>
+            <div class="error-message" *ngIf="vehicleForm.get('vehicleNumber')?.invalid && vehicleForm.get('vehicleNumber')?.touched">
+              <span *ngIf="vehicleForm.get('vehicleNumber')?.errors?.['required']">Vehicle number is required</span>
+              <span *ngIf="vehicleForm.get('vehicleNumber')?.errors?.['pattern']">Please enter a valid vehicle number format</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="vehicleType" class="form-label">Vehicle Type *</label>
+            <select
+              id="vehicleType"
+              formControlName="vehicleType"
+              class="form-select"
+              [class.error]="vehicleForm.get('vehicleType')?.invalid && vehicleForm.get('vehicleType')?.touched">
+              <option value="">Select vehicle type</option>
+              <option *ngFor="let type of vehicleTypes" [value]="type">{{type.replace('_', ' ')}}</option>
+            </select>
+            <div class="error-message" *ngIf="vehicleForm.get('vehicleType')?.invalid && vehicleForm.get('vehicleType')?.touched">
+              Vehicle type is required
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="wheelerType" class="form-label">Wheeler Type *</label>
+            <select
+              id="wheelerType"
+              formControlName="wheelerType"
+              class="form-select"
+              [class.error]="vehicleForm.get('wheelerType')?.invalid && vehicleForm.get('wheelerType')?.touched">
+              <option value="">Select wheeler type</option>
+              <option *ngFor="let type of wheelerTypes" [value]="type">{{type.replace('_', ' ')}}</option>
+            </select>
+            <div class="error-message" *ngIf="vehicleForm.get('wheelerType')?.invalid && vehicleForm.get('wheelerType')?.touched">
+              Wheeler type is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="seatingCapacity" class="form-label">Seating Capacity</label>
+            <input
+              id="seatingCapacity"
+              type="number"
+              formControlName="seatingCapacity"
+              class="form-input"
+              placeholder="Enter seating capacity"
+              min="0"
+              [class.error]="vehicleForm.get('seatingCapacity')?.invalid && vehicleForm.get('seatingCapacity')?.touched">
+            <div class="error-message" *ngIf="vehicleForm.get('seatingCapacity')?.invalid && vehicleForm.get('seatingCapacity')?.touched">
+              Please enter a valid seating capacity
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="vehicleDescription" class="form-label">Description</label>
+          <textarea
+            id="vehicleDescription"
+            formControlName="vehicleDescription"
+            class="form-textarea"
+            placeholder="Enter vehicle description, model, color, etc."
+            rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="isActive">
+            <span class="checkmark"></span>
+            Vehicle is active and operational
+          </label>
+        </div>
+      </div>
+
+      <!-- Owner Information (Read-only) -->
+      <div class="form-section" *ngIf="currentUser">
+        <h3 class="section-title">Owner Information</h3>
+        <div class="owner-info-card">
+          <div class="owner-avatar">
+            <span class="owner-initial">{{currentUser.name?.charAt(0)?.toUpperCase()}}</span>
+          </div>
+          <div class="owner-details">
+            <h4 class="owner-name">{{currentUser.name}}</h4>
+            <p class="owner-email">{{currentUser.email}}</p>
+            <span class="owner-badge">Vehicle Owner</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="submitting">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="vehicleForm.invalid || submitting">
+          <span *ngIf="!submitting">{{isEditMode ? 'Update Vehicle' : 'Register Vehicle'}}</span>
+          <span *ngIf="submitting">
+            <div class="btn-spinner"></div>
+            Processing...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

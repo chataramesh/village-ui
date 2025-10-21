@@ -1,0 +1,219 @@
+<div class="modal-overlay" *ngIf="isVisible" (click)="onBackdropClick($event)">
+  <div class="modal-content">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-title">User Profile</h2>
+      <button class="close-btn" (click)="onClose()" *ngIf="!isEditing">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="modal-body">
+      <div class="profile-section">
+        <!-- Profile Picture -->
+        <div class="profile-picture-section">
+          <div class="profile-picture">
+            <img
+              *ngIf="userProfile?.profileImage; else defaultAvatar"
+              [src]="userProfile?.profileImage"
+              [alt]="userProfile?.name"
+              class="profile-image"
+            />
+            <ng-template #defaultAvatar>
+              <div class="default-avatar">
+                <span class="avatar-text">{{getInitials(userProfile?.name)}}</span>
+              </div>
+            </ng-template>
+          </div>
+          <div class="profile-picture-actions" *ngIf="isEditing">
+            <button class="change-photo-btn">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <span>Change Photo</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Profile Information -->
+        <div class="profile-info-section">
+          <!-- Basic Information -->
+          <div class="info-group">
+            <h3 class="section-title">Basic Information</h3>
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="field-label">Full Name</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  [class.editing]="isEditing"
+                  [readonly]="!isEditing"
+                  [(ngModel)]="editedProfile!.name"
+                  placeholder="Enter full name"
+                />
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">Email Address</label>
+                <input
+                  type="email"
+                  class="form-input"
+                  [class.editing]="isEditing"
+                  [readonly]="!isEditing"
+                  [(ngModel)]="editedProfile!.email"
+                  placeholder="Enter email address"
+                />
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">Phone Number</label>
+                <input
+                  type="tel"
+                  class="form-input"
+                  [class.editing]="isEditing"
+                  [readonly]="!isEditing"
+                  [(ngModel)]="editedProfile!.phone"
+                  placeholder="Enter phone number"
+                />
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">Role</label>
+                <input
+                  *ngIf="!isEditing"
+                  type="text"
+                  class="form-input"
+                  readonly
+                  [value]="getRoleDisplayName(userProfile?.role)"
+                />
+                <select
+                  *ngIf="isEditing"
+                  class="form-input"
+                  [class.editing]="isEditing"
+                  [disabled]="!isEditing"
+                  [(ngModel)]="editedProfile!.role"
+                >
+                  <option value="VILLAGER">Villager</option>
+                  <option value="VILLAGE_ADMIN">Village Head</option>
+                  <option value="ENTITY_OWNER">Entity Owner</option>
+                  <option value="SUPER_ADMIN">Admin</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Address Information -->
+          <div class="info-group">
+            <h3 class="section-title">Address Information</h3>
+            <div class="form-grid">
+              <div class="form-field full-width">
+                <label class="field-label">Village</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  [class.editing]="isEditing"
+                  [readonly]="!isEditing"
+                  [(ngModel)]="editedProfile!.village"
+                  placeholder="Enter village name"
+                />
+              </div>
+
+              <div class="form-field full-width">
+                <label class="field-label">Address</label>
+                <textarea
+                  class="form-textarea"
+                  [class.editing]="isEditing"
+                  [readonly]="!isEditing"
+                  [(ngModel)]="editedProfile!.address"
+                  placeholder="Enter full address"
+                  rows="3"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Emergency Contact -->
+          <div class="info-group">
+            <h3 class="section-title">Emergency Contact</h3>
+            <div class="form-field full-width">
+              <label class="field-label">Emergency Contact</label>
+              <input
+                type="text"
+                class="form-input"
+                [class.editing]="isEditing"
+                [readonly]="!isEditing"
+                [(ngModel)]="editedProfile!.emergencyContact"
+                placeholder="Enter emergency contact details"
+              />
+            </div>
+          </div>
+
+          <!-- Account Information (Read-only) -->
+          <div class="info-group">
+            <h3 class="section-title">Account Information</h3>
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="field-label">Member Since</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  readonly
+                  [value]="formatDate(userProfile?.joinDate)"
+                />
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">User ID</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  readonly
+                  [value]="userProfile?.id"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="modal-actions">
+      <button
+        class="btn-secondary"
+        (click)="onClose()"
+        *ngIf="!isEditing">
+        Close
+      </button>
+
+      <div class="action-buttons" *ngIf="!isEditing">
+        <button class="btn-primary" (click)="onEdit()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+          <span>Edit Profile</span>
+        </button>
+
+        <button class="btn-danger" (click)="onDelete()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          <span>Delete Profile</span>
+        </button>
+      </div>
+
+      <div class="edit-actions" *ngIf="isEditing">
+        <button class="btn-secondary" (click)="onCancel()">Cancel</button>
+        <button class="btn-primary" (click)="onSave()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>

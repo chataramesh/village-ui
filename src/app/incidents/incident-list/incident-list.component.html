@@ -7,7 +7,7 @@
     </div>
 
     <div class="header-actions">
-      <button class="create-btn" (click)="navigateToCreate()">
+      <button class="create-btn" (click)="navigateToCreate()" *ngIf="canCreateIncidents">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
         </svg>
@@ -243,7 +243,7 @@
       <h3>No incidents found</h3>
       <p *ngIf="incidents.length === 0">No incidents have been reported yet.</p>
       <p *ngIf="incidents.length > 0">No incidents match your current filters.</p>
-      <button class="create-btn" (click)="navigateToCreate()">Report First Incident</button>
+      <button class="create-btn" (click)="navigateToCreate()" *ngIf="canCreateIncidents">Report First Incident</button>
     </div>
   </ng-template>
 </div>

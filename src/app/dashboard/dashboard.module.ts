@@ -8,6 +8,7 @@ import { VillagerComponent } from './villager/villager.component';
 import { DashboardLandingComponent } from './dashboard-landing/dashboard-landing.component';
 import { SharedModule } from '../shared/shared.module';
 import { NotificationBellComponent } from '../shared/components/notification-bell.component';
+import { ProfileModalComponent } from '../shared/components/profile-modal/profile-modal.component';
 
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -15,6 +16,7 @@ import { NgApexchartsModule } from 'ng-apexcharts';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule } from '@angular/forms';
 import { VillagerEntityListComponent } from './villager/villager-entity-list/villager-entity-list.component';
+import { SubscriptionsComponent } from './villager/subscriptions/subscriptions.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +31,8 @@ import { VillagerEntityListComponent } from './villager/villager-entity-list/vil
     DashboardRoutingModule,
     SharedModule,
     NotificationBellComponent,
+    ProfileModalComponent,
+    SubscriptionsComponent,
     MatTooltipModule,
     MatProgressBarModule,
     NgApexchartsModule,

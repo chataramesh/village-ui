@@ -14,6 +14,12 @@ interface Entity {
   type: string;
   villageId: string;
   ownerName: string;
+  ownerId?: string;
+  owner?: {
+    id: string;
+    name: string;
+    email: string;
+  };
   isOpen: boolean;
   openingTime: string;
   closingTime: string;
@@ -187,6 +193,28 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
 
   refresh() {
     this.loadEntities();
+  }
+
+  // Check if current user is the owner of the entity
+  isCurrentUserOwner(entity: Entity): boolean {
+    if (!this.currentUser?.id) return false;
+
+    // Check if entity has owner object with ID
+    if (entity.owner?.id) {
+      return entity.owner.id === this.currentUser.id;
+    }
+
+    // Check if entity has ownerId field
+    if (entity.ownerId) {
+      return entity.ownerId === this.currentUser.id;
+    }
+
+    return false;
+  }
+
+  // Navigate to edit entity page
+  editEntity(entity: Entity): void {
+    this.router.navigate(['/entities/edit', entity.id]);
   }
 
   // Subscription Methods

@@ -1,1 +1,181 @@
-<p>entity-create works!</p>
+<div class="entity-create-container">
+  <!-- Header -->
+  <div class="create-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="onCancel()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to Entities
+      </button>
+      <div class="header-info">
+        <h1 class="page-title">{{isEditMode ? 'Edit Entity' : 'Create New Entity'}}</h1>
+        <p class="page-subtitle">{{isEditMode ? 'Update entity information' : 'Add a new entity to the system'}}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Loading entity data...</p>
+  </div>
+
+  <!-- Form -->
+  <div class="form-container" *ngIf="!loading">
+    <form [formGroup]="entityForm" (ngSubmit)="onSubmit()" class="entity-form">
+
+      <!-- Basic Information -->
+      <div class="form-section">
+        <h3 class="section-title">Basic Information</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name" class="form-label">Entity Name *</label>
+            <input
+              id="name"
+              type="text"
+              formControlName="name"
+              class="form-input"
+              placeholder="Enter entity name"
+              [class.error]="entityForm.get('name')?.invalid && entityForm.get('name')?.touched">
+            <div class="error-message" *ngIf="entityForm.get('name')?.invalid && entityForm.get('name')?.touched">
+              <span *ngIf="entityForm.get('name')?.errors?.['required']">Entity name is required</span>
+              <span *ngIf="entityForm.get('name')?.errors?.['minlength']">Name must be at least 3 characters</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="type" class="form-label">Entity Type *</label>
+            <select
+              id="type"
+              formControlName="type"
+              class="form-select"
+              [class.error]="entityForm.get('type')?.invalid && entityForm.get('type')?.touched">
+              <option value="">Select entity type</option>
+              <option *ngFor="let type of entityTypes" [value]="type">{{type}}</option>
+            </select>
+            <div class="error-message" *ngIf="entityForm.get('type')?.invalid && entityForm.get('type')?.touched">
+              Entity type is required
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description" class="form-label">Description</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            class="form-textarea"
+            placeholder="Enter entity description"
+            rows="3"></textarea>
+        </div>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="form-section">
+        <h3 class="section-title">Contact Information</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contactNumber" class="form-label">Contact Number</label>
+            <input
+              id="contactNumber"
+              type="tel"
+              formControlName="contactNumber"
+              class="form-input"
+              placeholder="Enter contact number">
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              class="form-input"
+              placeholder="Enter email address"
+              [class.error]="entityForm.get('email')?.invalid && entityForm.get('email')?.touched">
+            <div class="error-message" *ngIf="entityForm.get('email')?.invalid && entityForm.get('email')?.touched">
+              Please enter a valid email address
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="address" class="form-label">Address</label>
+          <textarea
+            id="address"
+            formControlName="address"
+            class="form-textarea"
+            placeholder="Enter full address"
+            rows="2"></textarea>
+        </div>
+      </div>
+
+      <!-- Operating Details -->
+      <div class="form-section">
+        <h3 class="section-title">Operating Details</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="status" class="form-label">Status *</label>
+            <select
+              id="status"
+              formControlName="status"
+              class="form-select">
+              <option *ngFor="let status of entityStatuses" [value]="status">{{status}}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="capacity" class="form-label">Capacity</label>
+            <input
+              id="capacity"
+              type="number"
+              formControlName="capacity"
+              class="form-input"
+              placeholder="Enter capacity"
+              min="0">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="openingTime" class="form-label">Opening Time</label>
+            <input
+              id="openingTime"
+              type="time"
+              formControlName="openingTime"
+              class="form-input">
+          </div>
+
+          <div class="form-group">
+            <label for="closingTime" class="form-label">Closing Time</label>
+            <input
+              id="closingTime"
+              type="time"
+              formControlName="closingTime"
+              class="form-input">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="isActive">
+            <span class="checkmark"></span>
+            Entity is active
+          </label>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="submitting">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="entityForm.invalid || submitting">
+          <span *ngIf="!submitting">{{isEditMode ? 'Update Entity' : 'Create Entity'}}</span>
+          <span *ngIf="submitting">Processing...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

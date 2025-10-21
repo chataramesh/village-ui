@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { EntitiesRoutingModule } from './entities-routing.module';
 import { EntityListComponent } from './entity-list/entity-list.component';
@@ -19,6 +19,7 @@ import { WebSocketNotificationService } from '../core/services/websocket-notific
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     EntitiesRoutingModule,
     NotificationBellComponent
   ],

@@ -1,0 +1,218 @@
+<div class="vehicle-list-container">
+  <!-- Modern Header -->
+  <div class="vehicles-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="goBack()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to Dashboard
+      </button>
+      <div class="header-info">
+        <h1 class="page-title">Vehicle Registry</h1>
+        <p class="page-subtitle">Browse and manage village vehicles</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="create-btn" (click)="navigateToCreate()" *ngIf="canCreateVehicles">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+        Register Vehicle
+      </button>
+    </div>
+  </div>
+
+  <!-- Modern Filters Section -->
+  <div class="filters-section">
+    <div class="filters-container">
+      <div class="filter-group">
+        <label class="filter-label">Vehicle Type</label>
+        <select class="filter-select" [(ngModel)]="selectedVehicleType" (change)="onVehicleTypeChange()">
+          <option value="">All Types</option>
+          <option *ngFor="let type of vehicleTypes" [value]="type">{{type.replace('_', ' ')}}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Wheeler Type</label>
+        <select class="filter-select" [(ngModel)]="selectedWheelerType" (change)="onWheelerTypeChange()">
+          <option value="">All Wheelers</option>
+          <option *ngFor="let type of wheelerTypes" [value]="type">{{getWheelerTypeLabel(type)}}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-toggle">
+          <input type="checkbox" [(ngModel)]="showActiveOnly" (change)="onActiveFilterChange()">
+          <span class="toggle-slider"></span>
+          Active Only
+        </label>
+      </div>
+
+      <div class="filter-group search">
+        <label class="filter-label">Search</label>
+        <input 
+          type="text" 
+          class="search-input" 
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange()"
+          placeholder="Search by number, owner, or description...">
+      </div>
+
+      <div class="filter-actions">
+        <button class="clear-btn" (click)="clearFilters()">Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Loading vehicles...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="error && !loading">
+    <div class="error-icon">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+      </svg>
+    </div>
+    <h3>Failed to Load Vehicles</h3>
+    <p>{{error}}</p>
+    <button class="retry-btn" (click)="refresh()">Try Again</button>
+  </div>
+
+  <!-- Vehicles Grid -->
+  <div class="vehicles-content" *ngIf="!loading && !error">
+    <!-- Results Header -->
+    <div class="results-header">
+      <h2 class="results-title">{{filteredVehicles.length}} Vehicles Found</h2>
+      <button class="refresh-btn" (click)="refresh()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        Refresh
+      </button>
+    </div>
+
+    <!-- Vehicles Grid -->
+    <div class="vehicles-grid" *ngIf="filteredVehicles.length > 0; else noVehicles">
+      <div *ngFor="let vehicle of paginatedVehicles; let i = index" 
+           class="vehicle-card"
+           [style.animation-delay]="(i * 0.05) + 's'"
+           (click)="viewVehicleDetails(vehicle)">
+        
+        <div class="vehicle-card-header">
+          <div class="vehicle-icon">
+            <span class="vehicle-emoji">{{getVehicleTypeIcon(vehicle.vehicleType)}}</span>
+          </div>
+          <div class="vehicle-status" [class.active]="vehicle.isActive" [class.inactive]="!vehicle.isActive">
+            <span class="status-dot"></span>
+            {{vehicle.isActive ? 'Active' : 'Inactive'}}
+          </div>
+        </div>
+
+        <div class="vehicle-info">
+          <h3 class="vehicle-number">{{vehicle.vehicleNumber}}</h3>
+          <p class="vehicle-type">{{vehicle.vehicleType.replace('_', ' ')}}</p>
+          <p class="vehicle-wheeler">{{getWheelerTypeLabel(vehicle.wheelerType)}}</p>
+          
+          <div class="vehicle-details">
+            <div class="detail-item" *ngIf="vehicle.owner">
+              <span class="detail-label">Owner:</span>
+              <span class="detail-value">{{vehicle.owner.name}}</span>
+            </div>
+            <div class="detail-item" *ngIf="vehicle.seatingCapacity">
+              <span class="detail-label">Capacity:</span>
+              <span class="detail-value">{{vehicle.seatingCapacity}} seats</span>
+            </div>
+            <div class="detail-item" *ngIf="vehicle.village">
+              <span class="detail-label">Village:</span>
+              <span class="detail-value">{{vehicle.village.name}}</span>
+            </div>
+          </div>
+
+          <div class="vehicle-description" *ngIf="vehicle.vehicleDescription">
+            {{vehicle.vehicleDescription}}
+          </div>
+        </div>
+
+        <div class="vehicle-actions">
+          <button
+            class="action-btn edit-btn"
+            (click)="editVehicle(vehicle); $event.stopPropagation()"
+            *ngIf="isCurrentUserOwner(vehicle)"
+            title="Edit Vehicle">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+            Edit
+          </button>
+
+          <button
+            class="action-btn book-btn"
+            (click)="bookVehicle(vehicle); $event.stopPropagation()"
+            *ngIf="!isCurrentUserOwner(vehicle)"
+            title="Book Vehicle">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+            </svg>
+            Book
+          </button>
+
+          <button class="action-btn view-btn" title="View Details">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+            </svg>
+            View
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button 
+        class="pagination-btn" 
+        [disabled]="currentPage === 1"
+        (click)="onPageChange(currentPage - 1)">
+        Previous
+      </button>
+
+      <div class="pagination-pages">
+        <button 
+          *ngFor="let page of getPagesArray()"
+          class="pagination-btn page-btn"
+          [class.active]="page === currentPage"
+          (click)="onPageChange(page)">
+          {{page}}
+        </button>
+      </div>
+
+      <button 
+        class="pagination-btn"
+        [disabled]="currentPage === totalPages"
+        (click)="onPageChange(currentPage + 1)">
+        Next
+      </button>
+    </div>
+  </div>
+
+  <!-- No Vehicles State -->
+  <ng-template #noVehicles>
+    <div class="empty-state">
+      <div class="empty-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+        </svg>
+      </div>
+      <h3>No vehicles found</h3>
+      <p *ngIf="vehicles.length === 0">No vehicles have been registered yet.</p>
+      <p *ngIf="vehicles.length > 0">No vehicles match your current filters.</p>
+      <button class="create-btn" (click)="navigateToCreate()" *ngIf="canCreateVehicles">Register First Vehicle</button>
+    </div>
+  </ng-template>
+</div>

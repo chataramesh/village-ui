@@ -37,6 +37,11 @@ const routes: Routes = [
     data: { role: 'SUPER_ADMIN' }
   },
   {
+    path: 'vehicles',
+    loadChildren: () => import('./vehicles/vehicles.module').then(m => m.VehiclesModule),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'entities',
     loadChildren: () => import('./entities/entities.module').then(m => m.EntitiesModule),
     canActivate: [AuthGuard]
@@ -44,8 +49,7 @@ const routes: Routes = [
   {
     path: 'incidents',
     loadChildren: () => import('./incidents/incidents.module').then(m => m.IncidentsModule),
-    canActivate: [AuthGuard],
-    data: { roles: ['VILLAGE_ADMIN', 'SUPER_ADMIN'] }
+    canActivate: [AuthGuard]
   },
   {
     path: 'images',
@@ -59,7 +63,7 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     data: { roles: ['VILLAGE_ADMIN', 'SUPER_ADMIN'] }
   },
- 
+  
   {
     path: '**',
     redirectTo: 'dashboard'

@@ -11,6 +11,7 @@ import {
   DashboardSummary,
   IncidentFilters
 } from '../types/incident.types';
+import { TokenService } from 'src/app/core/services/token.service';
 
 @Component({
   selector: 'app-incident-list',
@@ -44,14 +45,19 @@ export class IncidentListComponent implements OnInit, OnDestroy {
   itemsPerPage = 10;
   totalItems = 0;
 
+  // User permissions
+  canCreateIncidents = false;
+
   constructor(
     private incidentService: IncidentService,
-    private router: Router
+    private router: Router,
+    private tokenService: TokenService
   ) {}
 
   ngOnInit(): void {
     console.log('IncidentListComponent: Initializing...');
     this.initializeEnums();
+    this.checkUserPermissions();
     this.loadDashboardSummary();
     this.loadIncidents();
   }
@@ -66,6 +72,17 @@ export class IncidentListComponent implements OnInit, OnDestroy {
     this.categories = Object.values(IncidentCategory);
     this.priorities = Object.values(IncidentPriority);
     this.locationTypes = Object.values(LocationType);
+  }
+
+  private checkUserPermissions(): void {
+    const tokenUser = this.tokenService.getCurrentUser();
+    if (tokenUser) {
+      const userRole = tokenUser.role || '';
+      // Only village-admin and super-admin can create incidents
+      this.canCreateIncidents = userRole === 'VILLAGE_ADMIN' || userRole === 'SUPER_ADMIN';
+    } else {
+      this.canCreateIncidents = false;
+    }
   }
 
   loadDashboardSummary(): void {

@@ -25,7 +25,7 @@
             <!-- User Info -->
             <div class="user-info">
               <span class="user-name">{{userName}}</span>
-              <span class="user-role">Villager</span>
+              <span class="user-role">{{userRole}}</span>
             </div>
 
             <!-- Dropdown Arrow -->
@@ -67,24 +67,6 @@
                 <div class="menu-item-content">
                   <span class="menu-item-title">View Profile</span>
                   <span class="menu-item-desc">Manage your account settings</span>
-                </div>
-                <div class="menu-item-arrow">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                  </svg>
-                </div>
-              </button>
-
-              <button class="dropdown-menu-item" (click)="viewNotifications()">
-                <div class="menu-item-icon">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M15 17h5l-5 5-5-5h5V12h-5l5-5 5 5h-5v5zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
-                  </svg>
-                </div>
-                <div class="menu-item-content">
-                  <span class="menu-item-title">Notifications</span>
-                  <span class="menu-item-desc">{{notificationsCount}} unread notifications</span>
                 </div>
                 <div class="menu-item-arrow">
                   <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,7 +134,7 @@
         </div>
 
         <!-- VEHICLE Card -->
-        <div class="action-card vehicle-card">
+        <div class="action-card vehicle-card" (click)="navigateToVehicles()">
           <div class="action-card-header" >
             <div class="action-icon-wrapper">
               <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -258,7 +240,16 @@
 
   </div>
 
-  <!-- Chat FAB -->
+  <!-- Profile Modal -->
+  <app-profile-modal
+    [isVisible]="showProfileModal"
+    [userProfile]="currentUserProfile"
+    (closeModal)="closeProfileModal()"
+    (updateProfile)="updateUserProfile($event)"
+    (deleteProfile)="deleteUserProfile($event)">
+  </app-profile-modal>
+
+<!-- Chat FAB -->
   <button class="chat-fab" (click)="toggleChatPopup()">
     <svg class="chat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -320,5 +311,4 @@
     </div>
   </div>
 
-</div>
 

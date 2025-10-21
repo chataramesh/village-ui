@@ -72,8 +72,7 @@
               "browserTarget": "village-ui:build:production"
             },
             "development": {
-              "browserTarget": "village-ui:build:development",
-              "proxyConfig": "proxy.conf.json"
+              "browserTarget": "village-ui:build:development"
             }
           },
           "defaultConfiguration": "development"

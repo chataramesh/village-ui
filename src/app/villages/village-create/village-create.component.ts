@@ -36,7 +36,7 @@ export class VillageCreateComponent implements OnInit {
   isSubmitting: boolean = false;
   villageId: string | null = null;
 
-  private apiUrl = environment.villageUrl;
+  //private apiUrl = environment.villageUrl;
 
   constructor(
     private router: Router,
@@ -54,9 +54,9 @@ export class VillageCreateComponent implements OnInit {
     // Load mandals for dropdown
     this.loadMandals();
 
-    if (this.isEditMode && this.villageId) {
-      this.loadVillage(this.villageId);
-    }
+    // if (this.isEditMode && this.villageId) {
+    //   this.loadVillage(this.villageId);
+    // }
   }
 
   loadMandals(): void {
@@ -70,17 +70,17 @@ export class VillageCreateComponent implements OnInit {
     });
   }
 
-  loadVillage(villageId: string): void {
-    this.http.get<Village>(`${this.apiUrl}/village/${villageId}`).subscribe({
-      next: (data) => {
-        this.village = data;
-      },
-      error: (err) => {
-        console.error('Error loading village:', err);
-        alert('Failed to load village data');
-      }
-    });
-  }
+  // loadVillage(villageId: string): void {
+  //   this.http.get<Village>(`${this.apiUrl}/village/${villageId}`).subscribe({
+  //     next: (data) => {
+  //       this.village = data;
+  //     },
+  //     error: (err) => {
+  //       console.error('Error loading village:', err);
+  //       alert('Failed to load village data');
+  //     }
+  //   });
+  // }
 
   onSubmit(): void {
     if (this.isSubmitting) return;

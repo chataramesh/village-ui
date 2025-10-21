@@ -6,6 +6,7 @@ import { VillageAdminComponent } from './village-admin/village-admin.component';
 import { VillagerComponent } from './villager/villager.component';
 import { VillagerEntityListComponent } from './villager/villager-entity-list/villager-entity-list.component';
 import { DashboardLandingComponent } from './dashboard-landing/dashboard-landing.component';
+import { SubscriptionsComponent } from './villager/subscriptions/subscriptions.component';
 
 const routes: Routes = [
   { path: '', component: DashboardLandingComponent }, // optional landing
@@ -15,7 +16,8 @@ const routes: Routes = [
     path: 'villager',
     children: [
       { path: '', component: VillagerComponent, canActivate: [RoleGuard], data: { role: 'VILLAGER' } },
-      { path: 'entities', component: VillagerEntityListComponent, canActivate: [RoleGuard], data: { role: 'VILLAGER' } }
+      { path: 'entities', component: VillagerEntityListComponent, canActivate: [RoleGuard], data: { role: 'VILLAGER' } },
+      { path: 'subscriptions', component: SubscriptionsComponent, canActivate: [RoleGuard], data: { role: 'VILLAGER' } }
     ]
   }
 ];

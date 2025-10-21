@@ -5,7 +5,8 @@ import { EntityListComponent } from './entity-list/entity-list.component';
 
 const routes: Routes = [
   { path: '', component: EntityListComponent },
-  { path: 'create', component: EntityCreateComponent }
+  { path: 'create', component: EntityCreateComponent },
+  { path: 'edit/:id', component: EntityCreateComponent }
 ];
 
 
