@@ -63,13 +63,26 @@ const routes: Routes = [
     canActivate: [AuthGuard]
     // Removed role restriction - villagers can access events too
   },
-  
+
+  // Schools routes
+  {
+    path: 'schools',
+    loadChildren: () => import('./schools/schools.module').then(m => m.SchoolsModule),
+    canActivate: [AuthGuard]
+  },
+
+  // Temples routes
+  {
+    path: 'temples',
+    loadChildren: () => import('./temples/temples.module').then(m => m.TemplesModule),
+    canActivate: [AuthGuard]
+  },
+
   {
     path: '**',
     redirectTo: 'dashboard'
   }
 ];
-
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
