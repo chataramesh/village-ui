@@ -120,7 +120,17 @@
         </div>
         <div class="count-card-content">
           <p class="count-card-label">Entities</p>
-          <p class="count-card-value">18</p>
+          <p class="count-card-value">{{counts.entities.totalEntities}}</p>
+          <div class="count-card-details">
+            <div class="detail-item active">
+              <div class="detail-dot active"></div>
+              <span>{{counts.entities.activeEntities}} Active</span>
+            </div>
+            <div class="detail-item inactive">
+              <div class="detail-dot inactive"></div>
+              <span>{{counts.entities.inactiveEntities}} Inactive</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -133,7 +143,17 @@
         </div>
         <div class="count-card-content">
           <p class="count-card-label">Villagers</p>
-          <p class="count-card-value">245</p>
+          <p class="count-card-value">{{counts.villagers!.totalVillagers || 0}}</p>
+          <div class="count-card-details">
+            <div class="detail-item active">
+              <div class="detail-dot active"></div>
+              <span>{{counts.villagers!.activeVillagers || 0}} Active</span>
+            </div>
+            <div class="detail-item inactive">
+              <div class="detail-dot inactive"></div>
+              <span>{{counts.villagers!.inactiveVillagers || 0}} Inactive</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -146,7 +166,17 @@
         </div>
         <div class="count-card-content">
           <p class="count-card-label">Events</p>
-          <p class="count-card-value">7</p>
+          <p class="count-card-value">{{counts.events.totalEvents}}</p>
+          <div class="count-card-details">
+            <div class="detail-item active">
+              <div class="detail-dot active"></div>
+              <span>{{counts.events.activeEvents}} Active</span>
+            </div>
+            <div class="detail-item inactive">
+              <div class="detail-dot inactive"></div>
+              <span>{{counts.events.inactiveEvents}} Inactive</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -160,7 +190,17 @@
         </div>
         <div class="count-card-content">
           <p class="count-card-label">Incidents</p>
-          <p class="count-card-value">23</p>
+          <p class="count-card-value">{{counts.incidents.totalIncidents}}</p>
+          <div class="count-card-details">
+            <div class="detail-item active">
+              <div class="detail-dot active"></div>
+              <span>{{counts.incidents.activeIncidents}} Active</span>
+            </div>
+            <div class="detail-item inactive">
+              <div class="detail-dot inactive"></div>
+              <span>{{counts.incidents.inactiveIncidents}} Inactive</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -68,7 +68,8 @@
         <div class="images-grid">
           <div class="image-card" *ngFor="let image of imagesByDate[date] || []">
             <div class="image-container">
-              <img [src]="'/Users/cramesh/uploads/images/4891b6e2-e66a-46c6-b793-551f6e18bea0.png'" [alt]="image.altText || image.originalFileName" class="image-preview" >
+             
+              <img [src]="image.filePath" [alt]="image.altText || image.originalFileName" class="image-preview" >
 
               <!-- Image Overlay Actions -->
               <div class="image-overlay">

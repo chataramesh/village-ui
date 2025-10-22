@@ -48,7 +48,7 @@ export class UserListComponent implements OnInit {
 
       if (roleParam) {
         this.contextRole = roleParam as Role;
-        this.roleFilter = this.contextRole;
+        this.roleFilter = this.contextRole; // Set role filter to the context role
       }
 
       if (villageIdParam) {
@@ -129,7 +129,14 @@ export class UserListComponent implements OnInit {
   }
 
   onFilterChange(): void {
-    this.applyFilters();
+    // Only allow role filter changes if no context role is set
+    if (!this.contextRole) {
+      this.applyFilters();
+    } else {
+      // Reset role filter to context role if user tries to change it
+      this.roleFilter = this.contextRole;
+      this.applyFilters();
+    }
   }
 
   applyFilters(): void {
@@ -151,8 +158,8 @@ export class UserListComponent implements OnInit {
       filtered = filtered.filter(user => user.isActive === isActive);
     }
 
-    // Apply role filter
-    if (this.roleFilter !== 'all') {
+    // Apply role filter only if no context role is set (to avoid double filtering)
+    if (this.roleFilter !== 'all' && !this.contextRole) {
       filtered = filtered.filter(user => user.role === this.roleFilter);
     }
 

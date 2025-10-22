@@ -30,7 +30,20 @@ export class SuperAdminComponent implements OnInit, AfterViewInit, OnDestroy {
     inactiveVillageAdmins: 15,
     villages: 28,
     activeVillages: 25,
-    inactiveVillages: 3
+    inactiveVillages: 3,
+    // New comprehensive counts
+    countries: 0,
+    activeCountries: 0,
+    inactiveCountries: 0,
+    states: 0,
+    activeStates: 0,
+    inactiveStates: 0,
+    districts: 0,
+    activeDistricts: 0,
+    inactiveDistricts: 0,
+    mandals: 0,
+    activeMandals: 0,
+    inactiveMandals: 0
   };
 
   // Chat properties
@@ -83,7 +96,41 @@ export class SuperAdminComponent implements OnInit, AfterViewInit, OnDestroy {
         alert('Error: ' + JSON.stringify(err));
       }
     });
+this.userService.getDashboardCount().subscribe({
+  next: (res: any) => {
+    // Village counts
+    this.counts.villages = res?.villageCounts?.totalVillages || 0;
+    this.counts.activeVillages = res?.villageCounts?.activeVillages || 0;
+    this.counts.inactiveVillages = res?.villageCounts?.inactiveVillages || 0;
 
+    // Country counts
+    this.counts.countries = res?.countryCounts?.totalCountries || 0;
+    this.counts.activeCountries = res?.countryCounts?.activeCountries || 0;
+    this.counts.inactiveCountries = res?.countryCounts?.inactiveCountries || 0;
+
+    // State counts
+    this.counts.states = res?.stateCounts?.totalStates || 0;
+    this.counts.activeStates = res?.stateCounts?.activeStates || 0;
+    this.counts.inactiveStates = res?.stateCounts?.inactiveStates || 0;
+
+    // District counts
+    this.counts.districts = res?.districtCounts?.totalDistricts || 0;
+    this.counts.activeDistricts = res?.districtCounts?.activeDistricts || 0;
+    this.counts.inactiveDistricts = res?.districtCounts?.inactiveDistricts || 0;
+
+    // Mandal counts
+    this.counts.mandals = res?.mandalCounts?.totalMandals || 0;
+    this.counts.activeMandals = res?.mandalCounts?.activeMandals || 0;
+    this.counts.inactiveMandals = res?.mandalCounts?.inactiveMandals || 0;
+
+    console.log('Comprehensive counts loaded:', this.counts);
+  },
+  error: (err: any) => {
+    console.error('Error loading comprehensive counts:', err);
+    alert('Error loading counts: ' + JSON.stringify(err));
+  }
+});
+    
     // Setup WebSocket message handling with chat context filtering
     this.websocketService.messages$.subscribe(message => {
       if (message) {

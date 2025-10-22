@@ -40,11 +40,103 @@ export interface UserCountResponse {
   activeVillagers: number;
   inactiveVillagers: number;
 }
+export interface CountryCountResponse {
+
+  totalCountries: number;
+  activeCountries: number;
+  inactiveCountries: number;
+}
+export interface StateCountResponse {
+  totalStates: number;
+  activeStates: number;
+  inactiveStates: number;
+}
+export interface DistrictCountResponse {
+  totalDistricts: number;
+  activeDistricts: number;
+  inactiveDistricts: number;
+}
+export interface MandalCountResponse {
+  totalMandals: number;
+  activeMandals: number;
+  inactiveMandals: number;
+}
+export interface VillageCountResponse {
+  totalVillages: number;
+  activeVillages: number;
+  inactiveVillages: number;
+}
+export interface VillagerCountResponse {
+  totalVillagers: number;
+  activeVillagers: number;
+  inactiveVillagers: number;
+}
+export interface EntityCountResponse {
+  totalEntities: number;
+  activeEntities: number;
+  inactiveEntities: number;
+}
+export interface EventCountResponse {
+  totalEvents: number;
+  activeEvents: number;
+  inactiveEvents: number;
+}
+export interface IncidentCountResponse {
+  totalIncidents: number;
+  activeIncidents: number;
+  inactiveIncidents: number;
+}
+export interface TempleCountResponse {
+  totalTemples: number;
+  activeTemples: number;
+  inactiveTemples: number;
+}
+export interface SchoolCountResponse {
+  totalSchools: number;
+  activeSchools: number;
+  inactiveSchools: number;
+}
+export interface VehicleCountResponse {
+  totalVehicles: number;
+  activeVehicles: number;
+  inactiveVehicles: number;
+}
+export interface ImageCountResponse {
+  totalImages: number;
+  activeImages: number;
+  inactiveImages: number;
+}
+export interface VillageDashboardCountResponse {
+  userCounts: UserCountResponse;
+  villageCounts: VillageCountResponse;
+  mandalCounts: MandalCountResponse;
+  districtCounts: DistrictCountResponse;
+  stateCounts: StateCountResponse;
+  countryCounts: CountryCountResponse;
+  entities: EntityCountResponse;
+  villagers: VillagerCountResponse;
+  events: EventCountResponse;
+  incidents: IncidentCountResponse;
+  temples: TempleCountResponse;
+  schools: SchoolCountResponse;
+  vehicles: VehicleCountResponse;
+  images: ImageCountResponse;
+}
+
+export interface ComprehensiveCountResponse {
+  userCounts:UserCountResponse;
+  villageCounts:VillageCountResponse;
+  mandalCounts:MandalCountResponse;
+  districtCounts:DistrictCountResponse;
+  stateCounts: StateCountResponse ;
+  countryCounts: CountryCountResponse ;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class UsersService {
+ 
 
   private apiUrl = `${environment.apiUrl}/users`;
 
@@ -101,5 +193,15 @@ export class UsersService {
   }
   getUsersCount(): Observable<UserCountResponse> {
     return this.http.get<UserCountResponse>(`${this.apiUrl}/count`);
+  }
+
+  getDashboardCount(): Observable<ComprehensiveCountResponse> {
+    return this.http.get<ComprehensiveCountResponse>(`${environment.apiUrl}/statistics/comprehensive`);
+
+  }
+
+  // Get village-specific dashboard counts for village-admin
+  getVillageDashboardCount(villageId: string): Observable<VillageDashboardCountResponse> {
+    return this.http.get<VillageDashboardCountResponse>(`${environment.apiUrl}/statistics/village/${villageId}`);
   }
 }

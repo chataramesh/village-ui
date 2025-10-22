@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
 import { HttpClient } from '@angular/common/http';
 import { TokenService } from 'src/app/core/services/token.service';
-import { UsersService, User } from 'src/app/users/users.service';
+import { UsersService, User, VillageDashboardCountResponse } from 'src/app/users/users.service';
 import { ChatService } from 'src/app/core/services/chat.service';
 import { WebsocketService } from 'src/app/core/services/websocket.service';
 
@@ -24,11 +24,49 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   // User Menu
   showUserMenu = false;
 
-  // Counts
-  counts = {
-    entities: 18,
-    villagers: 245,
-    events: 12
+  // Counts - now using API data with comprehensive structure
+  counts: VillageDashboardCountResponse = {
+    userCounts: {
+      totalVillageAdmins: 0,
+      activeVillageAdmins: 0,
+      inactiveVillageAdmins: 0,
+      totalVillagers: 0,
+      activeVillagers: 0,
+      inactiveVillagers: 0
+    },
+    villageCounts: {
+      totalVillages: 0,
+      activeVillages: 0,
+      inactiveVillages: 0
+    },
+    mandalCounts: {
+      totalMandals: 0,
+      activeMandals: 0,
+      inactiveMandals: 0
+    },
+    districtCounts: {
+      totalDistricts: 0,
+      activeDistricts: 0,
+      inactiveDistricts: 0
+    },
+    stateCounts: {
+      totalStates: 0,
+      activeStates: 0,
+      inactiveStates: 0
+    },
+    countryCounts: {
+      totalCountries: 0,
+      activeCountries: 0,
+      inactiveCountries: 0
+    },
+    entities: { totalEntities: 0, activeEntities: 0, inactiveEntities: 0 },
+    villagers: { totalVillagers: 0, activeVillagers: 0, inactiveVillagers: 0 },
+    events: { totalEvents: 0, activeEvents: 0, inactiveEvents: 0 },
+    incidents: { totalIncidents: 0, activeIncidents: 0, inactiveIncidents: 0 },
+    temples: { totalTemples: 0, activeTemples: 0, inactiveTemples: 0 },
+    schools: { totalSchools: 0, activeSchools: 0, inactiveSchools: 0 },
+    vehicles: { totalVehicles: 0, activeVehicles: 0, inactiveVehicles: 0 },
+    images: { totalImages: 0, activeImages: 0, inactiveImages: 0 }
   };
 
   // Event Messages with auto-scroll
@@ -164,6 +202,9 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
             this.currentUserVillageName = user.village.name || null;
             console.log('Village-admin village ID:', this.currentUserVillageId);
             console.log('Village-admin village name:', this.currentUserVillageName);
+
+            // Load village-specific dashboard counts
+            this.loadVillageDashboardCounts(this.currentUserVillageId);
           } else {
             console.warn('Village-admin user has no village information');
           }
@@ -180,6 +221,51 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       console.warn('No userId found in token');
     }
+  }
+
+  // Load village-specific dashboard counts
+  loadVillageDashboardCounts(villageId: string): void {
+    this.usersService.getVillageDashboardCount(villageId).subscribe({
+      next: (dashboardCounts:VillageDashboardCountResponse) => {
+        console.log('Village dashboard counts loaded:', dashboardCounts);
+        this.counts.villagers.totalVillagers = dashboardCounts.userCounts.totalVillagers;
+        this.counts.villagers.activeVillagers = dashboardCounts.userCounts.activeVillagers;
+        this.counts.villagers.inactiveVillagers = dashboardCounts.userCounts.inactiveVillagers;
+        this.counts.entities.totalEntities = dashboardCounts.entities.totalEntities!;
+        this.counts.entities.activeEntities = dashboardCounts.entities.activeEntities!;
+        this.counts.entities.inactiveEntities = dashboardCounts.entities.inactiveEntities!;
+        this.counts.events.totalEvents = dashboardCounts.events.totalEvents!;
+        this.counts.events.activeEvents = dashboardCounts.events.activeEvents!;
+        this.counts.events.inactiveEvents = dashboardCounts.events.inactiveEvents!;
+        this.counts.incidents.totalIncidents = dashboardCounts.incidents.totalIncidents!;
+        this.counts.incidents.activeIncidents = dashboardCounts.incidents.activeIncidents!;
+        this.counts.incidents.inactiveIncidents = dashboardCounts.incidents.inactiveIncidents!;
+        this.counts.temples.totalTemples = dashboardCounts.temples.totalTemples!;
+        this.counts.temples.activeTemples = dashboardCounts.temples.activeTemples!;
+        this.counts.temples.inactiveTemples = dashboardCounts.temples.inactiveTemples!;
+        this.counts.schools.totalSchools = dashboardCounts.schools.totalSchools!;
+        this.counts.schools.activeSchools = dashboardCounts.schools.activeSchools!;
+        this.counts.schools.inactiveSchools = dashboardCounts.schools.inactiveSchools!;
+        this.counts.vehicles.totalVehicles = dashboardCounts.vehicles.totalVehicles!;
+        this.counts.vehicles.activeVehicles = dashboardCounts.vehicles.activeVehicles!;
+        this.counts.vehicles.inactiveVehicles = dashboardCounts.vehicles.inactiveVehicles!;
+        this.counts.images.totalImages = dashboardCounts.images.totalImages!;
+        this.counts.images.activeImages = dashboardCounts.images.activeImages!;
+        this.counts.images.inactiveImages = dashboardCounts.images.inactiveImages!;
+
+        // Assign comprehensive counts
+        this.counts.userCounts = dashboardCounts.userCounts;
+        this.counts.villageCounts = dashboardCounts.villageCounts;
+        this.counts.mandalCounts = dashboardCounts.mandalCounts;
+        this.counts.districtCounts = dashboardCounts.districtCounts;
+        this.counts.stateCounts = dashboardCounts.stateCounts;
+        this.counts.countryCounts = dashboardCounts.countryCounts;
+      },
+      error: (error) => {
+        console.error('Error loading village dashboard counts:', error);
+        // Keep default values if API fails
+      }
+    });
   }
 
   loadChatUsers(): void {

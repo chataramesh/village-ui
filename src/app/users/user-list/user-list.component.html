@@ -99,8 +99,8 @@
 
         <select class="filter-select" [(ngModel)]="roleFilter" (change)="onFilterChange()">
           <option value="all">All Roles</option>
-          <option value="villager">Villager</option>
-          <option value="village_admin">Village Admin</option>
+          <option value="VILLAGER">Villager</option>
+          <option value="VILLAGE_ADMIN">Village Admin</option>
         </select>
       </div>
     </div>
@@ -132,7 +132,7 @@
               <td>{{user.email}}</td>
               <td>{{user.phone}}</td>
               <td>
-                <span class="role-badge" [class]="'role-' + user.role">{{user.role | titlecase}}</span>
+                <span class="role-badge" [class]="'role-' + user.role">{{Role[user.role] || user.role}}</span>
               </td>
               <td>
                 <span class="status-badge" [class.active]="user.isActive" [class.inactive]="!user.isActive">
@@ -178,7 +178,7 @@
                     </div>
                     <div class="detail-item">
                       <span class="detail-label">Role</span>
-                      <span class="detail-value">{{user.role | titlecase}}</span>
+                      <span class="detail-value">{{Role[user.role] || user.role}}</span>
                     </div>
                     <div class="detail-item">
                       <span class="detail-label">Created Date</span>
