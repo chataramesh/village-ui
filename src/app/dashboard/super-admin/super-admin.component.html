@@ -395,80 +395,13 @@
 
   </div>
 
-  <!-- Chat Button (Bottom Right) -->
-  <button class="chat-fab" (click)="toggleChatPopup()">
-    <svg class="chat-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-    </svg>
-    <span class="chat-badge" *ngIf="unreadMessages > 0">{{unreadMessages}}</span>
-  </button>
-
-  <!-- Chat Popup -->
-  <div class="chat-popup" *ngIf="showChatPopup">
-    <div class="chat-popup-header">
-      <h3 class="chat-popup-title">Chat</h3>
-      <button class="chat-close-btn" (click)="toggleChatPopup()">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
-    </div>
-    
-    <div class="chat-popup-body">
-      <!-- User Selection -->
-      <div class="chat-user-select">
-        <label class="chat-label">Select User to Chat</label>
-        <select class="chat-select" [(ngModel)]="selectedChatUser" (change)="loadChatMessages()">
-          <option value="">Choose a user...</option>
-          <option *ngFor="let user of chatUsers" [value]="user.id">{{user.name}} - {{user.role}}</option>
-        </select>
-      </div>
-
-      <!-- Chat Messages -->
-      <div class="chat-messages" *ngIf="selectedChatUser">
-        <div *ngFor="let message of chatMessages" 
-             [class.message-sent]="message.sender === 'me'"
-             [class.message-received]="message.sender !== 'me'"
-             class="chat-message">
-          <p class="message-text">{{message.content}}</p>
-          <span class="message-time">{{message.timestamp | date:'short'}}</span>
-        </div>
-
-        <!-- No messages found -->
-        <div class="no-messages" *ngIf="chatMessages.length === 0">
-          <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-          </svg>
-          <p>No chats found</p>
-        </div>
-      </div>
-
-      <div class="chat-empty" *ngIf="!selectedChatUser">
-        <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-        </svg>
-        <p>Select a user to start chatting</p>
-      </div>
-    </div>
-
-    <!-- Chat Input -->
-    <div class="chat-popup-footer" *ngIf="selectedChatUser">
-      <input type="text" 
-             class="chat-input" 
-             placeholder="Type a message..." 
-             [(ngModel)]="chatMessage"
-             (keyup.enter)="sendMessage()">
-      <button class="chat-send-btn" (click)="sendMessage()">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-        </svg>
-      </button>
-    </div>
-  </div>
+  <!-- Chat Widget -->
+  <app-chat-widget
+    [currentUserId]="currentUserId || ''"
+    [currentUserRole]="'SUPER_ADMIN'"
+    [currentUserName]="userProfileData.userName"
+    (chatToggled)="onChatToggled($event)">
+  </app-chat-widget>
 
   <!-- Profile Modal -->
   <app-profile-modal

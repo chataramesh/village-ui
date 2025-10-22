@@ -9,6 +9,7 @@ import { FooterComponent } from './footer/footer.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { UserProfileDropdownComponent } from './components/user-profile-dropdown/user-profile-dropdown.component';
 import { MatCardModule } from '@angular/material/card';
+import { ChatWidgetComponent } from './components/chat-widget/chat-widget.component';
 
 
 @NgModule({
@@ -23,14 +24,16 @@ import { MatCardModule } from '@angular/material/card';
     CommonModule,
     RouterModule,
     SharedRoutingModule,
-    MatCardModule
+    MatCardModule,
+    ChatWidgetComponent
   ],
   exports: [
     CardsComponent,
     NavbarComponent,
     FooterComponent,
     SidebarComponent,
-    UserProfileDropdownComponent
+    UserProfileDropdownComponent,
+    ChatWidgetComponent
   ]
 })
 export class SharedModule { }

@@ -253,19 +253,10 @@ this.userService.getDashboardCount().subscribe({
     this.closeProfileModal();
   }
 
-  // Chat Methods
-  toggleChatPopup() {
-    this.showChatPopup = !this.showChatPopup;
-    if (this.showChatPopup) {
-      this.unreadMessages = 0;
-      if (this.currentUserId) {
-        this.loadChatUsers();
-      }
-      if (!this.isConnected && this.currentUserId) {
-        console.log('Connecting to WebSocket for chat functionality');
-        this.connect();
-      }
-    }
+  // Chat Widget Event Handler
+  onChatToggled(isOpen: boolean) {
+    console.log('Chat toggled:', isOpen);
+    // Handle any additional logic when chat is opened/closed
   }
 
   loadChatUsers(): void {

@@ -95,7 +95,7 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   chatMessage: string = '';
   chatUsers: User[] = [];
   chatMessages: any[] = [];
-  private currentUserId: string | null = null;
+  currentUserId: string | null = null;
   isLoadingUsers = false;
   private chatPollingInterval: any;
   private lastSentMessage: string = '';
@@ -395,6 +395,12 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   deleteUserProfile(userId: string): void {
     console.log('Deleting user profile:', userId);
     this.closeProfileModal();
+  }
+
+  // Chat Widget Event Handler
+  onChatToggled(isOpen: boolean) {
+    console.log('Chat toggled:', isOpen);
+    // Handle any additional logic when chat is opened/closed
   }
 
   // Navigation Methods

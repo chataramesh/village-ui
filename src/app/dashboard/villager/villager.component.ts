@@ -335,6 +335,12 @@ export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
     this.closeProfileModal();
   }
 
+  // Chat Widget Event Handler
+  onChatToggled(isOpen: boolean) {
+    console.log('Chat toggled:', isOpen);
+    // Handle any additional logic when chat is opened/closed
+  }
+
   handleLogout() {
     this.closeUserMenu();
     console.log('Logging out...');
