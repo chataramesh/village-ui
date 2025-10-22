@@ -19,7 +19,8 @@ const routes: Routes = [
       { path: 'entities', component: VillagerEntityListComponent, canActivate: [RoleGuard], data: { role: 'VILLAGER' } },
       { path: 'subscriptions', component: SubscriptionsComponent, canActivate: [RoleGuard], data: { role: 'VILLAGER' } }
     ]
-  }
+  },
+  { path: 'subscriptions', component: SubscriptionsComponent, canActivate: [RoleGuard], data: { roles: ['VILLAGER', 'VILLAGE_ADMIN', 'SUPER_ADMIN'] } }
 ];
 
 @NgModule({     

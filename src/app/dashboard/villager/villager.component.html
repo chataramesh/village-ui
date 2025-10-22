@@ -9,103 +9,13 @@
         <p class="dashboard-subtitle">Welcome, {{userName}}!</p>
       </div>
       <div class="header-right">
-        <!-- Modern User Profile Menu -->
-        <div class="user-profile-wrapper">
-          <button class="user-profile-btn" (click)="toggleUserMenu()">
-            <!-- User Avatar -->
-            <div class="user-avatar">
-              <img [src]="userImage" [alt]="userName" class="avatar-image" *ngIf="userImage; else defaultAvatar">
-              <ng-template #defaultAvatar>
-                <div class="avatar-placeholder">
-                  {{userName.charAt(0).toUpperCase()}}
-                </div>
-              </ng-template>
-            </div>
-
-            <!-- User Info -->
-            <div class="user-info">
-              <span class="user-name">{{userName}}</span>
-              <span class="user-role">{{userRole}}</span>
-            </div>
-
-            <!-- Dropdown Arrow -->
-            <div class="dropdown-arrow" [class.rotated]="showUserMenu">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </div>
-          </button>
-
-          <!-- Enhanced Dropdown Menu -->
-          <div class="user-profile-dropdown" *ngIf="showUserMenu">
-            <!-- User Card Header -->
-            <div class="dropdown-header">
-              <div class="dropdown-avatar">
-                <img [src]="userImage" [alt]="userName" class="dropdown-avatar-img" *ngIf="userImage; else dropdownDefaultAvatar">
-                <ng-template #dropdownDefaultAvatar>
-                  <div class="dropdown-avatar-placeholder">
-                    {{userName.charAt(0).toUpperCase()}}
-                  </div>
-                </ng-template>
-              </div>
-              <div class="dropdown-user-info">
-                <h4 class="dropdown-user-name">{{userName}}</h4>
-                <p class="dropdown-user-role">Village Resident</p>
-                <span class="dropdown-user-status">Online</span>
-              </div>
-            </div>
-
-            <!-- Menu Items -->
-            <div class="dropdown-menu">
-              <button class="dropdown-menu-item" (click)="viewProfile()">
-                <div class="menu-item-icon">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                  </svg>
-                </div>
-                <div class="menu-item-content">
-                  <span class="menu-item-title">View Profile</span>
-                  <span class="menu-item-desc">Manage your account settings</span>
-                </div>
-                <div class="menu-item-arrow">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                  </svg>
-                </div>
-              </button>
-
-              <button class="dropdown-menu-item" (click)="viewSubscriptions()">
-                <div class="menu-item-icon">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                  </svg>
-                </div>
-                <div class="menu-item-content">
-                  <span class="menu-item-title">Subscriptions</span>
-                  <span class="menu-item-desc">{{subscribedEntities.length}} active subscriptions</span>
-                </div>
-                <div class="menu-item-arrow">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                  </svg>
-                </div>
-              </button>
-            </div>
-
-            <!-- Logout Section -->
-            <div class="dropdown-footer">
-              <button class="logout-btn" (click)="handleLogout()">
-                <svg class="logout-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                </svg>
-                <span>Sign Out</span>
-              </button>
-            </div>
-          </div>
-        </div>
+        <!-- Shared User Profile Dropdown -->
+        <app-user-profile-dropdown
+          [userData]="userProfileData"
+          (profileModalOpened)="onProfileModalOpened($event)"
+          (subscriptionsNavigated)="onSubscriptionsNavigated()"
+          (logoutClicked)="onLogoutClicked()">
+        </app-user-profile-dropdown>
       </div>
     </div>
 

@@ -6,6 +6,8 @@ import { TokenService } from 'src/app/core/services/token.service';
 import { UsersService, User } from 'src/app/users/users.service';
 import { ChatService } from 'src/app/core/services/chat.service';
 import { WebsocketService } from 'src/app/core/services/websocket.service';
+import { ProfileModalComponent, UserProfile } from 'src/app/shared/components/profile-modal/profile-modal.component';
+import { UserProfileData } from 'src/app/shared/components/user-profile-dropdown/user-profile-dropdown.component';
 
 Chart.register(...registerables);
 
@@ -19,6 +21,14 @@ export class SuperAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   userName = 'Super Admin';
   userImage = 'assets/people.png';
   showUserMenu = false;
+
+  // User Profile Data for shared component
+  userProfileData: UserProfileData = {
+    userName: 'Super Admin',
+    userRole: 'SUPER_ADMIN',
+    userImage: 'assets/people.png',
+    userId: ''
+  };
 
   // Counts with detailed breakdown
   counts = {
@@ -69,6 +79,10 @@ export class SuperAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('activityChart') activityChartRef!: ElementRef;
 
   private charts: Chart[] = [];
+
+  // Profile Modal Properties
+  showProfileModal = false;
+  currentUserProfile: UserProfile | null = null;
 
   constructor(
     private tokenService: TokenService,
@@ -190,8 +204,53 @@ this.userService.getDashboardCount().subscribe({
     const tokenUser = this.tokenService.getCurrentUser();
     if (tokenUser && tokenUser.userId) {
       this.currentUserId = tokenUser.userId;
-      console.log('Current super-admin user loaded:', this.currentUserId);
+      this.userService.getUserById(tokenUser.userId).subscribe({
+        next: (user) => {
+          // Update user profile data with fetched user information
+          this.userProfileData = {
+            userName: user.name || 'Super Admin',
+            userRole: user.role || 'SUPER_ADMIN',
+            userImage: this.userImage,
+            userId: this.currentUserId || ''
+          };
+          console.log('Current super-admin user loaded:', user);
+        },
+        error: (error) => {
+          console.error('Error loading current user:', error);
+        }
+      });
     }
+  }
+
+  // Event handlers for shared user profile component
+  onProfileModalOpened(userProfile: UserProfile): void {
+    this.currentUserProfile = userProfile;
+    this.showProfileModal = true;
+  }
+
+  onSubscriptionsNavigated(): void {
+    this.router.navigate(['/dashboard/subscriptions']);
+  }
+
+  onLogoutClicked(): void {
+    this.tokenService.logout();
+  }
+
+  // Profile Modal Methods
+  closeProfileModal(): void {
+    this.showProfileModal = false;
+    this.currentUserProfile = null;
+  }
+
+  updateUserProfile(updatedProfile: UserProfile): void {
+    console.log('Updating user profile:', updatedProfile);
+    // Profile update logic can be added here if needed
+    this.closeProfileModal();
+  }
+
+  deleteUserProfile(userId: string): void {
+    console.log('Deleting user profile:', userId);
+    this.closeProfileModal();
   }
 
   // Chat Methods

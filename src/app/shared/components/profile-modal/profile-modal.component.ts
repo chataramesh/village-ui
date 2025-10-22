@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { UsersService, Role } from 'src/app/users/users.service';
 
 export interface UserProfile {
   id: string;
@@ -32,12 +33,13 @@ export class ProfileModalComponent implements OnInit {
   isEditing = false;
   editedProfile: UserProfile | null = null;
 
-  constructor() {}
+  // Available roles from API
+  availableRoles: { value: string; label: string }[] = [];
+
+  constructor(private usersService: UsersService) {}
 
   ngOnInit(): void {
-    if (this.userProfile) {
-      this.editedProfile = { ...this.userProfile };
-    }
+    this.loadAvailableRoles();
   }
 
   ngOnChanges(): void {
@@ -45,6 +47,15 @@ export class ProfileModalComponent implements OnInit {
       this.editedProfile = { ...this.userProfile };
       this.isEditing = false;
     }
+  }
+
+  loadAvailableRoles(): void {
+    // Load roles from the Role enum
+    this.availableRoles = [
+      { value: 'VILLAGER', label: 'VILLAGER' },
+      { value: 'VILLAGE_ADMIN', label: 'VILLAGE_ADMIN' },
+      { value: 'SUPER_ADMIN', label: 'SUPER_ADMIN' },
+    ];
   }
 
   onClose(): void {
@@ -105,10 +116,9 @@ export class ProfileModalComponent implements OnInit {
     if (!role) return 'N/A';
 
     const roleMap: { [key: string]: string } = {
-      'VILLAGER': 'Villager',
-      'VILLAGE_ADMIN': 'Village Head',
-      'ENTITY_OWNER': 'Entity Owner',
-      'SUPER_ADMIN': 'Admin'
+      'VILLAGER': 'VILLAGER',
+      'VILLAGE_ADMIN': 'VILLAGE_ADMIN',
+      'SUPER_ADMIN': 'SUPER_ADMIN'
     };
 
     return roleMap[role] || role;

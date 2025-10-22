@@ -6,6 +6,8 @@ import { TokenService } from 'src/app/core/services/token.service';
 import { UsersService, User, VillageDashboardCountResponse } from 'src/app/users/users.service';
 import { ChatService } from 'src/app/core/services/chat.service';
 import { WebsocketService } from 'src/app/core/services/websocket.service';
+import { ProfileModalComponent, UserProfile } from 'src/app/shared/components/profile-modal/profile-modal.component';
+import { UserProfileData } from 'src/app/shared/components/user-profile-dropdown/user-profile-dropdown.component';
 
 Chart.register(...registerables);
 
@@ -23,6 +25,14 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   
   // User Menu
   showUserMenu = false;
+
+  // User Profile Data for shared component
+  userProfileData: UserProfileData = {
+    userName: 'NA',
+    userRole: 'VILLAGE_ADMIN',
+    userImage: 'assets/people.png',
+    userId: ''
+  };
 
   // Counts - now using API data with comprehensive structure
   counts: VillageDashboardCountResponse = {
@@ -108,6 +118,10 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   currentUserVillageId: string | null = null;
   currentUserVillageName: string | null = null;
 
+  // Profile Modal Properties
+  showProfileModal = false;
+  currentUserProfile: UserProfile | null = null;
+
   constructor(
     private router: Router,
     private tokenService: TokenService,
@@ -134,6 +148,15 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
         this.villageName = user!.village!.name;
         this.userRole = user!.role;
         this.userName = user!.name;
+
+        // Update shared component data
+        this.userProfileData = {
+          userName: this.userName,
+          userRole: this.userRole,
+          userImage: this.userImage,
+          userId: user!.id!
+        };
+
         console.log('Current village-admin user loaded:', user);
       },
       error: (error) => {
@@ -202,6 +225,14 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
             this.currentUserVillageName = user.village.name || null;
             console.log('Village-admin village ID:', this.currentUserVillageId);
             console.log('Village-admin village name:', this.currentUserVillageName);
+
+            // Update shared component data
+            this.userProfileData = {
+              userName: user.name || 'NA',
+              userRole: user.role || 'VILLAGE_ADMIN',
+              userImage: this.userImage,
+              userId: this.currentUserId
+            };
 
             // Load village-specific dashboard counts
             this.loadVillageDashboardCounts(this.currentUserVillageId);
@@ -333,6 +364,37 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
     // if (this.stompClient) {
     //   this.stompClient.deactivate();
     // }
+  }
+
+  // Event handlers for shared user profile component
+  onProfileModalOpened(userProfile: UserProfile): void {
+    this.currentUserProfile = userProfile;
+    this.showProfileModal = true;
+  }
+
+  onSubscriptionsNavigated(): void {
+    this.router.navigate(['/dashboard/subscriptions']);
+  }
+
+  onLogoutClicked(): void {
+    this.tokenService.logout();
+  }
+
+  // Profile Modal Methods
+  closeProfileModal(): void {
+    this.showProfileModal = false;
+    this.currentUserProfile = null;
+  }
+
+  updateUserProfile(updatedProfile: UserProfile): void {
+    console.log('Updating user profile:', updatedProfile);
+    // Profile update logic can be added here if needed
+    this.closeProfileModal();
+  }
+
+  deleteUserProfile(userId: string): void {
+    console.log('Deleting user profile:', userId);
+    this.closeProfileModal();
   }
 
   // Navigation Methods

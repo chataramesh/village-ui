@@ -6,6 +6,7 @@ import { UsersService, User, Role } from 'src/app/users/users.service';
 import { ChatService } from 'src/app/core/services/chat.service';
 import { WebsocketService } from 'src/app/core/services/websocket.service';
 import { ProfileModalComponent, UserProfile } from 'src/app/shared/components/profile-modal/profile-modal.component';
+import { UserProfileData } from 'src/app/shared/components/user-profile-dropdown/user-profile-dropdown.component';
 
 @Component({
   selector: 'app-villager',
@@ -17,9 +18,17 @@ export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
   userName = 'NA';
   userRole="NA";
   userImage = 'assets/people.png';
-  
+
   // User Menu
   showUserMenu = false;
+
+  // User Profile Data for shared component
+  userProfileData: UserProfileData = {
+    userName: 'NA',
+    userRole: 'VILLAGER',
+    userImage: 'assets/people.png',
+    userId: ''
+  };
 
   // Entities
   showEntitiesDropdown = false;
@@ -186,9 +195,31 @@ export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
       this.usersService.getUserById(tokenUser.userId).subscribe(user => {
         this.userName = user.name || 'NA';
         this.userRole = user.role || 'NA';
+
+        // Update shared component data
+        this.userProfileData = {
+          userName: this.userName,
+          userRole: this.userRole,
+          userImage: this.userImage,
+          userId: this.currentUserId || ''
+        };
       });
       console.log('Current villager user loaded:', this.currentUserId);
     }
+  }
+
+  // Event handlers for shared user profile component
+  onProfileModalOpened(userProfile: UserProfile): void {
+    this.currentUserProfile = userProfile;
+    this.showProfileModal = true;
+  }
+
+  onSubscriptionsNavigated(): void {
+    this.router.navigate(['/dashboard/villager/subscriptions']);
+  }
+
+  onLogoutClicked(): void {
+    this.tokenService.logout();
   }
   toggleUserMenu() {
     this.showUserMenu = !this.showUserMenu;

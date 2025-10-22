@@ -99,10 +99,7 @@
                   [disabled]="!isEditing"
                   [(ngModel)]="editedProfile!.role"
                 >
-                  <option value="VILLAGER">Villager</option>
-                  <option value="VILLAGE_ADMIN">Village Head</option>
-                  <option value="ENTITY_OWNER">Entity Owner</option>
-                  <option value="SUPER_ADMIN">Admin</option>
+                  <option *ngFor="let role of availableRoles" [value]="role.value">{{role.label}}</option>
                 </select>
               </div>
             </div>
