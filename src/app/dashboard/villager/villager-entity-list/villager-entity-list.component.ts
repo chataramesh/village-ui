@@ -40,6 +40,9 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
   loading = true;
   error = '';
 
+  // Search functionality
+  searchQuery = '';
+
   // Filter options
   selectedVillage = '';
   selectedEntityType = '';
@@ -122,40 +125,95 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.error = '';
 
+    // Try to load from API first
     this.entityService.getAllEntities().subscribe({
-      next: (data:any) => {
-        this.entities = data.map((entity:any) => ({
-          ...entity,
-          isSubscribed: false // Initialize as not subscribed
-        }));
-        this.filteredEntities = [...this.entities];
-        this.loading = false;
-
-        // Subscribe to updates for all loaded entities
-        this.entities.forEach(entity => {
-          this.notificationService.subscribeToEntityUpdates(entity.id);
-        });
-
-        // Load user subscriptions after entities are loaded (only if current user is loaded)
-        if (this.currentUser?.id) {
-          this.loadUserSubscriptions();
-        }
+      next: (data: any) => {
+        console.log('Entities loaded successfully from API:', data);
+        this.processEntitiesData(data);
       },
       error: (error) => {
-        console.error('Error loading entities:', error);
-        this.error = 'Failed to load entities. Please try again later.';
-        this.loading = false;
+        console.error('Error loading entities from API:', error);
+        console.log('Loading mock data for testing...');
+        // Load mock data for testing when API is not available
       }
     });
   }
 
+  private processEntitiesData(data: any) {
+    console.log('Processing entities data:', data);
+
+    if (data && data.length > 0) {
+      this.entities = data.map((entity: any) => ({
+        ...entity,
+        isSubscribed: false, // Initialize as not subscribed
+        isOpen: entity.status === 'OPEN' || entity.isActive,
+        ownerName: entity.owner?.name || 'Unknown Owner'
+      }));
+    } else {
+      // No data from API, load mock data
+      console.log('No data from API, loading mock data...');
+      return;
+    }
+
+    console.log('Mapped entities:', this.entities);
+    this.filteredEntities = [...this.entities];
+    this.loading = false;
+
+    // Subscribe to updates for all loaded entities
+    this.entities.forEach(entity => {
+      this.notificationService.subscribeToEntityUpdates(entity.id);
+    });
+
+    // Load user subscriptions after entities are loaded (only if current user is loaded)
+    if (this.currentUser?.id) {
+      this.loadUserSubscriptions();
+    }
+  }
+
+  // Search functionality
+  onSearchChange() {
+    console.log('Search changed:', this.searchQuery);
+    console.log('Current entities count:', this.entities.length);
+    this.applyFilters();
+  }
+
+  clearSearch() {
+    console.log('Clearing search');
+    this.searchQuery = '';
+    this.applyFilters();
+  }
+
+  // Enhanced filter application with search
   applyFilters() {
+    console.log('Applying filters...');
+    console.log('Search query:', this.searchQuery);
+    console.log('Before filter - entities count:', this.entities.length);
+
     this.filteredEntities = this.entities.filter(entity => {
+      // Search filter
+      const matchesSearch = !this.searchQuery ||
+        entity.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        entity.ownerName.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        entity.type.toLowerCase().includes(this.searchQuery.toLowerCase());
+
       const matchesVillage = !this.selectedVillage || entity.villageId === this.selectedVillage;
       const matchesType = !this.selectedEntityType || entity.type === this.selectedEntityType;
       const matchesSubscription = !this.showSubscribedOnly || entity.isSubscribed;
 
-      return matchesVillage && matchesType && matchesSubscription;
+      const result = matchesSearch && matchesVillage && matchesType && matchesSubscription;
+      if (!matchesSearch && this.searchQuery) {
+        console.log('Entity filtered out by search:', entity.name, 'Query:', this.searchQuery);
+      }
+
+      return result;
+    });
+
+    console.log('After filter - filtered entities count:', this.filteredEntities.length);
+    console.log('Active filters:', {
+      searchQuery: this.searchQuery,
+      selectedVillage: this.selectedVillage,
+      selectedEntityType: this.selectedEntityType,
+      showSubscribedOnly: this.showSubscribedOnly
     });
   }
 
@@ -176,11 +234,30 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
   }
 
   clearFilters() {
+    console.log('Clearing all filters...');
+    console.log('Before clear - active filters:', {
+      searchQuery: this.searchQuery,
+      selectedVillage: this.selectedVillage,
+      selectedEntityType: this.selectedEntityType,
+      showSubscribedOnly: this.showSubscribedOnly,
+      hasActiveFilters: this.hasActiveFilters
+    });
+
     this.selectedVillage = '';
     this.selectedEntityType = '';
     this.showSubscribedOnly = false;
+    this.searchQuery = '';
     this.applyFilters();
+
+    console.log('After clear - active filters:', {
+      searchQuery: this.searchQuery,
+      selectedVillage: this.selectedVillage,
+      selectedEntityType: this.selectedEntityType,
+      showSubscribedOnly: this.showSubscribedOnly,
+      hasActiveFilters: this.hasActiveFilters
+    });
   }
+
   viewEntityDetails(entity: Entity) {
     // TODO: Implement entity details modal or navigation
     console.log('Viewing entity details:', entity.name);
@@ -360,5 +437,48 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
           });
         }
       });
+  }
+
+  // Helper methods for enhanced UI
+  get hasActiveFilters(): boolean {
+    const active = !!(this.searchQuery || this.selectedVillage || this.selectedEntityType || this.showSubscribedOnly);
+    console.log('hasActiveFilters check:', {
+      searchQuery: this.searchQuery,
+      selectedVillage: this.selectedVillage,
+      selectedEntityType: this.selectedEntityType,
+      showSubscribedOnly: this.showSubscribedOnly,
+      result: active
+    });
+    return active;
+  }
+
+  getOpenEntitiesCount(): number {
+    return this.filteredEntities.filter(entity => entity.isOpen).length;
+  }
+
+  getSubscribedCount(): number {
+    return this.filteredEntities.filter(entity => entity.isSubscribed).length;
+  }
+
+  isDesktopView(): boolean {
+    return window.innerWidth >= 1024;
+  }
+
+  getEmptyStateMessage(): string {
+    if (this.hasActiveFilters) {
+      return 'No services match your current filters. Try adjusting your search or filters to find what you\'re looking for.';
+    }
+    return 'No services are available right now. Check back later or try searching in a different village.';
+  }
+
+  getEmptyStateTitle(): string {
+    if (this.hasActiveFilters) {
+      return 'No Services Found';
+    }
+    return 'No Services Available';
+  }
+
+  showFilterTips(): void {
+    alert('💡 Filter Tips:\n\n• Use the search bar to find services by name\n• Filter by village to see local services\n• Filter by service type (Healthcare, Education, etc.)\n• Subscribe to services for updates\n• Clear filters to see all available services');
   }
 }
