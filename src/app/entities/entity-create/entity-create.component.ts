@@ -107,7 +107,6 @@ export class EntityCreateComponent implements OnInit {
     
     this.submitting = true;
     const formData = this.entityForm.value;
-    alert(JSON.stringify(this.currentUser));
     if (this.isEditMode && this.entityId) {
       // Update existing entity
       if (this.currentUser?.role !== 'SUPER_ADMIN' && this.currentUser?.role !== 'VILLAGE_ADMIN') {
@@ -159,6 +158,6 @@ export class EntityCreateComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/entities']);
+    this.router.navigate(['/dashboard/villager/entities']);
   }
 }

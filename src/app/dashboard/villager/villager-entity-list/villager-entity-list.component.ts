@@ -214,7 +214,7 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
 
   // Navigate to edit entity page
   editEntity(entity: Entity): void {
-    this.router.navigate(['/entities/edit', entity.id]);
+    this.router.navigate(['/entities/edit', entity.id], { replaceUrl: true });
   }
 
   // Subscription Methods

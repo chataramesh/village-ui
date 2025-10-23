@@ -408,4 +408,9 @@ export class EntityListComponent implements OnInit {
   formatEntityType(type: string): string {
     return type.replace(/_/g, ' ');
   }
+
+  // Role-based access control
+  canCreateEntity(): boolean {
+    return this.currentUser?.role === 'SUPER_ADMIN' || this.currentUser?.role === 'VILLAGE_ADMIN';
+  }
 }

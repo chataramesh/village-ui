@@ -62,7 +62,7 @@
         <h2 class="table-title">All Entities</h2>
         <span class="table-count">{{filteredEntities.length}} entities</span>
       </div>
-      <button class="create-btn" (click)="openCreateModal()">
+      <button class="create-btn" (click)="openCreateModal()" *ngIf="canCreateEntity()">
         <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
