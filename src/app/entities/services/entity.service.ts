@@ -81,6 +81,7 @@ export interface EntityStats {
 })
 export class EntityService {
 
+
   private apiUrl = `${environment.apiUrl}/entities`;
 
   constructor(private http: HttpClient) { }
@@ -123,6 +124,9 @@ export class EntityService {
   // Update existing entity
   updateEntity(id: string, entity: Entity): Observable<Entity> {
     return this.http.put<Entity>(`${this.apiUrl}/${id}`, entity);
+  }
+  updateEntityByOwner(entityId: string,ownerId: string, entity: Entity) {
+    return this.http.put<Entity>(`${this.apiUrl}/${entityId}/${ownerId}`, entity);
   }
 
   // Delete entity

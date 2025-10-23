@@ -4,6 +4,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { EntityType, EntityStatus } from '../models/entity.model';
 import { environment } from 'src/environments/environment';
+import { EntityService } from '../services/entity.service';
+import { TokenService } from 'src/app/core/services/token.service';
+import { UsersService } from 'src/app/users/users.service';
 
 @Component({
   selector: 'app-entity-create',
@@ -16,7 +19,7 @@ export class EntityCreateComponent implements OnInit {
   entityId: string | null = null;
   loading = false;
   submitting = false;
-
+  currentUser:any;
   entityTypes = Object.values(EntityType);
   entityStatuses = Object.values(EntityStatus);
 
@@ -26,7 +29,10 @@ export class EntityCreateComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private fb: FormBuilder,
-    private http: HttpClient
+    private http: HttpClient,
+    private entityService: EntityService,
+    private tokenService: TokenService,
+    private usersService: UsersService
   ) {
     this.entityForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -45,6 +51,18 @@ export class EntityCreateComponent implements OnInit {
 
   ngOnInit(): void {
     // Check if we're in edit mode
+    const currentUser = this.tokenService.getCurrentUser();
+    this.usersService.getUserById(currentUser!.userId!).subscribe({
+      next: (user) => {
+        this.currentUser = user;
+      },
+      error: (error) => {
+        console.error('Error loading user:', error);
+        alert('Failed to load user data');
+        this.loading = false;
+        this.router.navigate(['/entities']);
+      }
+    });
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode = true;
@@ -56,7 +74,8 @@ export class EntityCreateComponent implements OnInit {
 
   loadEntity(id: string): void {
     this.loading = true;
-    this.http.get<any>(`${this.apiUrl}/entities/${id}`).subscribe({
+
+    this.entityService.getEntityById(id).subscribe({
       next: (entity) => {
         this.entityForm.patchValue({
           name: entity.name,
@@ -85,26 +104,46 @@ export class EntityCreateComponent implements OnInit {
   onSubmit(): void {
     if (this.entityForm.invalid || this.submitting) return;
 
+    
     this.submitting = true;
     const formData = this.entityForm.value;
-
+    alert(JSON.stringify(this.currentUser));
     if (this.isEditMode && this.entityId) {
       // Update existing entity
-      this.http.put(`${this.apiUrl}/entities/${this.entityId}`, formData).subscribe({
-        next: (response) => {
-          alert('Entity updated successfully!');
-          this.router.navigate(['/entities']);
-          this.submitting = false;
-        },
-        error: (error) => {
-          console.error('Error updating entity:', error);
-          alert('Failed to update entity');
-          this.submitting = false;
-        }
-      });
+      if (this.currentUser?.role !== 'SUPER_ADMIN' && this.currentUser?.role !== 'VILLAGE_ADMIN') {
+        // For non-admin users, call updateEntityByOwner
+        this.entityService.updateEntityByOwner(this.entityId,this.currentUser.id!, formData).subscribe({
+          next: (response) => {
+            alert('Entity updated successfully!');
+            this.router.navigate(['/entities']);
+            this.submitting = false;
+          },
+          error: (error) => {
+            console.error('Error updating entity:', error);
+            alert('Failed to update entity');
+            this.submitting = false;
+          }
+        });
+      } else {
+        // For SUPER_ADMIN or VILLAGE_ADMIN, call updateEntity
+        this.entityService.updateEntity(this.entityId, formData).subscribe({
+          next: (response) => {
+            alert('Entity updated successfully!');
+            this.router.navigate(['/entities']);
+            this.submitting = false;
+          },
+          error: (error) => {
+            console.error('Error updating entity:', error);
+            alert('Failed to update entity');
+            this.submitting = false;
+          }
+        });
+      }
+
+
     } else {
       // Create new entity
-      this.http.post(`${this.apiUrl}/entities`, formData).subscribe({
+      this.entityService.createEntity(formData).subscribe({
         next: (response) => {
           alert('Entity created successfully!');
           this.router.navigate(['/entities']);
