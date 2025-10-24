@@ -159,7 +159,8 @@ export class SubscriptionsComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/dashboard/villager']);
+    //this.router.navigate(['/dashboard/villager']);
+    this.router.navigate(['/dashboard/villager/entities']);
   }
 
   getEntityTypes(): string[] {

@@ -136,6 +136,7 @@ export interface ComprehensiveCountResponse {
   providedIn: 'root'
 })
 export class UsersService {
+  
  
 
   private apiUrl = `${environment.apiUrl}/users`;
@@ -146,7 +147,9 @@ export class UsersService {
   getAllUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiUrl}/all`);
   }
-
+getAllRoles() {
+    return this.http.get<any>(`${this.apiUrl}/all/roles`);
+  }
   // Get user by ID
   getUserById(id: string): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/${id}`);

@@ -17,6 +17,7 @@ export class LoginComponent  implements OnInit {
   showPassword = false;
   rememberMe = false;
   isLoading = false;
+  showForgetPasswordModal = false;
 
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {}
   
@@ -29,9 +30,17 @@ export class LoginComponent  implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
+  openForgetPasswordModal(): void {
+    this.showForgetPasswordModal = true;
+  }
+
+  closeForgetPasswordModal(): void {
+    this.showForgetPasswordModal = false;
+  }
+
   onSubmit(): void {
     if (this.loginForm.invalid) return;
-  
+
     this.isLoading = true;
     
     this.auth.login(this.loginForm.value as { email: string; password: string }).subscribe({

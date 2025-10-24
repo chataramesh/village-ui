@@ -1,64 +1,91 @@
-<!-- User Profile Dropdown Component -->
-<div class="user-profile-wrapper">
-  <button class="user-profile-btn" (click)="toggleUserMenu()">
+<!-- Modern User Profile Dropdown Component -->
+<div class="profile-dropdown-wrapper">
+  <!-- Profile Button -->
+  <button class="profile-trigger" (click)="toggleUserMenu()" aria-label="Open user menu">
     <!-- User Avatar -->
     <div class="user-avatar">
-      <img [src]="userData.userImage" [alt]="userData.userName" class="avatar-image" *ngIf="userData.userImage; else defaultAvatar">
+      <img
+        [src]="userData.userImage"
+        [alt]="userData.userName"
+        class="avatar-image"
+        *ngIf="userData.userImage; else defaultAvatar">
       <ng-template #defaultAvatar>
-        <div class="avatar-placeholder">
+        <div class="avatar-fallback">
           {{(userData.userName || 'U').charAt(0).toUpperCase()}}
         </div>
       </ng-template>
     </div>
 
     <!-- User Info -->
-    <div class="user-info">
+    <div class="user-details">
       <span class="user-name">{{userData.userName || 'Loading...'}}</span>
       <span class="user-role">{{getRoleDisplayName(userData.userRole)}}</span>
     </div>
 
     <!-- Dropdown Arrow -->
-    <div class="dropdown-arrow" [class.rotated]="showUserMenu">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="dropdown-indicator" [class.rotated]="showUserMenu">
+      <svg class="chevron-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
       </svg>
     </div>
   </button>
 
-  <!-- Enhanced Dropdown Menu -->
-  <div class="user-profile-dropdown" *ngIf="showUserMenu">
+  <!-- Modern Dropdown Menu -->
+  <div class="profile-menu" *ngIf="showUserMenu" [@dropdownAnimation]>
+    <!-- User Header -->
+    <div class="menu-header">
+      <div class="user-card">
+        <div class="user-avatar-large">
+          <img
+            [src]="userData.userImage"
+            [alt]="userData.userName"
+            class="avatar-large"
+            *ngIf="userData.userImage; else defaultAvatarLarge">
+          <ng-template #defaultAvatarLarge>
+            <div class="avatar-fallback-large">
+              {{(userData.userName || 'U').charAt(0).toUpperCase()}}
+            </div>
+          </ng-template>
+        </div>
+        <div class="user-summary">
+          <h3 class="user-display-name">{{userData.userName}}</h3>
+          <p class="user-display-role">{{getRoleDisplayName(userData.userRole)}}</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Menu Items -->
-    <div class="dropdown-menu">
-      <button class="dropdown-menu-item" (click)="viewProfile()">
-        <div class="menu-item-icon">
+    <div class="menu-options">
+      <button class="menu-option profile-option" (click)="viewProfile()">
+        <div class="option-icon">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
           </svg>
         </div>
-        <div class="menu-item-content">
-          <span class="menu-item-title">View Profile</span>
-          <span class="menu-item-desc">Manage your account settings</span>
+        <div class="option-content">
+          <span class="option-title">View Profile</span>
+          <span class="option-description">Manage your account settings</span>
         </div>
-        <div class="menu-item-arrow">
+        <div class="option-arrow">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
           </svg>
         </div>
       </button>
 
-      <button class="dropdown-menu-item" (click)="viewSubscriptions()" *ngIf="showSubscriptions">
-        <div class="menu-item-icon">
+      <button class="menu-option subscriptions-option" (click)="viewSubscriptions()" *ngIf="showSubscriptions">
+        <div class="option-icon">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
           </svg>
         </div>
-        <div class="menu-item-content">
-          <span class="menu-item-title">Subscriptions</span>
-          <span class="menu-item-desc">View your active subscriptions</span>
+        <div class="option-content">
+          <span class="option-title">Subscriptions</span>
+          <span class="option-description">View your active subscriptions</span>
         </div>
-        <div class="menu-item-arrow">
+        <div class="option-arrow">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
           </svg>
@@ -66,9 +93,12 @@
       </button>
     </div>
 
+    <!-- Divider -->
+    <div class="menu-divider"></div>
+
     <!-- Logout Section -->
-    <div class="dropdown-footer">
-      <button class="logout-btn" (click)="handleLogout()">
+    <div class="menu-footer">
+      <button class="logout-button" (click)="handleLogout()">
         <svg class="logout-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
