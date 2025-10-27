@@ -1,191 +1,135 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4 sm:p-6 lg:p-8 relative overflow-hidden">
-  <!-- Subtle animated background elements -->
-  <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-indigo-900/20"></div>
-
-  <!-- Animated geometric patterns -->
-  <div class="absolute top-0 left-0 w-full h-full opacity-5">
-    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full blur-3xl animate-pulse"></div>
-    <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-full blur-3xl animate-pulse delay-2000"></div>
-  </div>
-
-  <!-- Subtle grid pattern overlay -->
-  <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,_rgba(255,255,255,0.05)_1px,_transparent_0)] bg-[length:20px_20px] opacity-20"></div>
-
-  <!-- Main login container -->
-  <div class="relative z-10 w-full max-w-lg mx-auto">
-    <!-- Login form card with improved glass effect -->
-    <div class="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-12 login-form-wrapper border border-white/20 shadow-black/25">
-      <!-- Enhanced Header -->
-      <div class="text-center mb-10 form-header">
-        <!-- Improved logo and title section -->
-        <div class="flex items-center justify-center gap-4 mb-6">
-          <!-- Professional logo container -->
-          <div class="relative">
-            <div class="w-16 h-16 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-500/25">
-              <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-              </svg>
-            </div>
-            <!-- Subtle glow effect -->
-            <div class="absolute -inset-1 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl blur opacity-25"></div>
-          </div>
-
-          <!-- Enhanced title -->
-          <div class="text-left">
-            <h1 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-white via-blue-100 to-indigo-200 bg-clip-text text-transparent leading-tight">
-              Village Connect
-            </h1>
-            <p class="text-blue-200/80 text-sm font-medium tracking-wide">Community Management System</p>
+<!-- Modern Login Page -->
+<div class="login-wrapper">
+  <!-- Left Brand Panel (desktop only) -->
+  <div class="brand-panel">
+    <div class="brand-content">
+      <div class="brand-logo">
+        <div class="logo-icon">
+          <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+        </div>
+        <h1 class="brand-title">Village Connect</h1>
+        <p class="brand-tagline">Community Management Platform</p>
+      </div>
+      
+      <div class="brand-features">
+        <div class="feature-item">
+          <div class="feature-icon">🏘️</div>
+          <div class="feature-text">
+            <h3>Smart Villages</h3>
+            <p>Manage your community efficiently</p>
           </div>
         </div>
-
-        <!-- Improved subtitle -->
-        <div class="space-y-2">
-          <p class="text-slate-300 text-base sm:text-lg font-medium">Welcome to your village dashboard</p>
-          <p class="text-slate-400 text-sm">Sign in to access your community tools and updates</p>
+        <div class="feature-item">
+          <div class="feature-icon">👥</div>
+          <div class="feature-text">
+            <h3>Connected People</h3>
+            <p>Stay in touch with villagers</p>
+          </div>
         </div>
-
-        <!-- Decorative line -->
-        <div class="mt-6 flex items-center justify-center">
-          <div class="w-24 h-px bg-gradient-to-r from-transparent via-blue-400/30 to-transparent"></div>
-          <div class="mx-3 w-2 h-2 bg-blue-400 rounded-full"></div>
-          <div class="w-24 h-px bg-gradient-to-r from-transparent via-blue-400/30 to-transparent"></div>
+        <div class="feature-item">
+          <div class="feature-icon">📊</div>
+          <div class="feature-text">
+            <h3>Real-time Insights</h3>
+            <p>Track events and incidents</p>
+          </div>
         </div>
       </div>
 
-      <!-- Rest of the form remains the same but with improved styling -->
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6 login-form" novalidate aria-label="Login form">
+      <div class="brand-stats">
+        <div class="stat-item">
+          <div class="stat-value">10k+</div>
+          <div class="stat-label">Villagers</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">500+</div>
+          <div class="stat-label">Villages</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">24/7</div>
+          <div class="stat-label">Support</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Form Panel -->
+  <div class="form-panel">
+    <div class="form-container">
+      <!-- Mobile Logo (hidden on desktop) -->
+      <div class="mobile-header">
+        <div class="mobile-logo">
+          <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+        </div>
+        <h2 class="mobile-title">Village Connect</h2>
+        <p class="mobile-subtitle">Sign in to continue</p>
+      </div>
+
+      <!-- Form Header -->
+      <div class="form-header">
+        <h2 class="form-title">Welcome back</h2>
+        <p class="form-subtitle">Enter your credentials to access your account</p>
+      </div>
+
+      <!-- Login Form -->
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" novalidate aria-label="Login form">
         <!-- Email Field -->
-        <div class="space-y-2">
-          <label for="email" class="flex items-center gap-2 text-sm font-semibold text-slate-200">
-            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
-            </svg>
-            Email Address
-          </label>
-          <div class="relative">
-            <input
-              id="email"
-              formControlName="email"
-              type="email"
-              placeholder="Enter your email"
-              aria-label="Email address"
-              aria-describedby="email-error"
-              autocomplete="email"
-              class="w-full px-4 py-3 pl-12 text-sm sm:text-base border-2 border-slate-600/50 rounded-xl transition-all duration-200 bg-slate-800/50 text-white placeholder-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 focus:outline-none"
-              [ngClass]="{'border-red-500': loginForm.get('email')?.invalid && loginForm.get('email')?.touched, 'focus:ring-red-500/20': loginForm.get('email')?.invalid && loginForm.get('email')?.touched, 'bg-red-900/20': loginForm.get('email')?.invalid && loginForm.get('email')?.touched}">
-            <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-            </svg>
+        <div class="form-group">
+          <label for="email" class="form-label">Email</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
+              </svg>
+            </span>
+            <input id="email" formControlName="email" type="email" placeholder="name@example.com" autocomplete="email" class="form-input" [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
           </div>
-          <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="flex items-center gap-1 text-red-400 text-xs font-medium" id="email-error">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-            </svg>
-            Please enter a valid email address
-          </div>
+          <span *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-message">Please enter a valid email</span>
         </div>
 
         <!-- Password Field -->
-        <div class="space-y-2">
-          <label for="password" class="flex items-center gap-2 text-sm font-semibold text-slate-200">
-            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-            </svg>
-            Password
-          </label>
-          <div class="relative">
-            <input
-              id="password"
-              formControlName="password"
-              [type]="showPassword ? 'text' : 'password'"
-              placeholder="Enter your password"
-              aria-label="Password"
-              aria-describedby="password-error"
-              class="w-full px-4 py-3 pl-12 pr-12 text-sm sm:text-base border-2 border-slate-600/50 rounded-xl transition-all duration-200 bg-slate-800/50 text-white placeholder-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 focus:outline-none"
-              [ngClass]="{'border-red-500': loginForm.get('password')?.invalid && loginForm.get('password')?.touched, 'focus:ring-red-500/20': loginForm.get('password')?.invalid && loginForm.get('password')?.touched, 'bg-red-900/20': loginForm.get('password')?.invalid && loginForm.get('password')?.touched}">
-            <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-            </svg>
-            <button
-              type="button"
-              class="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-blue-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 rounded"
-              (click)="togglePassword()"
-              aria-label="Toggle password visibility">
-              <svg *ngIf="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <div class="input-wrapper">
+            <span class="input-icon">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
               </svg>
-              <svg *ngIf="showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
-              </svg>
+            </span>
+            <input id="password" formControlName="password" [type]="showPassword ? 'text' : 'password'" placeholder="••••••••" class="form-input" [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            <button type="button" class="password-toggle" (click)="togglePassword()" aria-label="Toggle password">
+              <svg *ngIf="!showPassword" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+              <svg *ngIf="showPassword" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
             </button>
           </div>
-          <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="flex items-center gap-1 text-red-400 text-xs font-medium" id="password-error">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-            </svg>
-            Password is required
-          </div>
+          <span *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error-message">Password is required</span>
         </div>
 
         <!-- Form Options -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <label class="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
-            <input
-              type="checkbox"
-              [(ngModel)]="rememberMe"
-              [ngModelOptions]="{standalone: true}"
-              id="remember-me"
-              class="w-4 h-4 text-blue-500 bg-slate-700 border-slate-600 rounded focus:ring-blue-500 focus:ring-2">
-            <span class="font-medium">Remember me</span>
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="rememberMe" [ngModelOptions]="{standalone: true}" class="checkbox-input">
+            <span class="checkbox-text">Remember me</span>
           </label>
-          <button type="button" class="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 rounded-lg transition-colors duration-200 border border-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-500/20" (click)="openForgetPasswordModal()" aria-label="Reset forgotten password">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-            </svg>
-            Forgot password?
-          </button>
+          <button type="button" class="link-button" (click)="openForgetPasswordModal()">Forgot password?</button>
         </div>
 
         <!-- Submit Button -->
-        <button
-          type="submit"
-          class="w-full py-3 sm:py-4 px-6 text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:scale-100 shadow-lg shadow-blue-500/25"
-          [disabled]="loginForm.invalid || isLoading"
-          aria-label="Sign in to your account">
-          <div *ngIf="!isLoading" class="flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
-            </svg>
-            Sign In
-          </div>
-          <div *ngIf="isLoading" class="flex items-center justify-center gap-2">
-            <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+        <button type="submit" class="submit-button" [disabled]="loginForm.invalid || isLoading" [class.loading]="isLoading">
+          <span *ngIf="!isLoading">Sign In</span>
+          <span *ngIf="isLoading" class="loading-text">
+            <svg class="spinner" viewBox="0 0 24 24"><circle class="spinner-track" cx="12" cy="12" r="10"></circle><circle class="spinner-head" cx="12" cy="12" r="10"></circle></svg>
             Signing in...
-          </div>
+          </span>
         </button>
       </form>
 
-      <!-- Enhanced Footer -->
-      <div class="mt-8 pt-6 border-t border-slate-600/50 text-center">
-        <p class="text-sm text-slate-400">
-          New to Village Connect?
-          <a href="#" class="font-semibold text-blue-400 hover:text-blue-300 transition-colors duration-200">Contact your village admin</a>
-        </p>
+      <!-- Footer -->
+      <div class="form-footer">
+        <p>Don't have an account? <button type="button" class="link-text" (click)="openContactAdminModal()">Contact your village admin</button></p>
       </div>
     </div>
   </div>
@@ -196,3 +140,54 @@
   *ngIf="showForgetPasswordModal"
   (closeModal)="closeForgetPasswordModal()">
 </app-forget-password-modal>
+
+<!-- Contact Village Admin Modal -->
+<div *ngIf="showContactAdminModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40" (click)="closeContactAdminModal()"></div>
+  <div class="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-semibold text-gray-900">Contact village admin</h3>
+      <button type="button" (click)="closeContactAdminModal()" class="text-gray-500 hover:text-gray-700 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500/20" aria-label="Close">
+        ✕
+      </button>
+    </div>
+
+    <form [formGroup]="contactForm" (ngSubmit)="submitContactAdmin()" class="space-y-4">
+      <div class="space-y-1">
+        <label class="block text-sm font-medium text-gray-700">Your name</label>
+        <input type="text" formControlName="name" class="form-input w-full px-4 py-3 text-sm border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" placeholder="Enter your name" />
+      </div>
+      <div class="space-y-1">
+        <label class="block text-sm font-medium text-gray-700">Village</label>
+        <select formControlName="villageId" class="form-select w-full px-4 py-3 text-sm border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+          <option value="" disabled>Select a village</option>
+          <option *ngFor="let v of villageOptions" [value]="v.id">{{ v.name }}</option>
+        </select>
+      </div>
+      <div class="space-y-1">
+        <label class="block text-sm font-medium text-gray-700">Reason</label>
+        <textarea formControlName="reason" rows="3" class="form-input w-full px-4 py-3 text-sm border border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" placeholder="Briefly describe why you want to contact"></textarea>
+      </div>
+
+      <button type="submit" [disabled]="contactLoading || contactForm.invalid" class="w-full py-3 px-6 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50">
+        <span *ngIf="!contactLoading">Find village admins</span>
+        <span *ngIf="contactLoading" class="inline-flex items-center gap-2">
+          <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          Loading...
+        </span>
+      </button>
+    </form>
+
+    <div *ngIf="contactSubmitted" class="mt-4">
+      <ng-container *ngIf="contactResultEmails.length > 0; else noAdmins">
+        <p class="text-sm text-gray-700 mb-2">Please contact your village admin using the following email(s):</p>
+        <ul class="list-disc pl-5 text-sm text-gray-800">
+          <li *ngFor="let email of contactResultEmails"><span class="font-medium">{{ email }}</span></li>
+        </ul>
+      </ng-container>
+      <ng-template #noAdmins>
+        <p class="text-sm text-gray-600">No village admin emails found for the selected village. Please try another village or contact support.</p>
+      </ng-template>
+    </div>
+  </div>
+</div>

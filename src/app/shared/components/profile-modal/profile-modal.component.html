@@ -122,15 +122,25 @@
               </div>
 
               <div class="form-field full-width">
-                <label class="field-label">Address</label>
-                <textarea
-                  class="form-textarea"
-                  [class.editing]="isEditing"
-                  [readonly]="!isEditing"
-                  [(ngModel)]="editedProfile!.address"
-                  placeholder="Enter full address"
-                  rows="3"
-                ></textarea>
+                <label class="field-label">Full Address</label>
+                <div class="address-action-row">
+                  <button class="btn-primary" type="button" (click)="onGetMapLocation()" [disabled]="isLocating">
+                    <span *ngIf="!isLocating">Get map location</span>
+                    <span *ngIf="isLocating">Fetching location...</span>
+                  </button>
+                </div>
+                <div class="address-display">
+                  <input
+                    type="text"
+                    class="form-input"
+                    readonly
+                    [value]="editedProfile?.address || 'No address set'"
+                  />
+                  <div class="address-meta" *ngIf="coords">
+                    <span>Lat: {{coords.lat | number:'1.6-6'}}, Lng: {{coords.lng | number:'1.6-6'}}</span>
+                  </div>
+                  <div class="address-error" *ngIf="locationError">{{locationError}}</div>
+                </div>
               </div>
             </div>
           </div>
@@ -164,16 +174,6 @@
                   [value]="formatDate(userProfile?.joinDate)"
                 />
               </div>
-
-              <div class="form-field">
-                <label class="field-label">User ID</label>
-                <input
-                  type="text"
-                  class="form-input"
-                  readonly
-                  [value]="userProfile?.id"
-                />
-              </div>
             </div>
           </div>
         </div>
@@ -196,14 +196,6 @@
                   d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
           </svg>
           <span>Edit Profile</span>
-        </button>
-
-        <button class="btn-danger" (click)="onDelete()">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-          </svg>
-          <span>Delete Profile</span>
         </button>
       </div>
 

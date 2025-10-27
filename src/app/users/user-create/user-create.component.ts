@@ -154,8 +154,14 @@ export class UserCreateComponent implements OnInit {
         this.countries = data;
         console.log('Countries loaded for edit:', this.countries);
 
-        // Set the user's country selection
-        if (this.user.village?.mandal?.district?.state?.country?.id) {
+        // Auto-select and load next level if only one country
+        if (this.countries.length === 1) {
+          this.selectedCountryId = this.countries[0].id;
+          setTimeout(() => {
+            this.loadStatesForEdit();
+          }, 100);
+        } else if (this.user.village?.mandal?.district?.state?.country?.id) {
+          // Set the user's country selection
           this.selectedCountryId = this.user.village.mandal.district.state.country.id;
           console.log('Set country selection:', this.selectedCountryId);
 
@@ -173,8 +179,14 @@ export class UserCreateComponent implements OnInit {
         ];
         console.log('Using fallback countries');
 
-        // Try to set country selection even with fallback data
-        if (this.user.village?.mandal?.district?.state?.country?.id) {
+        // Auto-select and load next level if only one country (fallback)
+        if (this.countries.length === 1) {
+          this.selectedCountryId = this.countries[0].id;
+          setTimeout(() => {
+            this.loadStatesForEdit();
+          }, 100);
+        } else if (this.user.village?.mandal?.district?.state?.country?.id) {
+          // Try to set country selection even with fallback data
           this.selectedCountryId = this.user.village.mandal.district.state.country.id;
           setTimeout(() => {
             this.loadStatesForEdit();
@@ -192,8 +204,14 @@ export class UserCreateComponent implements OnInit {
           this.states = data;
           console.log('States loaded for edit:', this.states);
 
-          // Set the user's state selection
-          if (this.user.village?.mandal?.district?.state?.id) {
+          // Auto-select and load next level if only one state
+          if (this.states.length === 1) {
+            this.selectedStateId = this.states[0].id;
+            setTimeout(() => {
+              this.loadDistrictsForEdit();
+            }, 100);
+          } else if (this.user.village?.mandal?.district?.state?.id) {
+            // Set the user's state selection
             this.selectedStateId = this.user.village.mandal.district.state.id;
             console.log('Set state selection:', this.selectedStateId);
 
@@ -209,7 +227,13 @@ export class UserCreateComponent implements OnInit {
             { id: '1', name: 'Telangana', country: { id: '1', name: 'India' } }
           ];
 
-          if (this.user.village?.mandal?.district?.state?.id) {
+          // Auto-select and load next level if only one state (fallback)
+          if (this.states.length === 1) {
+            this.selectedStateId = this.states[0].id;
+            setTimeout(() => {
+              this.loadDistrictsForEdit();
+            }, 100);
+          } else if (this.user.village?.mandal?.district?.state?.id) {
             this.selectedStateId = this.user.village.mandal.district.state.id;
             setTimeout(() => {
               this.loadDistrictsForEdit();
@@ -228,8 +252,14 @@ export class UserCreateComponent implements OnInit {
           this.districts = data;
           console.log('Districts loaded for edit:', this.districts);
 
-          // Set the user's district selection
-          if (this.user.village?.mandal?.district?.id) {
+          // Auto-select and load next level if only one district
+          if (this.districts.length === 1) {
+            this.selectedDistrictId = this.districts[0].id;
+            setTimeout(() => {
+              this.loadMandalsForEdit();
+            }, 100);
+          } else if (this.user.village?.mandal?.district?.id) {
+            // Set the user's district selection
             this.selectedDistrictId = this.user.village.mandal.district.id;
             console.log('Set district selection:', this.selectedDistrictId);
 
@@ -245,7 +275,13 @@ export class UserCreateComponent implements OnInit {
             { id: '1', name: 'Hyderabad', state: { id: '1', name: 'Telangana' } }
           ];
 
-          if (this.user.village?.mandal?.district?.id) {
+          // Auto-select and load next level if only one district (fallback)
+          if (this.districts.length === 1) {
+            this.selectedDistrictId = this.districts[0].id;
+            setTimeout(() => {
+              this.loadMandalsForEdit();
+            }, 100);
+          } else if (this.user.village?.mandal?.district?.id) {
             this.selectedDistrictId = this.user.village.mandal.district.id;
             setTimeout(() => {
               this.loadMandalsForEdit();
@@ -264,8 +300,14 @@ export class UserCreateComponent implements OnInit {
           this.mandals = data;
           console.log('Mandals loaded for edit:', this.mandals);
 
-          // Set the user's mandal selection
-          if (this.user.village?.mandal?.id) {
+          // Auto-select and load next level if only one mandal
+          if (this.mandals.length === 1) {
+            this.selectedMandalId = this.mandals[0].id;
+            setTimeout(() => {
+              this.loadVillagesForEdit();
+            }, 100);
+          } else if (this.user.village?.mandal?.id) {
+            // Set the user's mandal selection
             this.selectedMandalId = this.user.village.mandal.id;
             console.log('Set mandal selection:', this.selectedMandalId);
 
@@ -281,7 +323,13 @@ export class UserCreateComponent implements OnInit {
             { id: '1', name: 'Mandal 1', district: { id: '1', name: 'Hyderabad' } }
           ];
 
-          if (this.user.village?.mandal?.id) {
+          // Auto-select and load next level if only one mandal (fallback)
+          if (this.mandals.length === 1) {
+            this.selectedMandalId = this.mandals[0].id;
+            setTimeout(() => {
+              this.loadVillagesForEdit();
+            }, 100);
+          } else if (this.user.village?.mandal?.id) {
             this.selectedMandalId = this.user.village.mandal.id;
             setTimeout(() => {
               this.loadVillagesForEdit();
@@ -300,8 +348,14 @@ export class UserCreateComponent implements OnInit {
           this.villages = data;
           console.log('Villages loaded for edit:', this.villages);
 
-          // Set the user's village selection
-          if (this.user.village?.id) {
+          // Auto-select if only one village
+          if (this.villages.length === 1) {
+            this.selectedVillageId = this.villages[0].id || '';
+            setTimeout(() => {
+              this.onVillageChange();
+            }, 100);
+          } else if (this.user.village?.id) {
+            // Set the user's village selection
             this.selectedVillageId = this.user.village.id;
             console.log('Set village selection:', this.selectedVillageId);
           }
@@ -313,7 +367,13 @@ export class UserCreateComponent implements OnInit {
             { id: '2', name: 'Village 2' }
           ];
 
-          if (this.user.village?.id) {
+          // Auto-select if only one village (fallback)
+          if (this.villages.length === 1) {
+            this.selectedVillageId = this.villages[0].id || '';
+            setTimeout(() => {
+              this.onVillageChange();
+            }, 100);
+          } else if (this.user.village?.id) {
             this.selectedVillageId = this.user.village.id;
           }
         }
@@ -326,6 +386,14 @@ export class UserCreateComponent implements OnInit {
       next: (data) => {
         this.countries = data;
         console.log('Countries loaded:', this.countries);
+
+        // Auto-select and load next level if only one country
+        if (this.countries.length === 1) {
+          this.selectedCountryId = this.countries[0].id;
+          setTimeout(() => {
+            this.onCountryChange();
+          }, 100);
+        }
       },
       error: (error) => {
         console.error('Error loading countries:', error);
@@ -333,13 +401,6 @@ export class UserCreateComponent implements OnInit {
         console.log('Using fallback countries:', this.countries);
       }
     });
-  }
-
-  // Helper method for edit mode state loading
-  loadStatesForEditMode(): void {
-    if (this.selectedCountryId) {
-      this.loadStates(this.selectedCountryId);
-    }
   }
 
   loadStates(countryId: string): void {
@@ -356,6 +417,14 @@ export class UserCreateComponent implements OnInit {
         this.selectedVillageId = '';
 
         console.log('States loaded:', this.states);
+
+        // Auto-select and load next level if only one state
+        if (this.states.length === 1) {
+          this.selectedStateId = this.states[0].id;
+          setTimeout(() => {
+            this.onStateChange();
+          }, 100);
+        }
       },
       error: (error) => {
         console.error('Error loading states:', error);
@@ -366,13 +435,6 @@ export class UserCreateComponent implements OnInit {
         ];
       }
     });
-  }
-
-  // Helper method for edit mode district loading (legacy - not used in new implementation)
-  loadDistrictsForEditMode(): void {
-    if (this.selectedStateId) {
-      this.loadDistricts(this.selectedStateId);
-    }
   }
 
   loadDistricts(stateId: string): void {
@@ -386,6 +448,14 @@ export class UserCreateComponent implements OnInit {
         this.selectedVillageId = '';
 
         console.log('Districts loaded:', this.districts);
+
+        // Auto-select and load next level if only one district
+        if (this.districts.length === 1) {
+          this.selectedDistrictId = this.districts[0].id;
+          setTimeout(() => {
+            this.onDistrictChange();
+          }, 100);
+        }
       },
       error: (error) => {
         console.error('Error loading districts:', error);
@@ -407,6 +477,14 @@ export class UserCreateComponent implements OnInit {
         this.selectedVillageId = '';
 
         console.log('Mandals loaded:', this.mandals);
+
+        // Auto-select and load next level if only one mandal
+        if (this.mandals.length === 1) {
+          this.selectedMandalId = this.mandals[0].id;
+          setTimeout(() => {
+            this.onMandalChange();
+          }, 100);
+        }
       },
       error: (error) => {
         console.error('Error loading mandals:', error);
@@ -419,18 +497,21 @@ export class UserCreateComponent implements OnInit {
     });
   }
 
-  // Helper method for edit mode village loading
-  loadVillagesForEditMode(): void {
-    if (this.selectedMandalId) {
-      this.loadVillagesByMandal(this.selectedMandalId);
-    }
-  }
-
   loadVillagesByMandal(mandalId: string): void {
     this.villagesService.getVillagesByMandal(mandalId).subscribe({
       next: (data) => {
         this.villages = data;
         this.selectedVillageId = '';
+
+        console.log('Villages loaded:', this.villages);
+
+        // Auto-select if only one village
+        if (this.villages.length === 1) {
+          this.selectedVillageId = this.villages[0].id || '';
+          setTimeout(() => {
+            this.onVillageChange();
+          }, 100);
+        }
       },
       error: (error) => {
         console.error('Error loading villages:', error);

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UsersService, Role, User } from 'src/app/users/users.service';
 import { TokenService } from 'src/app/core/services/token.service';
+import { Capacitor } from '@capacitor/core';
+import { Geolocation } from '@capacitor/geolocation';
 
 export interface UserProfile {
   id: string;
@@ -33,6 +35,11 @@ export class ProfileModalComponent implements OnInit, OnChanges {
 
   isEditing = false;
   editedProfile: UserProfile | null = null;
+
+  // Geolocation state
+  isLocating = false;
+  coords: { lat: number; lng: number } | null = null;
+  locationError: string | null = null;
 
   currentUser:any;
   // Available roles from API
@@ -161,5 +168,81 @@ export class ProfileModalComponent implements OnInit, OnChanges {
     };
 
     return roleMap[role] || role;
+  }
+
+  // Fetch current location and reverse-geocode to full address
+  async onGetMapLocation(): Promise<void> {
+    this.locationError = null;
+    this.isLocating = true;
+    try {
+      let lat: number, lng: number;
+
+      if (Capacitor.isNativePlatform()) {
+        // Capacitor native path: request runtime permissions and get position
+        await Geolocation.requestPermissions();
+        const pos = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 15000 });
+        lat = pos.coords.latitude;
+        lng = pos.coords.longitude;
+      } else {
+        // Web fallback
+        if (!('geolocation' in navigator)) {
+          throw new Error('Geolocation is not supported in this browser.');
+        }
+        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 30000,
+          });
+        });
+        lat = position.coords.latitude;
+        lng = position.coords.longitude;
+      }
+
+      this.coords = { lat, lng };
+
+      // Reverse geocode using OpenStreetMap Nominatim (no API key)
+      const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}`;
+      const res = await fetch(url, {
+        headers: {
+          'Accept': 'application/json',
+          // Some services suggest a referer or email; browsers restrict custom UA headers
+        }
+      });
+      if (!res.ok) {
+        throw new Error(`Reverse geocoding failed (${res.status})`);
+      }
+      const data: any = await res.json();
+
+      const display = data?.display_name as string | undefined;
+      const addressObj = data?.address || {};
+
+      const fallback = [
+        addressObj.road,
+        addressObj.neighbourhood,
+        addressObj.suburb,
+        addressObj.village || addressObj.town || addressObj.city,
+        addressObj.state,
+        addressObj.postcode,
+        addressObj.country
+      ].filter(Boolean).join(', ');
+
+      const fullAddress = display || fallback || `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+      if (!this.editedProfile && this.userProfile) {
+        this.editedProfile = { ...this.userProfile };
+      }
+      if (this.editedProfile) {
+        this.editedProfile.address = fullAddress;
+      }
+    } catch (err: any) {
+      const code = err?.code as number | undefined;
+      if (code === 1) this.locationError = 'Permission denied. Please allow location access.'; // PERMISSION_DENIED
+      else if (code === 2) this.locationError = 'Position unavailable. Try again later.'; // POSITION_UNAVAILABLE
+      else if (code === 3) this.locationError = 'Location request timed out.'; // TIMEOUT
+      else this.locationError = err?.message || 'Failed to fetch location.';
+    } finally {
+      this.isLocating = false;
+    }
   }
 }
