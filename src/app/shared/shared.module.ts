@@ -10,6 +10,7 @@ import { SidebarComponent } from './sidebar/sidebar.component';
 import { UserProfileDropdownComponent } from './components/user-profile-dropdown/user-profile-dropdown.component';
 import { MatCardModule } from '@angular/material/card';
 import { ChatWidgetComponent } from './components/chat-widget/chat-widget.component';
+import { FeatureHeaderComponent } from './components/feature-header/feature-header.component';
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import { ChatWidgetComponent } from './components/chat-widget/chat-widget.compon
     NavbarComponent,
     SidebarComponent,
     FooterComponent,
-    UserProfileDropdownComponent
+    UserProfileDropdownComponent,
+    FeatureHeaderComponent
   ],
   imports: [
     CommonModule,
@@ -33,7 +35,8 @@ import { ChatWidgetComponent } from './components/chat-widget/chat-widget.compon
     FooterComponent,
     SidebarComponent,
     UserProfileDropdownComponent,
-    ChatWidgetComponent
+    ChatWidgetComponent,
+    FeatureHeaderComponent
   ]
 })
 export class SharedModule { }

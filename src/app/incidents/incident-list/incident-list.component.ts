@@ -50,6 +50,10 @@ export class IncidentListComponent implements OnInit, OnDestroy {
   currentUser: any = null;
   canCreateIncidents = false;
   canEditAnyIncident = false;
+  canChangeStatus = false;
+
+  // UI state
+  expanded: { [id: string]: boolean } = {};
 
   constructor(
     private incidentService: IncidentService,
@@ -63,6 +67,10 @@ export class IncidentListComponent implements OnInit, OnDestroy {
     this.checkUserPermissions();
     this.loadDashboardSummary();
     this.loadIncidents();
+  }
+
+  toggleExpand(id: string): void {
+    this.expanded[id] = !this.expanded[id];
   }
 
   ngOnDestroy(): void {
@@ -87,14 +95,17 @@ export class IncidentListComponent implements OnInit, OnDestroy {
       if (userRole === 'VILLAGE_ADMIN' || userRole === 'SUPER_ADMIN') {
         this.canCreateIncidents = true;
         this.canEditAnyIncident = true;
+        this.canChangeStatus = true;
       } else {
-        // Villagers can only create incidents and edit their own
-        this.canCreateIncidents = true; // Villagers can create incidents
-        this.canEditAnyIncident = false; // But can only edit their own
+        // Villagers: can create only. No edit/delete/assign/status updates
+        this.canCreateIncidents = true;
+        this.canEditAnyIncident = false;
+        this.canChangeStatus = false;
       }
     } else {
       this.canCreateIncidents = false;
       this.canEditAnyIncident = false;
+      this.canChangeStatus = false;
     }
   }
 
@@ -250,13 +261,13 @@ export class IncidentListComponent implements OnInit, OnDestroy {
   }
 
   canEditIncident(incident: Incident): boolean {
-    // Admins can edit any incident, villagers can only edit their own
-    return this.canEditAnyIncident || this.isCurrentUserOwner(incident);
+    // Only admins can edit; villagers cannot edit even if owner
+    return this.canEditAnyIncident;
   }
 
   canDeleteIncident(incident: Incident): boolean {
-    // Admins can delete any incident, villagers can only delete their own
-    return this.canEditAnyIncident || this.isCurrentUserOwner(incident);
+    // Only admins can delete; villagers cannot delete even if owner
+    return this.canEditAnyIncident;
   }
 
   getPagesArray(): number[] {

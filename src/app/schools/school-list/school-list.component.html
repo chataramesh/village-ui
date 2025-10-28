@@ -1,30 +1,31 @@
 <div class="schools-container">
   <!-- Header Section -->
+  <app-feature-header
+    [title]="'🏫 Schools & Colleges'"
+    [subtitle]="'Educational institutions in your village'"
+    [dense]="true">
+    <div header-actions>
+      <button *ngIf="canCreate()" (click)="openAddModal()" class="add-btn small">
+        <svg class="add-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+        Add School
+      </button>
+    </div>
+  </app-feature-header>
+
+  <!-- Search and Filter -->
   <div class="schools-header">
     <div class="header-content">
-      <div class="header-left">
-        <h1 class="page-title">🏫 Schools & Colleges</h1>
-        <p class="page-subtitle">Educational institutions in your village</p>
-      </div>
       <div class="header-right">
-        <!-- Search and Filter -->
         <div class="search-filter-section">
           <div class="search-box">
             <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
-            <input
-              type="text"
-              placeholder="Search schools..."
-              [(ngModel)]="searchQuery"
-              (input)="filterSchools()"
-              class="search-input">
+            <input type="text" placeholder="Search schools..." [(ngModel)]="searchQuery" (input)="filterSchools()" class="search-input">
           </div>
-
-          <select
-            [(ngModel)]="selectedType"
-            (change)="filterSchools()"
-            class="filter-select">
+          <select [(ngModel)]="selectedType" (change)="filterSchools()" class="filter-select">
             <option value="all">All Types</option>
             <option value="SCHOOL">Schools</option>
             <option value="COLLEGE">Colleges</option>
@@ -34,17 +35,6 @@
             <option value="TRAINING_CENTER">Training Centers</option>
           </select>
         </div>
-
-        <!-- Admin Actions -->
-        <button
-          *ngIf="canCreate() && ['SUPER_ADMIN', 'VILLAGE_ADMIN'].includes(currentUser?.role)"
-          (click)="openAddModal()"
-          class="add-btn">
-          <svg class="add-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-          </svg>
-          Add School
-        </button>
       </div>
     </div>
   </div>

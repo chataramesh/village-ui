@@ -1,0 +1,17 @@
+<header class="feature-header" [class.dense]="dense">
+  <div class="feature-header-inner" [class.actions-left]="actionsAlign==='left'" [class.actions-center]="actionsAlign==='center'">
+    <div class="title-group">
+      <button *ngIf="showBack" class="back-btn" type="button" (click)="onBack()" aria-label="Back">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M15.7 5.3a1 1 0 010 1.4L10.41 12l5.3 5.3a1 1 0 01-1.42 1.4l-6-6a1 1 0 010-1.4l6-6a1 1 0 011.41 0z"/></svg>
+      </button>
+      <div class="titles">
+        <h1 class="title">{{ title }}</h1>
+        <p class="subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <ng-content select="[header-actions]"></ng-content>
+    </div>
+  </div>
+</header>

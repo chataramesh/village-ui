@@ -6,11 +6,13 @@ import { SchoolService } from '../services/school.service';
 import { SchoolResponse, SchoolRequest, SchoolType } from '../models/school.model';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UsersService } from 'src/app/users/users.service';
+import { ToastService } from 'src/app/shared/services/toast.service';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 @Component({
   selector: 'app-school-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, SharedModule],
   templateUrl: './school-list.component.html',
   styleUrls: ['./school-list.component.scss']
 })
@@ -25,7 +27,7 @@ export class SchoolListComponent implements OnInit, OnDestroy {
   searchQuery = '';
   selectedType: string = 'all';
   currentUser: any = null;
-  isAdmin = true; // For demo purposes - set to true to show admin features
+  isAdmin = true; // computed from user role
 
   schoolForm!: FormGroup;
   private destroy$ = new Subject<void>();
@@ -43,7 +45,8 @@ export class SchoolListComponent implements OnInit, OnDestroy {
     private schoolService: SchoolService,
     private fb: FormBuilder,
     private userService: UsersService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private toast: ToastService
   ) {
     this.initializeForm();
   }
@@ -53,6 +56,7 @@ export class SchoolListComponent implements OnInit, OnDestroy {
     this.userService.getUserById(tokenUser?.userId!).subscribe({
       next: (user: any) => {
         this.currentUser = user;
+        this.isAdmin = ['SUPER_ADMIN','VILLAGE_ADMIN'].includes(this.currentUser?.role);
         console.log('Current user loaded:', user);
         console.log('Village ID:', this.currentUser?.village?.id);
         this.loadSchools();
@@ -60,7 +64,8 @@ export class SchoolListComponent implements OnInit, OnDestroy {
       error: (error: any) => {
         console.error('Error loading user:', error);
         // Load with demo village ID as fallback
-        this.currentUser = { village: { id: 'demo-village-id' } };
+        this.currentUser = { village: { id: 'demo-village-id' }, role: 'VILLAGER' };
+        this.isAdmin = false;
         this.loadSchools();
       }
     });
@@ -234,7 +239,7 @@ export class SchoolListComponent implements OnInit, OnDestroy {
 
       // Additional validation: ensure village and owner are set
       if (!formValue.villageId || !formValue.ownerId) {
-        alert('Village and owner information must be set. Please refresh the page if this persists.');
+        this.toast.error('Village and owner must be set. Please refresh and try again.');
         return;
       }
 
@@ -274,10 +279,11 @@ export class SchoolListComponent implements OnInit, OnDestroy {
           // Reload the schools list to get the updated data
           this.loadSchools();
           this.closeModals();
+          this.toast.success('School created successfully');
         },
         error: (error: any) => {
           console.error('Error creating school:', error);
-          // Handle error - could show a toast notification
+          this.toast.error('Failed to create school');
         }
       });
   }
@@ -290,10 +296,11 @@ export class SchoolListComponent implements OnInit, OnDestroy {
           // Reload the schools list to get the updated data
           this.loadSchools();
           this.closeModals();
+          this.toast.success('School updated successfully');
         },
         error: (error: any) => {
           console.error('Error updating school:', error);
-          // Handle error - could show a toast notification
+          this.toast.error('Failed to update school');
         }
       });
   }
@@ -311,7 +318,7 @@ export class SchoolListComponent implements OnInit, OnDestroy {
             this.schools = this.schools.filter(s => s.id !== this.selectedSchool?.id);
             this.filteredSchools = this.filteredSchools.filter(s => s.id !== this.selectedSchool?.id);
             this.closeModals();
-            console.log('School deleted successfully');
+            this.toast.success('School deleted successfully');
           },
           error: (error: any) => {
             console.error('Error deleting school:', error);
@@ -321,7 +328,7 @@ export class SchoolListComponent implements OnInit, OnDestroy {
               message: error.message,
               url: error.url
             });
-            alert(`Failed to delete school: ${error.message || 'Unknown error'}. Please try again.`);
+            this.toast.error('Failed to delete school. Please try again.');
           }
         });
     }

@@ -36,7 +36,7 @@ export class VehicleCreateComponent implements OnInit {
     private toast: ToastService
   ) {
     this.vehicleForm = this.fb.group({
-      vehicleNumber: ['', [Validators.required, Validators.pattern(/^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/)]],
+      vehicleNumber: ['', [Validators.required,  Validators.pattern(/^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/)]],
       vehicleType: ['', Validators.required],
       wheelerType: ['', Validators.required],
       vehicleDescription: [''],

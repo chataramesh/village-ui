@@ -6,11 +6,13 @@ import { TempleService } from '../services/temple.service';
 import { TempleResponse, TempleRequest, TempleType } from '../models/temple.model';
 import { UsersService, User, Role } from '../../users/users.service';
 import { TokenService } from 'src/app/core/services/token.service';
+import { ToastService } from 'src/app/shared/services/toast.service';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 @Component({
   selector: 'app-temple-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, SharedModule],
   templateUrl: './temple-list.component.html',
   styleUrls: ['./temple-list.component.scss']
 })
@@ -25,7 +27,7 @@ export class TempleListComponent implements OnInit, OnDestroy {
   searchQuery = '';
   selectedType: string = 'all';
   currentUser: any = null;
-  isAdmin = true; // For demo purposes - set to true to show admin features
+  isAdmin = true; // will be evaluated from user role
 
 
   // Users for priest dropdown
@@ -50,7 +52,8 @@ export class TempleListComponent implements OnInit, OnDestroy {
     private templeService: TempleService,
     private usersService: UsersService,
     private fb: FormBuilder,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private toast: ToastService
   ) {
     this.initializeForm();
   }
@@ -62,6 +65,7 @@ export class TempleListComponent implements OnInit, OnDestroy {
       next: (user: any) => {
         this.currentUser = user;
         this.selectedVillageId = this.currentUser.village?.id;
+        this.isAdmin = ['SUPER_ADMIN','VILLAGE_ADMIN'].includes(this.currentUser?.role);
         // Load users and temples after setting the village ID
         this.loadUsers();
         this.loadTemples();
@@ -70,6 +74,7 @@ export class TempleListComponent implements OnInit, OnDestroy {
         console.error('Error loading user:', error);
         // Load with demo village ID as fallback
         this.selectedVillageId = 'demo-village-id';
+        this.isAdmin = false;
         this.loadUsers();
         this.loadTemples();
       }
@@ -239,7 +244,7 @@ export class TempleListComponent implements OnInit, OnDestroy {
 
       // Additional validation: ensure priest is selected and village/owner are set
       if (!formValue.priestName || !formValue.villageId || !formValue.ownerId) {
-        alert('Please select a priest from the dropdown. Village and owner information will be set automatically.');
+        this.toast.error('Please select a priest. Village and owner will be set automatically.');
         return;
       }
 
@@ -284,10 +289,11 @@ export class TempleListComponent implements OnInit, OnDestroy {
           // Reload the temples list to get the updated data
           this.loadTemples();
           this.closeModals();
+          this.toast.success('Temple created successfully');
         },
         error: (error: any) => {
           console.error('Error creating temple:', error);
-          // Handle error - could show a toast notification
+          this.toast.error('Failed to create temple');
         }
       });
   }
@@ -300,10 +306,11 @@ export class TempleListComponent implements OnInit, OnDestroy {
           // Reload the temples list to get the updated data
           this.loadTemples();
           this.closeModals();
+          this.toast.success('Temple updated successfully');
         },
         error: (error: any) => {
           console.error('Error updating temple:', error);
-          // Handle error - could show a toast notification
+          this.toast.error('Failed to update temple');
         }
       });
   }
@@ -321,7 +328,7 @@ export class TempleListComponent implements OnInit, OnDestroy {
             this.temples = this.temples.filter(t => t.id !== this.selectedTemple?.id);
             this.filteredTemples = this.filteredTemples.filter(t => t.id !== this.selectedTemple?.id);
             this.closeModals();
-            console.log('Temple deleted successfully');
+            this.toast.success('Temple deleted successfully');
           },
           error: (error: any) => {
             console.error('Error deleting temple:', error);
@@ -331,7 +338,7 @@ export class TempleListComponent implements OnInit, OnDestroy {
               message: error.message,
               url: error.url
             });
-            alert(`Failed to delete temple: ${error.message || 'Unknown error'}. Please try again.`);
+            this.toast.error('Failed to delete temple. Please try again.');
           }
         });
     }

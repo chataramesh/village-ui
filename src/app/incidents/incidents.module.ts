@@ -6,6 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { IncidentListComponent } from './incident-list/incident-list.component';
 import { IncidentCreateComponent } from './incident-create/incident-create.component';
 import { IncidentsRoutingModule } from './incidents-routing.module';
+import { SharedModule } from '../shared/shared.module';
 
 
 @NgModule({
@@ -19,6 +20,7 @@ import { IncidentsRoutingModule } from './incidents-routing.module';
     FormsModule,
     HttpClientModule,
     IncidentsRoutingModule,
+    SharedModule,
   ]
 })
 export class IncidentsModule { }
