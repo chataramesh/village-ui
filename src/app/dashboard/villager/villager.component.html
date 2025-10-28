@@ -3,12 +3,16 @@
   <div class="dashboard-container">
     
     <!-- Header with User Menu -->
-    <app-feature-header
-      [title]="'Villager Dashboard'"
-      [subtitle]="'Welcome, ' + userName + '!'"
-      [dense]="true"
-      [showBack]="false">
-      <div header-actions>
+
+
+      <!-- Header with User Menu -->
+    <div class="dashboard-header">
+      <div class="header-left">
+        <h1 class="dashboard-title">Villager Dashboard</h1>
+        <p class="dashboard-subtitle">Welcome, {{userName}}!</p>
+      </div>
+      <div class="header-right">
+        <!-- Shared User Profile Dropdown -->
         <app-user-profile-dropdown
           [userData]="userProfileData"
           (profileModalOpened)="onProfileModalOpened($event)"
@@ -16,7 +20,7 @@
           (logoutClicked)="onLogoutClicked()">
         </app-user-profile-dropdown>
       </div>
-    </app-feature-header>
+    </div>
 
     <!-- Quick Actions Grid -->
     <div class="quick-actions-section">

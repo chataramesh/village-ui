@@ -2,9 +2,10 @@ import { Component, EventEmitter, Input, OnInit, OnDestroy, Output } from '@angu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChatService, ChatMessage, UserWithMessageCount } from '../../../core/services/chat.service';
-import { UsersService, User } from '../../../users/users.service';
+import { UsersService, User, Role } from '../../../users/users.service';
 import { WebsocketService } from '../../../core/services/websocket.service';
 import { TokenService } from '../../../core/services/token.service';
+import { EntitySubscriptionService } from '../../../entities/services/entity-subscription.service';
 
 interface ChatUser extends User {
   unreadCount: number;
@@ -45,7 +46,8 @@ export class ChatWidgetComponent implements OnInit, OnDestroy {
     private chatService: ChatService,
     private userService: UsersService,
     private websocketService: WebsocketService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private entitySubscriptionService: EntitySubscriptionService
   ) {}
 
   ngOnInit() {
@@ -106,16 +108,53 @@ export class ChatWidgetComponent implements OnInit, OnDestroy {
     if (!this.currentUserId) return;
 
     this.isLoadingUsers = true;
+    const role = (this.currentUserRole || '').toUpperCase();
+
+    if (role === Role.SUPER_ADMIN) {
+      this.userService.getAllUsers().subscribe({
+        next: (users) => {
+          const filteredUsers = users.filter(u => u.id !== this.currentUserId);
+          this.chatService.updateUsersWithCountsFromBackend(filteredUsers, this.currentUserId);
+          this.isLoadingUsers = false;
+        },
+        error: () => { this.isLoadingUsers = false; }
+      });
+      return;
+    }
+
+    if (role === Role.VILLAGE_ADMIN) {
+      const villageId = this.tokenService.getUserVillageId();
+      if (!villageId) { this.isLoadingUsers = false; return; }
+      this.userService.getUsersByVillage(villageId, Role.VILLAGER).subscribe({
+        next: (users) => {
+          const filteredUsers = (users || []).filter(u => u.id !== this.currentUserId);
+          this.chatService.updateUsersWithCountsFromBackend(filteredUsers, this.currentUserId);
+          this.isLoadingUsers = false;
+        },
+        error: () => { this.isLoadingUsers = false; }
+      });
+      return;
+    }
+
+    if (role === Role.VILLAGER) {
+      this.userService.getUsersByRole(Role.SUPER_ADMIN).subscribe({
+        next: (users) => {
+          const filteredUsers = (users || []).filter(u => u.id !== this.currentUserId);
+          this.chatService.updateUsersWithCountsFromBackend(filteredUsers, this.currentUserId);
+          this.isLoadingUsers = false;
+        },
+        error: () => { this.isLoadingUsers = false; }
+      });
+      return;
+    }
+
     this.userService.getAllUsers().subscribe({
       next: (users) => {
-        const filteredUsers = users.filter(user => user.id !== this.currentUserId);
+        const filteredUsers = users.filter(u => u.id !== this.currentUserId);
         this.chatService.updateUsersWithCountsFromBackend(filteredUsers, this.currentUserId);
         this.isLoadingUsers = false;
       },
-      error: (error) => {
-        console.error('Error loading chat users:', error);
-        this.isLoadingUsers = false;
-      }
+      error: () => { this.isLoadingUsers = false; }
     });
   }
 

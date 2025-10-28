@@ -242,4 +242,16 @@ export class EventListComponent implements OnInit {
   formatDateTime(dateTimeString: string): string {
     return new Date(dateTimeString).toLocaleString();
   }
+
+  // RBAC: SUPER_ADMIN can edit/delete all; VILLAGE_ADMIN only within own village
+  canEditDelete(event: Event): boolean {
+    const role = this.currentUser?.role;
+    if (role === 'SUPER_ADMIN') return true;
+    if (role === 'VILLAGE_ADMIN') {
+      const userVillageId = this.currentUser?.village?.id;
+      const eventVillageId = (event as any)?.village?.id || (event as any)?.villageId || null;
+      return !!userVillageId && userVillageId === eventVillageId;
+    }
+    return false;
+  }
 }

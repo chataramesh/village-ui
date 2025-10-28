@@ -27,20 +27,20 @@
 
 /* Header Section */
 .temples-header {
-  background: transparent;
-  border-radius: 0;
-  padding: 0.25rem 0;
-  margin-bottom: 0.5rem;
-  border: 0;
-  box-shadow: none;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.1rem 1.4rem;
+  margin-bottom: 1rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .header-content {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  gap: 1rem;
+  flex-wrap: nowrap;
 }
 
 .header-left {
@@ -69,8 +69,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  flex: 1 1 auto;
-  justify-content: flex-start;
+  flex: 0 0 auto;
+  justify-content: flex-end;
 }
 
 /* Search and Filter Section */
@@ -79,7 +79,6 @@
   grid-template-columns: 1fr auto;
   gap: 0.5rem;
   align-items: center;
-  width: 100%;
 }
 
 .search-box {
@@ -146,6 +145,8 @@
   gap: 0.5rem;
   transition: all 0.3s ease;
   box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+  white-space: nowrap;
+  min-width: max-content;
 }
 
 .add-btn.small { padding: 0.35rem 0.7rem; font-size: 0.8rem; height: 36px; }
@@ -821,10 +822,14 @@
     gap: 0.75rem;
   }
 
-  .header-content {
-    flex-direction: column;
-    gap: 0.75rem;
-    align-items: stretch;
+  .header-content { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+  }
+
+  .header-right {
+    margin-left: auto;
   }
 
   .search-filter-section { width: 100%; }

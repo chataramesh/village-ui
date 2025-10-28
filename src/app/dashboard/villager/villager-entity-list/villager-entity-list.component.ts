@@ -147,7 +147,7 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
       this.entities = data.map((entity: any) => ({
         ...entity,
         isSubscribed: false, // Initialize as not subscribed
-        isOpen: entity.status === 'OPEN' || entity.isActive,
+        isOpen: entity.status === 'OPEN' || entity.active,
         ownerName: entity.owner?.name || 'Unknown Owner'
       }));
     } else {
@@ -417,10 +417,10 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
 
           // Set subscription status for subscribed entities
           subscriptions.forEach(sub => {
-            this.userSubscriptions[sub.entityId] = sub.isActive;
+            this.userSubscriptions[sub.entityId] = sub.active;
             const entity = this.entities.find(e => e.id === sub.entityId);
             if (entity) {
-              entity.isSubscribed = sub.isActive;
+              entity.isSubscribed = sub.active;
             }
           });
 

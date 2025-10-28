@@ -49,6 +49,8 @@ export class EntityListComponent implements OnInit {
 
   // Current user for ownership
   currentUser: User | null = null;
+  currentUserId: string | null = null;
+  subscribedEntityIds: Set<string> = new Set();
 
   constructor(
     private entityService: EntityService,
@@ -106,12 +108,77 @@ export class EntityListComponent implements OnInit {
       this.usersService.getUserById(tokenUser.userId).subscribe({
         next: (user) => {
           this.currentUser = user;
+          this.currentUserId = (user.id ?? tokenUser.userId ?? null);
+          this.loadSubscriptions();
         },
         error: (error) => {
           console.error('Error loading current user:', error);
         }
       });
     }
+  }
+
+  loadSubscriptions(): void {
+    if (!this.currentUserId) return;
+    this.subscriptionService.getUserSubscriptions(this.currentUserId).subscribe({
+      next: (subs) => {
+        this.subscribedEntityIds = new Set(subs.map(s => (s as any).entity?.id || (s as any).entityId));
+      },
+      error: (err) => {
+        console.error('Error loading subscriptions:', err);
+        this.subscribedEntityIds = new Set();
+      }
+    });
+  }
+
+  unsubscribe(entity: Entity): void {
+    if (!this.currentUserId || !entity.id) return;
+    this.subscriptionService.unsubscribeFromEntity(entity.id, this.currentUserId).subscribe({
+      next: () => {
+        this.toast.success('Unsubscribed successfully');
+        this.subscribedEntityIds.delete(entity.id!);
+      },
+      error: (err) => {
+        console.error('Unsubscribe failed', err);
+        this.toast.error('Failed to unsubscribe');
+      }
+    });
+  }
+
+  // RBAC helpers
+  private entityVillageId(entity: any): string | null {
+    return entity?.village?.id || entity?.villageId || null;
+  }
+
+  isVillageAdmin(): boolean {
+    return this.currentUser?.role === 'VILLAGE_ADMIN';
+  }
+
+  isSuperAdmin(): boolean {
+    return this.currentUser?.role === 'SUPER_ADMIN';
+  }
+
+  canEditDelete(entity: Entity): boolean {
+    if (this.isSuperAdmin()) return true;
+    return this.isVillageAdmin() && !!this.currentUser?.village?.id && this.entityVillageId(entity) === this.currentUser.village.id;
+  }
+
+  isSubscribed(entityId?: string): boolean {
+    return !!entityId && this.subscribedEntityIds.has(entityId);
+  }
+
+  subscribe(entity: Entity): void {
+    if (!this.currentUserId || !entity.id) return;
+    this.subscriptionService.subscribeToEntity(entity.id, this.currentUserId, 'GENERAL').subscribe({
+      next: () => {
+        this.toast.success('Subscribed successfully');
+        this.subscribedEntityIds.add(entity.id!);
+      },
+      error: (err) => {
+        console.error('Subscribe failed', err);
+        this.toast.error('Failed to subscribe');
+      }
+    });
   }
 
   loadEntities(): void {

@@ -22,35 +22,36 @@
 
 // Header with User Menu
 .dashboard-header {
-  background: white;
-  border-radius: 0 0 24px 24px;
-  padding: 2rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
-  margin-bottom: 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 30px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
 
   .header-left {
     .dashboard-title {
-      font-size: 1.875rem;
+      font-size: 24px;
       font-weight: 700;
-      color: #111827;
-      margin: 0 0 0.25rem 0;
+      color: #1e293b;
+      margin: 0;
     }
 
     .dashboard-subtitle {
-      font-size: 0.875rem;
-      color: #6b7280;
-      margin: 0;
+      font-size: 14px;
+      color: #64748b;
+      margin: 5px 0 0 0;
     }
   }
 
   .header-right {
     position: relative;
+    scroll-snap-align: start;
   }
-}
+
 
 // Modern User Profile Styles (replaced by shared component)
 // .user-profile-wrapper {

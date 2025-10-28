@@ -10,9 +10,15 @@ export interface SubscriptionResponse {
   entityType: string;
   subscriptionType: string;
   subscribedAt: string;
-  isActive: boolean;
+  active: boolean;
 }
-
+export interface SubscribedEntity {
+  id: string;
+  entity: any;
+  subscriptionType: string;
+  subscribedAt: string;
+  active: boolean;
+}
 export interface NotificationResponse {
   id: string;
   entityId: string;
@@ -62,11 +68,15 @@ export class EntitySubscriptionService {
     console.log('Making unsubscribe request to:', `${this.apiUrl}/subscriptions/${entityId}/unsubscribe`);
     console.log('With params:', params.toString());
 
-    return this.http.delete<string>(`${this.apiUrl}/subscriptions/${entityId}/unsubscribe`, { params });
+    // Backend returns plain text like "Successfully unsubscribed from entity"; ensure we treat it as text
+    return this.http.delete<string>(`${this.apiUrl}/subscriptions/${entityId}/unsubscribe`, {
+      params,
+      responseType: 'text' as 'json'
+    });
   }
 
   // Get User Subscriptions
-  getUserSubscriptions(userId: string): Observable<SubscriptionResponse[]> {
+  getUserSubscriptions(userId: string): Observable<any[]> {
     const params = new HttpParams().set('userId', userId);
     return this.http.get<SubscriptionResponse[]>(`${this.apiUrl}/subscriptions/my-subscriptions`, { params });
   }

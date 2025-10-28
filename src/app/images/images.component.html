@@ -2,12 +2,6 @@
   <!-- Header Section -->
   <div class="images-header">
     <div class="header-left">
-      <button class="back-btn" (click)="goBack()" title="Back to Dashboard" aria-label="Back to Dashboard">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-        </svg>
-        Back to Dashboard
-      </button>
       <div class="header-info">
         <h1 class="page-title">Village Images</h1>
         <p class="page-subtitle">Manage and organize village photos</p>
@@ -76,7 +70,7 @@
                   </svg>
                 </button>
 
-                <button class="action-btn delete-btn" (click)="deleteImage(image)" title="Delete">
+                <button class="action-btn delete-btn" *ngIf="canDeleteImage(image)" (click)="deleteImage(image)" title="Delete">
                   <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                   </svg>

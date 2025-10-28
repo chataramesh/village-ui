@@ -192,6 +192,17 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     return this.currentUser?.userId === vehicle.owner?.id;
   }
 
+  canEditDelete(vehicle: Vehicle): boolean {
+    const role = this.currentUser?.role;
+    if (role === 'SUPER_ADMIN') return true;
+    if (role === 'VILLAGE_ADMIN') {
+      const userVillageId = this.currentUser?.village?.id;
+      const vehicleVillageId = vehicle?.village?.id || (vehicle as any)?.villageId || null;
+      return !!userVillageId && userVillageId === vehicleVillageId;
+    }
+    return false;
+  }
+
   get paginatedVehicles(): Vehicle[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     return this.filteredVehicles.slice(startIndex, startIndex + this.itemsPerPage);

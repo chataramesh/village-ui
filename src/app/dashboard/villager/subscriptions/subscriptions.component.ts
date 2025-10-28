@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { TokenService } from 'src/app/core/services/token.service';
-import { EntitySubscriptionService, SubscriptionResponse } from 'src/app/entities/services/entity-subscription.service';
+import { EntitySubscriptionService, SubscribedEntity } from 'src/app/entities/services/entity-subscription.service';
 
 interface Entity {
   id: string;
@@ -40,10 +40,10 @@ interface Entity {
 })
 export class SubscriptionsComponent implements OnInit {
 
-  userSubscriptions: SubscriptionResponse[] = [];
+  userSubscriptions: SubscribedEntity[] = [];
   subscribedEntities: any[] = [];
   showUnsubscribeConfirm = false;
-  subscriptionToUnsubscribe: SubscriptionResponse | null = null;
+  subscriptionToUnsubscribe: SubscribedEntity | null = null;
   isLoading = false;
   error: string | null = null;
 
@@ -71,6 +71,7 @@ export class SubscriptionsComponent implements OnInit {
 
     this.subscriptionService.getUserSubscriptions(currentUser.userId).subscribe({
       next: (subscriptions) => {
+        console.log('User subscriptions:', JSON.stringify(subscriptions));
         this.userSubscriptions = subscriptions;
         this.subscribedEntities = subscriptions.map(sub => ({
           id: sub.entityId,
@@ -78,7 +79,7 @@ export class SubscriptionsComponent implements OnInit {
           type: sub.entityType,
           subscriptionType: sub.subscriptionType,
           subscribedAt: sub.subscribedAt,
-          isActive: sub.isActive
+          active: sub.active
         }));
         this.isLoading = false;
       },
@@ -90,14 +91,14 @@ export class SubscriptionsComponent implements OnInit {
     });
   }
 
-  toggleSubscription(subscription: SubscriptionResponse): void {
-    if (subscription.isActive) {
+  toggleSubscription(subscription: SubscribedEntity): void {
+    if (subscription.active) {
       // Show confirmation dialog for unsubscribe
       this.subscriptionToUnsubscribe = subscription;
       this.showUnsubscribeConfirm = true;
     } else {
       // Subscribe to entity
-      this.subscribeToEntity(subscription.entityId, subscription.entityName);
+      this.subscribeToEntity(subscription.entity.id!, subscription.entity.name!);
     }
   }
 
@@ -129,11 +130,11 @@ export class SubscriptionsComponent implements OnInit {
       }
 
       this.subscriptionService.unsubscribeFromEntity(
-        this.subscriptionToUnsubscribe.entityId,
+        this.subscriptionToUnsubscribe.entity.id!,
         currentUser.userId
       ).subscribe({
         next: () => {
-          console.log(`Unsubscribed from ${this.subscriptionToUnsubscribe!.entityName}`);
+          console.log(`Unsubscribed from ${this.subscriptionToUnsubscribe!.entity.name}`);
           this.loadUserSubscriptions(); // Reload subscriptions
           this.closeUnsubscribeConfirm();
         },
@@ -150,26 +151,30 @@ export class SubscriptionsComponent implements OnInit {
     this.subscriptionToUnsubscribe = null;
   }
 
-  getStatusBadgeClass(subscription: SubscriptionResponse): string {
-    return subscription.isActive ? 'status-active' : 'status-inactive';
+  getStatusBadgeClass(subscription: SubscribedEntity): string {
+    return subscription.active ? 'status-active' : 'status-inactive';
   }
 
-  getStatusText(subscription: SubscriptionResponse): string {
-    return subscription.isActive ? 'Active' : 'Inactive';
+  getStatusText(subscription: SubscribedEntity): string {
+    return subscription.active ? 'Active' : 'Inactive';
   }
 
-  goBack(): void {
+  gotoEntities(): void {
     //this.router.navigate(['/dashboard/villager']);
-    this.router.navigate(['/dashboard/villager/entities']);
+    this.router.navigate(['/entities']);
+  }
+   goBack(): void {
+    this.router.navigate(['/dashboard']);
+    
   }
 
   getEntityTypes(): string[] {
-    const types = [...new Set(this.userSubscriptions.map(sub => sub.entityType))];
+    const types = [...new Set(this.userSubscriptions.map(sub => sub.entity.type))];
     return types;
   }
 
-  getSubscriptionsByType(type: string): SubscriptionResponse[] {
-    return this.userSubscriptions.filter(sub => sub.entityType === type);
+  getSubscriptionsByType(type: string): SubscribedEntity[] {
+    return this.userSubscriptions.filter(sub => sub.entity.type === type);
   }
 
   getTypeIcon(type: string): string {

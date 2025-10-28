@@ -270,6 +270,18 @@ export class IncidentListComponent implements OnInit, OnDestroy {
     return this.canEditAnyIncident;
   }
 
+  // RBAC: SUPER_ADMIN can edit/delete all; VILLAGE_ADMIN only within own village
+  canEditDeleteIncident(incident: Incident): boolean {
+    const role = this.currentUser?.role;
+    if (role === 'SUPER_ADMIN') return true;
+    if (role === 'VILLAGE_ADMIN') {
+      const userVillageId = this.currentUser?.village?.id;
+      const incidentVillageId = (incident as any)?.village?.id || (incident as any)?.villageId || null;
+      return !!userVillageId && userVillageId === incidentVillageId;
+    }
+    return false;
+  }
+
   getPagesArray(): number[] {
     const totalPages = this.getTotalPages();
     const currentPage = this.currentPage;

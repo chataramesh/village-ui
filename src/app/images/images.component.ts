@@ -163,9 +163,9 @@ export class ImagesComponent implements OnInit, OnDestroy {
     }
   }
 
-  goBack(): void {
-    this.router.navigate(['/dashboard/village-admin']);
-  }
+  // goBack(): void {
+  //   this.router.navigate(['/dashboard/village-admin']);
+  // }
 
   getDateKeys(): string[] {
     return Object.keys(this.imagesByDate).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());

@@ -21,11 +21,17 @@
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
   border: 1px solid rgba(226, 232, 240, 0.7);
   backdrop-filter: blur(10px);
+  gap: 1rem;
 
-  @media (max-width: 768px) {
+  .header-left { flex: 1 1 auto; min-width: 0; }
+  .header-actions { flex: 0 0 auto; margin-left: auto; }
+
+  @media (max-width: 640px) {
     flex-direction: column;
     gap: 0.75rem;
     padding: 1rem;
+    .header-actions { width: 100%; display: flex; justify-content: stretch; }
+    .header-actions .upload-btn { width: 100%; justify-content: center; }
   }
 
   .header-left {
@@ -34,25 +40,29 @@
     gap: 1rem;
 
     .back-btn {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.55rem 0.9rem;
-      background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+      padding: 0.5rem 0.85rem;
+      background: rgba(255,255,255,0.85);
       border: 1px solid #e2e8f0;
-      border-radius: 10px;
+      border-radius: 999px;
       color: #334155;
       font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.25s ease;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+      backdrop-filter: blur(6px);
 
       &:hover {
-        background: linear-gradient(135deg, #eef2ff 0%, #e2e8f0 100%);
+        background: rgba(248,250,252,0.95);
         border-color: #cbd5e1;
         transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1);
+      }
+
+      &:active {
+        transform: translateY(0);
       }
 
       svg { width: 16px; height: 16px; }
