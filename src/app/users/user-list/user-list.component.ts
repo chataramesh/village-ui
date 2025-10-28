@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { UsersService, User, Role } from '../users.service';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
 
 @Component({
@@ -19,7 +20,7 @@ export class UserListComponent implements OnInit {
   searchTerm: string = '';
   statusFilter: string = 'all';
   roleFilter: string = 'all';
-  contextRole: Role | null = null; // Role from query params
+  contextRole: string | null = null; // Role from query params (store as string to avoid enum mismatch)
   contextVillageId: string | null = null; // Village ID from query params
   contextVillageName: string | null = null; // Village name from query params
 
@@ -36,27 +37,57 @@ export class UserListComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private usersService: UsersService
+    private usersService: UsersService,private toast: ToastService
   ) {}
 
   ngOnInit(): void {
     // Check for role and village filters from query params
     this.route.queryParams.subscribe(params => {
-      const roleParam = params['role'];
-      const villageIdParam = params['villageId'];
-      const villageNameParam = params['villageName'];
+      const roleParam = params['role'] as string | undefined;
+      const villageIdParam = params['villageId'] as string | undefined;
+      const villageNameParam = params['villageName'] as string | undefined;
 
+      // If query params provided, use them and persist
       if (roleParam) {
-        this.contextRole = roleParam as Role;
+        this.contextRole = roleParam;
         this.roleFilter = this.contextRole; // Set role filter to the context role
+        try { localStorage.setItem('ul_context_role', this.contextRole); } catch {}
       }
 
       if (villageIdParam) {
         this.contextVillageId = villageIdParam;
+        try { localStorage.setItem('ul_context_village_id', this.contextVillageId); } catch {}
       }
 
       if (villageNameParam) {
         this.contextVillageName = villageNameParam;
+        try { localStorage.setItem('ul_context_village_name', this.contextVillageName); } catch {}
+      }
+
+      // If no query params, attempt to restore from storage
+      if (!roleParam && !villageIdParam) {
+        try {
+          const savedRole = localStorage.getItem('ul_context_role');
+          const savedVillageId = localStorage.getItem('ul_context_village_id');
+          const savedVillageName = localStorage.getItem('ul_context_village_name');
+          if (savedRole) {
+            this.contextRole = savedRole;
+            this.roleFilter = savedRole;
+          }
+          if (savedVillageId) {
+            this.contextVillageId = savedVillageId;
+          }
+          if (savedVillageName) {
+            this.contextVillageName = savedVillageName;
+          }
+        } catch {}
+      }
+
+      // If still no context, redirect to dashboard to avoid falling back to generic User Management unintentionally
+      if (!this.contextRole && !this.contextVillageId) {
+        // If user purposely opened /users with no context, keep page; otherwise, redirect. Here we enforce redirect.
+        this.router.navigate(['/dashboard']);
+        return;
       }
 
       this.loadUsers();
@@ -115,8 +146,8 @@ export class UserListComponent implements OnInit {
 
   updateStats(): void {
     this.totalUsers = this.users.length;
-    this.activeUsers = this.users.filter(u => u.isActive).length;
-    this.inactiveUsers = this.users.filter(u => !u.isActive).length;
+    this.activeUsers = this.users.filter(u => u.active).length;
+    this.inactiveUsers = this.users.filter(u => !u.active).length;
   }
 
   onSearch(): void {
@@ -155,7 +186,7 @@ export class UserListComponent implements OnInit {
     // Apply status filter
     if (this.statusFilter !== 'all') {
       const isActive = this.statusFilter === 'active';
-      filtered = filtered.filter(user => user.isActive === isActive);
+      filtered = filtered.filter(user => user.active === isActive);
     }
 
     // Apply role filter only if no context role is set (to avoid double filtering)
@@ -202,7 +233,7 @@ export class UserListComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error deleting user:', err);
-          alert('Failed to delete user');
+          this.toast.error('Failed to delete user');
         }
       });
     }
@@ -211,9 +242,9 @@ export class UserListComponent implements OnInit {
   getPageTitle(): string {
     if (this.contextVillageId) {
       return `${this.contextVillageName || 'Village'} Villagers`;
-    } else if (this.contextRole === Role.VILLAGE_ADMIN) {
+    } else if (this.contextRole === 'VILLAGE_ADMIN') {
       return 'Village Admins';
-    } else if (this.contextRole === Role.VILLAGER) {
+    } else if (this.contextRole === 'VILLAGER') {
       return 'Villagers';
     }
     return 'User Management';
@@ -222,9 +253,9 @@ export class UserListComponent implements OnInit {
   getCreateButtonText(): string {
     if (this.contextVillageId) {
       return 'Create Villager';
-    } else if (this.contextRole === Role.VILLAGE_ADMIN) {
+    } else if (this.contextRole === 'VILLAGE_ADMIN') {
       return 'Create Admin';
-    } else if (this.contextRole === Role.VILLAGER) {
+    } else if (this.contextRole === 'VILLAGER') {
       return 'Create Villager';
     }
     return 'Create User';
@@ -233,9 +264,9 @@ export class UserListComponent implements OnInit {
   getStatsLabel(): string {
     if (this.contextVillageId) {
       return 'Villagers';
-    } else if (this.contextRole === Role.VILLAGE_ADMIN) {
+    } else if (this.contextRole === 'VILLAGE_ADMIN') {
       return 'Admins';
-    } else if (this.contextRole === Role.VILLAGER) {
+    } else if (this.contextRole === 'VILLAGER') {
       return 'Villagers';
     }
     return 'Users';
@@ -244,9 +275,9 @@ export class UserListComponent implements OnInit {
   getSubtitle(): string {
     if (this.contextVillageId) {
       return `Manage villagers in ${this.contextVillageName || 'your village'}`;
-    } else if (this.contextRole === Role.VILLAGE_ADMIN) {
+    } else if (this.contextRole === 'VILLAGE_ADMIN') {
       return 'Manage and monitor village admins in the system';
-    } else if (this.contextRole === Role.VILLAGER) {
+    } else if (this.contextRole === 'VILLAGER') {
       return 'Manage and monitor villagers in the system';
     }
     return 'Manage and monitor all users in the system';

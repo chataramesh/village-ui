@@ -115,7 +115,6 @@
             <th>Phone</th>
             <th>Role</th>
             <th>Status</th>
-            <th>Joined Date</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -135,12 +134,11 @@
                 <span class="role-badge" [class]="'role-' + user.role">{{Role[user.role] || user.role}}</span>
               </td>
               <td>
-                <span class="status-badge" [class.active]="user.isActive" [class.inactive]="!user.isActive">
+                <span class="status-badge" [class.active]="user.active" [class.inactive]="!user.active">
                   <span class="status-dot"></span>
-                  {{user.isActive ? 'Active' : 'Inactive'}}
+                  {{user.active ? 'Active' : 'Inactive'}}
                 </span>
               </td>
-              <td>{{user.createdDate | date:'MMM dd, yyyy'}}</td>
               <td>
                 <div class="action-buttons" (click)="$event.stopPropagation()">
                   <button class="action-btn edit-btn" (click)="user.id && editUser(user.id)" title="Edit">
@@ -191,9 +189,9 @@
                     <div class="detail-item">
                       <span class="detail-label">Account Status</span>
                       <span class="detail-value">
-                        <span class="status-badge" [class.active]="user.isActive" [class.inactive]="!user.isActive">
+                        <span class="status-badge" [class.active]="user.active" [class.inactive]="!user.active">
                           <span class="status-dot"></span>
-                          {{user.isActive ? 'Active' : 'Inactive'}}
+                          {{user.active ? 'Active' : 'Inactive'}}
                         </span>
                       </span>
                     </div>

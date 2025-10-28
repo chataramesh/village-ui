@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 export enum EntityStatus {
@@ -33,11 +34,12 @@ export interface Entity {
     id?: string;
     name?: string;
     email?: string;
+    active?: any;
   };
   openingTime?: string;
   closingTime?: string;
   status: EntityStatus;
-  isActive: boolean;
+  active?: any;
   createdAt?: Date;
   updatedAt?: Date;
   latitude?: number;
@@ -58,13 +60,15 @@ export interface EntitySubscription {
     id?: string;
     name?: string;
     email?: string;
+    active?: any;
   };
   entity?: {
     id?: string;
     name?: string;
     type?: string;
+    active?: any;
   };
-  isActive: boolean;
+active?: any;
   subscribedAt?: Date;
   subscriptionType: 'GENERAL' | 'EMERGENCY' | 'UPDATES';
 }
@@ -129,19 +133,11 @@ export class EntityService {
     return this.http.put<Entity>(`${this.apiUrl}/${entityId}/${ownerId}`, entity);
   }
 
-  // Delete entity
+  // Delete entity (handle text/empty responses to avoid JSON parse errors)
   deleteEntity(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
-
-  // Toggle entity status
-  toggleEntityStatus(id: string): Observable<Entity> {
-    return this.http.patch<Entity>(`${this.apiUrl}/${id}/toggle-status`, {});
-  }
-
-  // Update entity status
-  updateEntityStatus(id: string, status: EntityStatus): Observable<Entity> {
-    return this.http.patch<Entity>(`${this.apiUrl}/${id}/status`, { status });
+    return this.http
+      .delete(`${this.apiUrl}/${id}`, { responseType: 'text' })
+      .pipe(map(() => void 0));
   }
 
   // Get entity statistics

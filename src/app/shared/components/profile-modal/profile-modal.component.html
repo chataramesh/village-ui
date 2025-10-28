@@ -125,7 +125,7 @@
                 <label class="field-label">Full Address</label>
                 <div class="address-action-row">
                   <button class="btn-primary" type="button" (click)="onGetMapLocation()" [disabled]="isLocating">
-                    <span *ngIf="!isLocating">Get map location</span>
+                    <span *ngIf="!isLocating">Update map location</span>
                     <span *ngIf="isLocating">Fetching location...</span>
                   </button>
                 </div>
@@ -136,8 +136,8 @@
                     readonly
                     [value]="editedProfile?.address || 'No address set'"
                   />
-                  <div class="address-meta" *ngIf="coords">
-                    <span>Lat: {{coords.lat | number:'1.6-6'}}, Lng: {{coords.lng | number:'1.6-6'}}</span>
+                  <div class="address-meta" *ngIf="editedProfile?.latitude != null && editedProfile?.longitude != null">
+                    <span>Lat: {{ editedProfile!.latitude | number:'1.6-6' }}, Lng: {{ editedProfile!.longitude | number:'1.6-6' }}</span>
                   </div>
                   <div class="address-error" *ngIf="locationError">{{locationError}}</div>
                 </div>

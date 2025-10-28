@@ -47,12 +47,14 @@ export interface Vehicle {
     id: string;
     name: string;
     email: string;
+    active: any;
   };
   village?: {
     id: string;
     name: string;
+    active: any;
   };
-  isActive: boolean;
+  active: any;
   seatingCapacity?: number;
   createdAt?: string;
   updatedAt?: string;
@@ -61,6 +63,6 @@ export interface Vehicle {
 export interface VehicleFilters {
   vehicleType?: VehicleType;
   wheelerType?: WheelerType;
-  isActive?: boolean;
+  active?: boolean;
   search?: string;
 }

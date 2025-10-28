@@ -63,6 +63,7 @@ export interface Incident {
   createdAt?: string;
   updatedAt?: string;
   closedAt?: string;
+  village?: any;
 }
 
 export interface DashboardSummary {

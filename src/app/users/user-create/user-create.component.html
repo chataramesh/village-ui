@@ -125,7 +125,7 @@
                 placeholder="Enter password"
                 [(ngModel)]="user.passwordHash"
                 [required]="!isEditMode"
-                minlength="6"
+                minlength="4"
                 #passwordField="ngModel"
                 [class.error]="passwordField.invalid && passwordField.touched">
               <button type="button" class="toggle-password" (click)="togglePassword()">
@@ -332,9 +332,9 @@
             <label class="checkbox-label">
               <input
                 type="checkbox"
-                name="isActive"
+                name="active"
                 class="form-checkbox"
-                [(ngModel)]="user.isActive">
+                [(ngModel)]="user.active">
               <span class="checkbox-text">
                 <span class="checkbox-title">Active User</span>
                 <span class="checkbox-description">User can login and access the system</span>

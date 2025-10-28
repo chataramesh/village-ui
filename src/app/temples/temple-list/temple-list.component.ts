@@ -27,6 +27,7 @@ export class TempleListComponent implements OnInit, OnDestroy {
   currentUser: any = null;
   isAdmin = true; // For demo purposes - set to true to show admin features
 
+
   // Users for priest dropdown
   users: User[] = [];
   filteredUsers: User[] = [];
@@ -166,6 +167,7 @@ export class TempleListComponent implements OnInit, OnDestroy {
 
     this.filteredTemples = filtered;
   }
+
 
   openAddModal(): void {
     this.templeForm.reset({

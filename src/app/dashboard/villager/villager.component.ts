@@ -27,7 +27,9 @@ export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
     userName: 'NA',
     userRole: 'VILLAGER',
     userImage: 'assets/people.png',
-    userId: ''
+    userId: '',
+    latitude: '',
+    longitude: ''
   };
 
   // Entities
@@ -201,7 +203,9 @@ export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
           userName: this.userName,
           userRole: this.userRole,
           userImage: this.userImage,
-          userId: this.currentUserId || ''
+          userId: this.currentUserId || '',
+          latitude: user.latitude,
+          longitude: user.longitude
         };
       });
       console.log('Current villager user loaded:', this.currentUserId);
@@ -254,7 +258,9 @@ export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
             village: userData.village?.name || '',
             joinDate: userData.createdDate?.toISOString() || new Date().toISOString(),
             address: '', // User interface doesn't have address field
-            emergencyContact: '' // User interface doesn't have emergencyContact field
+            emergencyContact: '' , // User interface doesn't have emergencyContact field,
+            latitude: userData.latitude,
+            longitude: userData.longitude
           };
           this.showProfileModal = true;
         },
@@ -270,7 +276,9 @@ export class VillagerComponent implements OnInit, AfterViewInit, OnDestroy {
             village: 'Village Name',
             joinDate: new Date().toISOString(),
             address: 'Village Address, District',
-            emergencyContact: '+91-9876543211'
+            emergencyContact: '+91-9876543211',
+            latitude: 0,
+            longitude: 0
           };
           this.showProfileModal = true;
         }

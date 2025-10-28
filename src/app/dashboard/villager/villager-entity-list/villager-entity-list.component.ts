@@ -7,6 +7,7 @@ import { WebSocketNotificationService } from 'src/app/core/services/websocket-no
 import { TokenService } from 'src/app/core/services/token.service';
 import { UsersService } from 'src/app/users/users.service';
 import { Subject, takeUntil } from 'rxjs';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
 interface Entity {
   id: string;
@@ -79,7 +80,7 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
     private subscriptionService: EntitySubscriptionService,
     private notificationService: WebSocketNotificationService,
     private tokenService: TokenService,
-    private usersService: UsersService
+    private usersService: UsersService,private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -297,7 +298,7 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
   // Subscription Methods
   subscribeToEntity(entity: Entity): void {
     if (!this.currentUser?.id) {
-      alert('Please log in to subscribe to entities');
+      this.toast.info('Please log in to subscribe to entities');
       console.error('Cannot subscribe - no current user');
       return;
     }
@@ -313,7 +314,7 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
           this.userSubscriptions[entity.id] = true;
           entity.isSubscribed = true;
           this.subscriptionLoading[entity.id] = false;
-          alert(`Successfully subscribed to ${entity.name}!`);
+          this.toast.success(`Successfully subscribed to ${entity.name}!`);
           this.applyFilters(); // Refresh filtered entities
         },
         error: (error) => {
@@ -328,13 +329,13 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
 
           // Provide more specific error messages
           if (error.status === 401) {
-            alert('Authentication failed. Please log in again.');
+            this.toast.error('Authentication failed. Please log in again.');
           } else if (error.status === 404) {
-            alert('Entity not found. Please refresh and try again.');
+            this.toast.error('Entity not found. Please refresh and try again.');
           } else if (error.status === 400) {
-            alert('Already subscribed or invalid request. Please try again.');
+            this.toast.error('Already subscribed or invalid request. Please try again.');
           } else {
-            alert('Failed to subscribe. Please check your connection and try again.');
+            this.toast.error('Failed to subscribe. Please check your connection and try again.');
           }
         }
       });
@@ -342,7 +343,7 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
 
   unsubscribeFromEntity(entity: Entity): void {
     if (!this.currentUser?.id) {
-      alert('Please log in to unsubscribe from entities');
+      this.toast.error('Please log in to unsubscribe from entities');
       console.error('Cannot unsubscribe - no current user');
       return;
     }
@@ -362,7 +363,6 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
           this.userSubscriptions[entity.id] = false;
           entity.isSubscribed = false;
           this.subscriptionLoading[entity.id] = false;
-          alert(message);
           this.applyFilters(); // Refresh filtered entities
         },
         error: (error) => {
@@ -377,11 +377,11 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
 
           // Provide more specific error messages
           if (error.status === 401) {
-            alert('Authentication failed. Please log in again.');
+            this.toast.error('Authentication failed. Please log in again.');
           } else if (error.status === 404) {
-            alert('Subscription not found. Please refresh and try again.');
+            this.toast.error('Subscription not found. Please refresh and try again.');
           } else {
-            alert('Failed to unsubscribe. Please check your connection and try again.');
+            this.toast.error('Failed to unsubscribe. Please check your connection and try again.');
           }
         }
       });

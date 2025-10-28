@@ -4,6 +4,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { VehicleService } from '../services/vehicle.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { Vehicle, VehicleType, WheelerType, VehicleFilters } from '../models/vehicle.model';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-vehicle-list',
@@ -39,7 +40,8 @@ export class VehicleListComponent implements OnInit, OnDestroy {
   constructor(
     private vehicleService: VehicleService,
     private router: Router,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -67,7 +69,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     this.error = '';
 
     const filters: VehicleFilters = {
-      isActive: this.showActiveOnly
+      active: this.showActiveOnly
     };
 
     if (this.selectedVehicleType) {
@@ -102,7 +104,7 @@ export class VehicleListComponent implements OnInit, OnDestroy {
     this.filteredVehicles = this.vehicles.filter(vehicle => {
       const matchesType = !this.selectedVehicleType || vehicle.vehicleType === this.selectedVehicleType;
       const matchesWheeler = !this.selectedWheelerType || vehicle.wheelerType === this.selectedWheelerType;
-      const matchesActive = !this.showActiveOnly || vehicle.isActive;
+      const matchesActive = !this.showActiveOnly || vehicle.active;
       const matchesSearch = !this.searchQuery || 
         vehicle.vehicleNumber.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
         vehicle.vehicleDescription?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
@@ -146,13 +148,12 @@ export class VehicleListComponent implements OnInit, OnDestroy {
   }
 
   bookVehicle(vehicle: Vehicle): void {
-    // For now, show a simple alert. In a real app, this would open a booking modal or navigate to booking page
-    alert(`Booking functionality for ${vehicle.vehicleNumber} will be implemented. This would typically open a booking form or calendar.`);
+    this.toast.info(`Booking flow for ${vehicle.vehicleNumber} will be implemented soon`);
     // Future implementation could navigate to: this.router.navigate(['/vehicles/book', vehicle.id]);
   }
 
   viewVehicleDetails(vehicle: Vehicle): void {
-    this.router.navigate(['/vehicles', vehicle.id]);
+    // this.router.navigate(['/vehicles', vehicle.id]);
   }
 
   goBack(): void {

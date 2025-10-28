@@ -7,6 +7,7 @@ import { environment } from 'src/environments/environment';
 import { EntityService } from '../services/entity.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UsersService } from 'src/app/users/users.service';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-entity-create',
@@ -32,7 +33,8 @@ export class EntityCreateComponent implements OnInit {
     private http: HttpClient,
     private entityService: EntityService,
     private tokenService: TokenService,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private toast: ToastService
   ) {
     this.entityForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -58,7 +60,7 @@ export class EntityCreateComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading user:', error);
-        alert('Failed to load user data');
+        this.toast.error('Failed to load user data');
         this.loading = false;
         this.router.navigate(['/entities']);
       }
@@ -88,13 +90,13 @@ export class EntityCreateComponent implements OnInit {
           openingTime: entity.openingTime,
           closingTime: entity.closingTime,
           capacity: entity.capacity,
-          isActive: entity.isActive
+          active: entity.active
         });
         this.loading = false;
       },
       error: (error) => {
         console.error('Error loading entity:', error);
-        alert('Failed to load entity data');
+        this.toast.error('Failed to load entity data');
         this.loading = false;
         this.router.navigate(['/entities']);
       }
@@ -106,7 +108,13 @@ export class EntityCreateComponent implements OnInit {
 
     
     this.submitting = true;
-    const formData = this.entityForm.value;
+    const formData: any = { ...this.entityForm.value };
+    // Attach village info from current user
+    if (this.currentUser?.village?.id) {
+      formData.villageId = this.currentUser.village.id;
+      formData.villageName = this.currentUser.village.name;
+      formData.village = this.currentUser.village;
+    }
     if (this.isEditMode && this.entityId) {
       // Update existing entity
       if (this.currentUser?.role !== 'SUPER_ADMIN' && this.currentUser?.role !== 'VILLAGE_ADMIN') {
@@ -119,7 +127,7 @@ export class EntityCreateComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error updating entity:', error);
-            alert('Failed to update entity');
+            this.toast.error('Failed to update entity');
             this.submitting = false;
           }
         });
@@ -133,7 +141,7 @@ export class EntityCreateComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error updating entity:', error);
-            alert('Failed to update entity');
+            this.toast.error('Failed to update entity');
             this.submitting = false;
           }
         });
@@ -150,7 +158,7 @@ export class EntityCreateComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error creating entity:', error);
-          alert('Failed to create entity');
+          this.toast.error('Failed to create entity');
           this.submitting = false;
         }
       });

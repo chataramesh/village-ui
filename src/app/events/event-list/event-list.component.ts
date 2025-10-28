@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { EventService, Event } from '../event.service';
+import { ToastService } from 'src/app/shared/services/toast.service';
+import { TokenService } from 'src/app/core/services/token.service';
+import { UsersService, User } from 'src/app/users/users.service';
 
 @Component({
   selector: 'app-event-list',
@@ -30,12 +33,34 @@ export class EventListComponent implements OnInit {
     startTime: '',
     endTime: '',
     place: '',
-    isActive: true
+    active: true,
+    villageId: '',
+    villageName: '',
+    village: null
   };
 
-  constructor(private eventService: EventService) {}
+  // Current user
+  currentUser: User | null = null;
+
+  constructor(
+    private eventService: EventService,
+    private toast: ToastService,
+    private tokenService: TokenService,
+    private usersService: UsersService
+  ) {}
 
   ngOnInit(): void {
+    const tokenUser = this.tokenService.getCurrentUser();
+    if (tokenUser?.userId) {
+      this.usersService.getUserById(tokenUser.userId).subscribe({
+        next: (user) => {
+          this.currentUser = user;
+        },
+        error: () => {
+          this.currentUser = null;
+        }
+      });
+    }
     this.loadEvents();
   }
 
@@ -57,11 +82,11 @@ export class EventListComponent implements OnInit {
 
   updateStats(): void {
     this.totalEvents = this.events.length;
-    this.activeEvents = this.events.filter(event => event.isActive).length;
+    this.activeEvents = this.events.filter(event => event.active).length;
 
     const now = new Date();
     this.upcomingEvents = this.events.filter(event =>
-      new Date(event.startTime) > now && event.isActive
+      new Date(event.startTime) > now && event.active
     ).length;
 
     this.pastEvents = this.events.filter(event =>
@@ -101,7 +126,9 @@ export class EventListComponent implements OnInit {
       startTime: '',
       endTime: '',
       place: '',
-      isActive: true
+      active: true,
+      villageId: this.currentUser?.village?.id || '',
+      villageName: this.currentUser?.village?.name || ''
     };
     this.showModal = true;
   }
@@ -123,24 +150,30 @@ export class EventListComponent implements OnInit {
         next: () => {
           this.loadEvents();
           this.closeModal();
-          alert('Event updated successfully!');
+          this.toast.success('Event updated successfully');
         },
         error: (err) => {
           console.error('Error updating event:', err);
-          alert('Failed to update event: ' + (err.error?.message || err.message));
+          this.toast.error('Failed to update event');
         }
       });
     } else {
       // Create new event
+      // Ensure village details are attached
+      if (!this.formData.villageId && this.currentUser?.village?.id) {
+        this.formData.villageId = this.currentUser.village.id;
+        this.formData.villageName = this.currentUser.village.name;
+      }
+      this.formData.village = this.currentUser?.village;
       this.eventService.createEvent(this.formData).subscribe({
         next: () => {
           this.loadEvents();
           this.closeModal();
-          alert('Event created successfully!');
+          this.toast.success('Event created successfully');
         },
         error: (err) => {
           console.error('Error creating event:', err);
-          alert('Failed to create event: ' + (err.error?.message || err.message));
+          this.toast.error('Failed to create event');
         }
       });
     }
@@ -151,11 +184,11 @@ export class EventListComponent implements OnInit {
       this.eventService.deleteEvent(eventId).subscribe({
         next: () => {
           this.loadEvents();
-          alert('Event deleted successfully!');
+          this.toast.success('Event deleted successfully');
         },
         error: (err) => {
           console.error('Error deleting event:', err);
-          alert('Failed to delete event');
+          this.toast.error('Failed to delete event');
         }
       });
     }
@@ -165,11 +198,11 @@ export class EventListComponent implements OnInit {
     this.eventService.toggleEventStatus(event.id!).subscribe({
       next: () => {
         this.loadEvents();
-        alert(`Event ${event.isActive ? 'deactivated' : 'activated'} successfully!`);
+        this.toast.success(`Event ${event.active ? 'deactivated' : 'activated'} successfully`);
       },
       error: (err) => {
         console.error('Error toggling event status:', err);
-        alert('Failed to update event status');
+        this.toast.error('Failed to update event status');
       }
     });
   }
@@ -179,7 +212,7 @@ export class EventListComponent implements OnInit {
     const startTime = new Date(event.startTime);
     const endTime = new Date(event.endTime);
 
-    if (!event.isActive) {
+    if (!event.active) {
       return 'status-badge inactive';
     } else if (startTime > now) {
       return 'status-badge upcoming';
@@ -195,7 +228,7 @@ export class EventListComponent implements OnInit {
     const startTime = new Date(event.startTime);
     const endTime = new Date(event.endTime);
 
-    if (!event.isActive) {
+    if (!event.active) {
       return 'Inactive';
     } else if (startTime > now) {
       return 'Upcoming';

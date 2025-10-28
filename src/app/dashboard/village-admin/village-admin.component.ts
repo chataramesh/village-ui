@@ -8,6 +8,7 @@ import { ChatService } from 'src/app/core/services/chat.service';
 import { WebsocketService } from 'src/app/core/services/websocket.service';
 import { ProfileModalComponent, UserProfile } from 'src/app/shared/components/profile-modal/profile-modal.component';
 import { UserProfileData } from 'src/app/shared/components/user-profile-dropdown/user-profile-dropdown.component';
+import { EventService } from 'src/app/events/event.service';
 
 Chart.register(...registerables);
 
@@ -31,7 +32,9 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
     userName: 'NA',
     userRole: 'VILLAGE_ADMIN',
     userImage: 'assets/people.png',
-    userId: ''
+    userId: '',
+    latitude: '',
+    longitude: ''
   };
 
   // Counts - now using API data with comprehensive structure
@@ -80,13 +83,7 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   // Event Messages with auto-scroll
-  eventMessages = [
-    { time: '10:30 AM', title: 'Village Cleanup Drive', message: 'Join us this Saturday at 7 AM for village cleanup' },
-    { time: '09:15 AM', title: 'Health Camp Scheduled', message: 'Free health checkup on Oct 15 at Primary School' },
-    { time: '08:00 AM', title: 'Water Supply Update', message: 'Water supply timing changed to 6 AM - 9 AM' },
-    { time: 'Yesterday', title: 'Farmers Meeting', message: 'Monthly farmers meeting on Oct 18 at 10 AM' },
-    { time: 'Yesterday', title: 'New Entity Added', message: 'Community Hall added to village entities' }
-  ];
+  eventMessages: any = [];
 
   // Chat (temporarily disabled WebSocket functionality)
   showChatPopup = false;
@@ -128,7 +125,8 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
     private usersService: UsersService,
     private http: HttpClient,
     private chatService: ChatService,
-    private websocketService: WebsocketService
+    private websocketService: WebsocketService,
+    private eventService: EventService
   ) {}
 
   title = 'frontend';
@@ -141,6 +139,7 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     // Load current user details and village data
     this.loadCurrentUser();
+    this.loadEvents();
     this.startEventMessagesScroll();
 
     this.usersService.getUserById(this.tokenService.getCurrentUser()!.userId!).subscribe({
@@ -154,7 +153,9 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
           userName: this.userName,
           userRole: this.userRole,
           userImage: this.userImage,
-          userId: user!.id!
+          userId: user!.id!,
+          latitude: user!.latitude,
+          longitude: user!.longitude
         };
 
         console.log('Current village-admin user loaded:', user);
@@ -208,6 +209,17 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
+  loadEvents() {
+    this.eventService.getAllEvents().subscribe({
+      next: (events) => {
+        this.eventMessages = events;
+        console.log('Events loaded:', events);
+      },
+      error: (error) => {
+        console.error('Error loading events:', error);
+      }
+    });
+  }
 
   // Load current user details from API using userId from token
   loadCurrentUser(): void {
@@ -231,7 +243,9 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
               userName: user.name || 'NA',
               userRole: user.role || 'VILLAGE_ADMIN',
               userImage: this.userImage,
-              userId: this.currentUserId
+              userId: this.currentUserId,
+              latitude: user.latitude,
+              longitude: user.longitude
             };
 
             // Load village-specific dashboard counts
@@ -257,32 +271,33 @@ export class VillageAdminComponent implements OnInit, AfterViewInit, OnDestroy {
   // Load village-specific dashboard counts
   loadVillageDashboardCounts(villageId: string): void {
     this.usersService.getVillageDashboardCount(villageId).subscribe({
-      next: (dashboardCounts:VillageDashboardCountResponse) => {
+      next: (dashboardCounts:any) => {
         console.log('Village dashboard counts loaded:', dashboardCounts);
+        //alert( JSON.stringify(dashboardCounts.entityCounts));
         this.counts.villagers.totalVillagers = dashboardCounts.userCounts.totalVillagers;
         this.counts.villagers.activeVillagers = dashboardCounts.userCounts.activeVillagers;
         this.counts.villagers.inactiveVillagers = dashboardCounts.userCounts.inactiveVillagers;
-        this.counts.entities.totalEntities = dashboardCounts.entities.totalEntities!;
-        this.counts.entities.activeEntities = dashboardCounts.entities.activeEntities!;
-        this.counts.entities.inactiveEntities = dashboardCounts.entities.inactiveEntities!;
-        this.counts.events.totalEvents = dashboardCounts.events.totalEvents!;
-        this.counts.events.activeEvents = dashboardCounts.events.activeEvents!;
-        this.counts.events.inactiveEvents = dashboardCounts.events.inactiveEvents!;
-        this.counts.incidents.totalIncidents = dashboardCounts.incidents.totalIncidents!;
-        this.counts.incidents.activeIncidents = dashboardCounts.incidents.activeIncidents!;
-        this.counts.incidents.inactiveIncidents = dashboardCounts.incidents.inactiveIncidents!;
-        this.counts.temples.totalTemples = dashboardCounts.temples.totalTemples!;
-        this.counts.temples.activeTemples = dashboardCounts.temples.activeTemples!;
-        this.counts.temples.inactiveTemples = dashboardCounts.temples.inactiveTemples!;
-        this.counts.schools.totalSchools = dashboardCounts.schools.totalSchools!;
-        this.counts.schools.activeSchools = dashboardCounts.schools.activeSchools!;
-        this.counts.schools.inactiveSchools = dashboardCounts.schools.inactiveSchools!;
-        this.counts.vehicles.totalVehicles = dashboardCounts.vehicles.totalVehicles!;
-        this.counts.vehicles.activeVehicles = dashboardCounts.vehicles.activeVehicles!;
-        this.counts.vehicles.inactiveVehicles = dashboardCounts.vehicles.inactiveVehicles!;
-        this.counts.images.totalImages = dashboardCounts.images.totalImages!;
-        this.counts.images.activeImages = dashboardCounts.images.activeImages!;
-        this.counts.images.inactiveImages = dashboardCounts.images.inactiveImages!;
+        this.counts.entities.totalEntities = dashboardCounts!.entityCounts!.totalEntities;
+        this.counts.entities.activeEntities = dashboardCounts.entityCounts.activeEntities;
+        this.counts.entities.inactiveEntities = dashboardCounts.entityCounts.inactiveEntities;
+        this.counts.events.totalEvents = dashboardCounts.eventCounts.totalEvents!;
+        this.counts.events.activeEvents = dashboardCounts.eventCounts.activeEvents!;
+        this.counts.events.inactiveEvents = dashboardCounts.eventCounts.inactiveEvents!;
+        this.counts.incidents.totalIncidents = dashboardCounts.incidentCounts.totalIncidents!;
+        this.counts.incidents.activeIncidents = dashboardCounts.incidentCounts.activeIncidents!;
+        this.counts.incidents.inactiveIncidents = dashboardCounts.incidentCounts.inactiveIncidents!;
+        this.counts.temples.totalTemples = dashboardCounts.templeCounts.totalTemples!;
+        this.counts.temples.activeTemples = dashboardCounts.templeCounts.activeTemples!;
+        this.counts.temples.inactiveTemples = dashboardCounts.templeCounts.inactiveTemples!;
+        this.counts.schools.totalSchools = dashboardCounts.schoolCounts.totalSchools!;
+        this.counts.schools.activeSchools = dashboardCounts.schoolCounts.activeSchools!;
+        this.counts.schools.inactiveSchools = dashboardCounts.schoolCounts.inactiveSchools!;
+        this.counts.vehicles.totalVehicles = dashboardCounts.vehicleCounts.totalVehicles!;
+        this.counts.vehicles.activeVehicles = dashboardCounts.vehicleCounts.activeVehicles!;
+        this.counts.vehicles.inactiveVehicles = dashboardCounts.vehicleCounts.inactiveVehicles!;
+        this.counts.images.totalImages = dashboardCounts.imageCounts.totalImages!;
+        this.counts.images.activeImages = dashboardCounts.imageCounts.activeImages!;
+        this.counts.images.inactiveImages = dashboardCounts.imageCounts.inactiveImages!;
 
         // Assign comprehensive counts
         this.counts.userCounts = dashboardCounts.userCounts;

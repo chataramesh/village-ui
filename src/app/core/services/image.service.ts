@@ -26,8 +26,8 @@ export interface Image {
   contentType: string;
   fileSize: number;
   active: boolean; // Changed from isActive to active to match backend
-  createdAt?: string; // Changed to string to match backend response
-  updatedAt?: string | null;
+  createdAt?: any; // Changed to string to match backend response
+  updatedAt?: any | null;
   uploadedBy?: string;
   altText?: string;
   fileContent?: string;

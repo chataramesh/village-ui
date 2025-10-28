@@ -5,6 +5,7 @@ import { TokenService } from 'src/app/core/services/token.service';
 import { UsersService } from 'src/app/users/users.service';
 import { VehicleService } from '../services/vehicle.service';
 import { Vehicle, VehicleType, WheelerType } from '../models/vehicle.model';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-vehicle-create',
@@ -31,7 +32,8 @@ export class VehicleCreateComponent implements OnInit {
     private fb: FormBuilder,
     private vehicleService: VehicleService,
     private tokenService: TokenService,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private toast: ToastService
   ) {
     this.vehicleForm = this.fb.group({
       vehicleNumber: ['', [Validators.required, Validators.pattern(/^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/)]],
@@ -39,7 +41,7 @@ export class VehicleCreateComponent implements OnInit {
       wheelerType: ['', Validators.required],
       vehicleDescription: [''],
       seatingCapacity: [0, [Validators.min(0)]],
-      isActive: [true]
+      active: [true]
     });
   }
 
@@ -91,13 +93,13 @@ export class VehicleCreateComponent implements OnInit {
           wheelerType: vehicle.wheelerType,
           vehicleDescription: vehicle.vehicleDescription,
           seatingCapacity: vehicle.seatingCapacity,
-          isActive: vehicle.isActive
+          active: vehicle.active
         });
         this.loading = false;
       },
       error: (error) => {
         console.error('Error loading vehicle:', error);
-        alert('Failed to load vehicle data');
+        this.toast.error('Failed to load vehicle data');
         this.loading = false;
         this.router.navigate(['/vehicles']);
       }
@@ -125,13 +127,13 @@ export class VehicleCreateComponent implements OnInit {
       // Update existing vehicle
       this.vehicleService.updateVehicle(this.vehicleId, vehicleData).subscribe({
         next: (response) => {
-          alert('Vehicle updated successfully!');
+          this.toast.success('Vehicle updated successfully!');
           this.router.navigate(['/vehicles']);
           this.submitting = false;
         },
         error: (error) => {
           console.error('Error updating vehicle:', error);
-          alert('Failed to update vehicle');
+           this.toast.error('Failed to update vehicle');
           this.submitting = false;
         }
       });
@@ -139,13 +141,13 @@ export class VehicleCreateComponent implements OnInit {
       // Create new vehicle
       this.vehicleService.createVehicle(vehicleData).subscribe({
         next: (response) => {
-          alert('Vehicle registered successfully!');
+           this.toast.success('Vehicle registered successfully!');
           this.router.navigate(['/vehicles']);
           this.submitting = false;
         },
         error: (error) => {
           console.error('Error creating vehicle:', error);
-          alert('Failed to register vehicle');
+          this.toast.error('Failed to register vehicle');
           this.submitting = false;
         }
       });

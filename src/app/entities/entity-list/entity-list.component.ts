@@ -3,6 +3,7 @@ import { EntityService, Entity, EntityStatus, EntityType } from '../services/ent
 import { EntitySubscriptionService } from '../services/entity-subscription.service';
 import { UsersService, User } from 'src/app/users/users.service';
 import { TokenService } from 'src/app/core/services/token.service';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-entity-list',
@@ -53,7 +54,8 @@ export class EntityListComponent implements OnInit {
     private entityService: EntityService,
     private subscriptionService: EntitySubscriptionService,
     private usersService: UsersService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -130,8 +132,8 @@ export class EntityListComponent implements OnInit {
 
   updateStats(): void {
     this.totalEntities = this.entities.length;
-    this.activeEntities = this.entities.filter(e => e.isActive).length;
-    this.inactiveEntities = this.entities.filter(e => !e.isActive).length;
+    this.activeEntities = this.entities.filter(e => e.active).length;
+    this.inactiveEntities = this.entities.filter(e => !e.active).length;
 
     // Count by status
     this.entitiesByStatus = {};
@@ -194,7 +196,7 @@ export class EntityListComponent implements OnInit {
       contactNumber: '',
       email: '',
       capacity: null,
-      isActive: true,
+      active: true,
       owner: null
     };
     this.showModal = true;
@@ -224,7 +226,7 @@ export class EntityListComponent implements OnInit {
     console.log('Users array length:', this.users.length);
 
     if (!this.formData.owner || this.formData.owner === '') {
-      alert('Please select an owner for the entity');
+      this.toast.warning('Please select an owner for the entity');
       console.log('Owner validation failed - no owner selected');
       return;
     }
@@ -232,18 +234,19 @@ export class EntityListComponent implements OnInit {
     // Try different owner formats for backend compatibility
     const entityData1 = {
       ...this.formData,
-      owner: { id: this.formData.owner }
+      owner: { id: this.formData.owner },
+      village :this.currentUser?.village
     };
 
-    const entityData2 = {
-      ...this.formData,
-      owner: this.formData.owner  // Just the ID as string
-    };
+    // const entityData2 = {
+    //   ...this.formData,
+    //   owner: this.formData.owner  // Just the ID as string
+    // };
 
-    const entityData3 = {
-      ...this.formData,
-      ownerId: this.formData.owner  // Maybe backend expects ownerId field
-    };
+    // const entityData3 = {
+    //   ...this.formData,
+    //   ownerId: this.formData.owner  // Maybe backend expects ownerId field
+    // };
     // Try format 1 first (object with id)
     this.tryCreateEntity(entityData1);
   }
@@ -255,7 +258,7 @@ export class EntityListComponent implements OnInit {
         next: () => {
           this.loadEntities();
           this.closeModal();
-          alert('Entity updated successfully!');
+          this.toast.success('Entity updated successfully');
         },
         error: (err) => {
           console.error('Error with current format, trying alternative format:', err);
@@ -263,7 +266,7 @@ export class EntityListComponent implements OnInit {
           if (err.error?.message?.includes('owner')) {
             this.tryAlternativeFormat(entityData);
           } else {
-            alert('Failed to update entity: ' + (err.error?.message || err.message));
+            this.toast.error('Failed to update entity');
           }
         }
       });
@@ -273,7 +276,7 @@ export class EntityListComponent implements OnInit {
         next: () => {
           this.loadEntities();
           this.closeModal();
-          alert('Entity created successfully!');
+          this.toast.success('Entity created successfully');
         },
         error: (err) => {
           console.error('Error with current format, trying alternative format:', err);
@@ -281,7 +284,7 @@ export class EntityListComponent implements OnInit {
           if (err.error?.message?.includes('owner')) {
             this.tryAlternativeFormat(entityData);
           } else {
-            alert('Failed to create entity: ' + (err.error?.message || err.message));
+            this.toast.error('Failed to create entity');
           }
         }
       });
@@ -302,11 +305,11 @@ export class EntityListComponent implements OnInit {
         next: () => {
           this.loadEntities();
           this.closeModal();
-          alert('Entity updated successfully!');
+          this.toast.success('Entity updated successfully');
         },
         error: (err) => {
           console.error('Alternative format also failed:', err);
-          alert('Failed to save entity. Please check the console for details.');
+          this.toast.error('Failed to save entity');
         }
       });
     } else {
@@ -314,11 +317,11 @@ export class EntityListComponent implements OnInit {
         next: () => {
           this.loadEntities();
           this.closeModal();
-          alert('Entity created successfully!');
+          this.toast.success('Entity created successfully');
         },
         error: (err) => {
           console.error('Alternative format also failed:', err);
-          alert('Failed to save entity. Please check the console for details.');
+          this.toast.error('Failed to save entity');
         }
       });
     }
@@ -329,30 +332,30 @@ export class EntityListComponent implements OnInit {
     if (confirm('Are you sure you want to delete this entity?')) {
       this.entityService.deleteEntity(entityId).subscribe({
         next: () => {
+          this.toast.success('Entity deleted successfully');
           this.loadEntities();
-          alert('Entity deleted successfully!');
         },
         error: (err) => {
           console.error('Error deleting entity:', err);
-          alert('Failed to delete entity');
+          this.toast.error('Failed to delete entity');
         }
       });
     }
   }
 
-  toggleEntityStatus(entity: Entity): void {
-    const newStatus = entity.isActive ? EntityStatus.CLOSED : EntityStatus.OPEN;
-    this.entityService.updateEntityStatus(entity.id!, newStatus).subscribe({
-      next: () => {
-        this.loadEntities();
-        alert(`Entity ${entity.isActive ? 'deactivated' : 'activated'} successfully!`);
-      },
-      error: (err) => {
-        console.error('Error toggling entity status:', err);
-        alert('Failed to update entity status');
-      }
-    });
-  }
+  // toggleEntityStatus(entity: Entity): void {
+  //   entity.status = entity.active ? EntityStatus.CLOSED : EntityStatus.OPEN;
+  //   this.entityService.updateEntity(entity.id!, entity).subscribe({
+  //     next: () => {
+  //       this.loadEntities();
+  //       this.toast.success(`Entity ${entity.active ? 'deactivated' : 'activated'} successfully`);
+  //     },
+  //     error: (err) => {
+  //       console.error('Error toggling entity status:', err);
+  //       this.toast.error('Failed to update entity status');
+  //     }
+  //   });
+  // }
 
   getStatusBadgeClass(status: EntityStatus): string {
     switch (status) {

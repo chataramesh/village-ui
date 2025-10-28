@@ -27,7 +27,9 @@ export class SuperAdminComponent implements OnInit, AfterViewInit, OnDestroy {
     userName: 'Super Admin',
     userRole: 'SUPER_ADMIN',
     userImage: 'assets/people.png',
-    userId: ''
+    userId: '',
+    latitude: '',
+    longitude: ''
   };
 
   // Counts with detailed breakdown
@@ -211,7 +213,9 @@ this.userService.getDashboardCount().subscribe({
             userName: user.name || 'Super Admin',
             userRole: user.role || 'SUPER_ADMIN',
             userImage: this.userImage,
-            userId: this.currentUserId || ''
+            userId: this.currentUserId || '',
+            latitude: user.latitude,
+            longitude: user.longitude
           };
           console.log('Current super-admin user loaded:', user);
         },
@@ -419,24 +423,24 @@ this.userService.getDashboardCount().subscribe({
     this.router.navigate(['/users'], { queryParams: { role: 'VILLAGER' } });
   }
 
-  navigateToVillagesTree() {
-    this.router.navigate(['/villages/']);
+  navigateToVillages() {
+    this.router.navigate(['/address/']);
   }
 
   navigateToCountries() {
-    this.router.navigate(['/villages/countries']);
+    this.router.navigate(['/address/countries']);
   }
 
   navigateToStates() {
-    this.router.navigate(['/villages/states']);
+    this.router.navigate(['/address/states']);
   }
 
   navigateToDistricts() {
-    this.router.navigate(['/villages/districts']);
+    this.router.navigate(['/address/districts']);
   }
 
   navigateToMandals() {
-    this.router.navigate(['/villages/mandals']);
+    this.router.navigate(['/address/mandals']);
   }
 
   navigateToImages() {

@@ -16,9 +16,11 @@ export interface User {
   phone: string;
   passwordHash?: string;
   role: Role;
-  isActive: boolean;
+  active: boolean;
   createdDate?: Date;
   lastLogin?: Date;
+  longitude?:any;
+  latitude?:any;
   village?: {
     id?: string;
     name?: string;
@@ -72,9 +74,9 @@ export interface VillagerCountResponse {
   inactiveVillagers: number;
 }
 export interface EntityCountResponse {
-  totalEntities: number;
-  activeEntities: number;
-  inactiveEntities: number;
+  totalEntities?: number;
+  activeEntities?: number;
+  inactiveEntities?: number;
 }
 export interface EventCountResponse {
   totalEvents: number;

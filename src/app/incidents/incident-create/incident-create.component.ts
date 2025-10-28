@@ -9,6 +9,9 @@ import {
   LocationType,
   Incident
 } from '../types/incident.types';
+import { TokenService } from 'src/app/core/services/token.service';
+import { ToastService } from 'src/app/shared/services/toast.service';
+import { UsersService } from 'src/app/users/users.service';
 
 @Component({
   selector: 'app-incident-create',
@@ -22,6 +25,8 @@ export class IncidentCreateComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
 
+  currentUser: any = null;
+
   categories = Object.values(IncidentCategory);
   priorities = Object.values(IncidentPriority);
   locationTypes = Object.values(LocationType);
@@ -29,7 +34,10 @@ export class IncidentCreateComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private incidentService: IncidentService,
-    private router: Router
+    private router: Router,
+    private tokenService: TokenService,
+    private toast: ToastService,
+    private usersService: UsersService
   ) {
     this.createForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(200)]],
@@ -44,7 +52,22 @@ export class IncidentCreateComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    const currentUser = this.tokenService.getCurrentUser();
+    if (currentUser) {
+      this.usersService.getUserById(currentUser.userId!)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (user) => {
+            this.currentUser = user;
+          },
+          error: (error) => {
+            console.error('Error loading user:', error);
+            this.toast.error('Failed to load user. Please try again.');
+          }
+        });
+    }
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -69,7 +92,8 @@ export class IncidentCreateComponent implements OnInit, OnDestroy {
         contactInfo: formValue.contactInfo,
         urgencyReason: formValue.urgencyReason || undefined,
         requiresFollowUp: formValue.requiresFollowUp,
-        status: undefined // Will be set by backend to OPEN
+        status: undefined,
+        village: this.currentUser.village // Will be set by backend to OPEN
       };
 
       this.incidentService.createIncident(incidentData)
@@ -77,10 +101,12 @@ export class IncidentCreateComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (createdIncident) => {
             this.loading = false;
+            this.toast.success('Incident created successfully');
             this.router.navigate(['/incidents'], { replaceUrl: true });
           },
           error: (error) => {
             this.loading = false;
+            this.toast.error('Failed to create incident. Please try again.');
             console.error('Error creating incident:', error);
             this.error = 'Failed to create incident. Please try again.';
           }

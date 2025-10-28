@@ -78,6 +78,18 @@
       height: 36px;
       stroke: white;
     }
+    
+    &:focus-visible {
+      outline: 3px solid rgba(102, 126, 234, 0.25);
+      outline-offset: 0;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .form-input {
+      padding: 1rem 1rem 1rem 3rem;
+      font-size: 1rem;
+    }
   }
   
   .brand-title {
@@ -194,6 +206,11 @@
   @media (min-width: 1024px) {
     box-shadow: none;
     padding: 0;
+  }
+
+  @media (max-width: 640px) {
+    border-radius: 20px;
+    padding: 2rem 1.25rem;
   }
 }
 
@@ -403,7 +420,7 @@
   width: 100%;
   padding: 1rem 1.5rem;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   color: white;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
@@ -411,6 +428,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  min-height: 48px;
   
   &:hover:not(:disabled) {
     transform: translateY(-2px);
@@ -426,11 +444,29 @@
     cursor: not-allowed;
   }
   
+  &:focus-visible {
+    outline: 3px solid rgba(102, 126, 234, 0.35);
+    outline-offset: 2px;
+  }
+  
   .loading-text {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .form-header {
+    margin-bottom: 1.5rem;
+    .form-title { font-size: 1.5rem; }
+    .form-subtitle { font-size: 0.9rem; }
+  }
+
+  .submit-button {
+    min-height: 52px;
+    font-size: 1.0625rem;
   }
 }
 

@@ -2,9 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
-import { VillagesService } from '../../villages/services/villages.service';
+import { VillagesService } from '../../address/services/villages.service';
 import { UsersService, Role } from '../../users/users.service';
+import { TokenService } from 'src/app/core/services/token.service';
 import { Preferences } from '@capacitor/preferences';
+import { GeolocationService } from 'src/app/shared/services/geolocation.service';
 
 @Component({
   selector: 'app-login',
@@ -39,7 +41,9 @@ export class LoginComponent  implements OnInit {
     private auth: AuthService,
     private router: Router,
     private villagesService: VillagesService,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private tokenService: TokenService,
+    private geolocation: GeolocationService
   ) {}
   
   ngOnInit() {
@@ -102,6 +106,10 @@ export class LoginComponent  implements OnInit {
     });
   }
 
+  private ensureUserLocation(): Promise<void> {
+    return this.geolocation.ensureUserLocation();
+  }
+
   onSubmit(): void {
     if (this.loginForm.invalid) return;
 
@@ -110,8 +118,16 @@ export class LoginComponent  implements OnInit {
     this.auth.login(this.loginForm.value as { email: string; password: string }).subscribe({
       next: () => {
         console.log('Login successful');
-        this.isLoading = false;
-        this.router.navigate(['/dashboard']);
+        // Make location mandatory before navigating
+        this.ensureUserLocation()
+          .then(() => {
+            this.isLoading = false;
+            this.router.navigate(['/dashboard']);
+          })
+          .catch(() => {
+            this.isLoading = false;
+            alert('Location permission is required to continue. Please enable location and try again.');
+          });
       },
       error: (err) => {
         console.error('Login error:', err);

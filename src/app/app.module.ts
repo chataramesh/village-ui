@@ -7,12 +7,14 @@ import { AppComponent } from './app.component';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CardsComponent } from './shared/cards/cards.component';
+import { ToastContainerComponent } from './shared/components/toast-container/toast-container.component';
 import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
 import { ImagesModule } from './images/images.module';
 
 @NgModule({
   declarations: [
     AppComponent,
+    ToastContainerComponent,
   ],
   imports: [
     BrowserModule,

@@ -5,9 +5,10 @@ export interface Event {
   startTime: string; // ISO date string format
   endTime: string;   // ISO date string format
   place: string;
-  isActive: boolean;
+  active: boolean;
   createdAt?: string;
   updatedAt?: string;
+  village: any;
 }
 
 export interface EventStats {

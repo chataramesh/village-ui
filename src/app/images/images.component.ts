@@ -4,6 +4,8 @@ import { Subject, takeUntil } from 'rxjs';
 import { ImageService, Image, ImageCategory } from 'src/app/core/services/image.service';
 import { TokenService } from 'src/app/core/services/token.service';
 import { UsersService } from '../users/users.service';
+import { environment } from 'src/environments/environment';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-images',
@@ -32,7 +34,8 @@ export class ImagesComponent implements OnInit, OnDestroy {
     private tokenService: TokenService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -85,10 +88,10 @@ export class ImagesComponent implements OnInit, OnDestroy {
     this.imageService.getAllActiveImages()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (images) => {
-          console.log('Images loaded successfully:', images?.length || 0, 'images');
-          this.images = images || [];
-          this.imagesByDate = this.imageService.getImagesGroupedByDate(images || []);
+        next: (response:any) => {
+          console.log('Images loaded successfully:', response?.length || 0, 'images');
+          this.images = response || [];
+          this.imagesByDate = this.imageService.getImagesGroupedByDate(this.images || []);
           this.loading = false;
           this.isLoadingImages = false;
           // Manually trigger change detection to prevent loops
@@ -97,6 +100,7 @@ export class ImagesComponent implements OnInit, OnDestroy {
         error: (error) => {
           console.error('Error loading images:', error);
           this.error = 'Failed to load images. Please check your connection and try again.';
+          this.toast.error('Failed to load images');
           this.loading = false;
           this.isLoadingImages = false;
         }
@@ -113,6 +117,7 @@ export class ImagesComponent implements OnInit, OnDestroy {
   onImageUploaded(): void {
     this.closeUploadModal();
     this.loadImages();
+    this.toast.success('Images uploaded successfully');
   }
 
   downloadImage(image: Image): void {
@@ -132,7 +137,7 @@ export class ImagesComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Error downloading image:', error);
-            alert('Failed to download image. Please try again.');
+            this.toast.error('Failed to download image');
           }
         });
     }
@@ -146,15 +151,15 @@ export class ImagesComponent implements OnInit, OnDestroy {
           next: () => {
             this.images = this.images.filter(img => img.id !== image.id);
             this.imagesByDate = this.imageService.getImagesGroupedByDate(this.images);
-            alert('Image deleted successfully');
+            this.toast.success('Image deleted successfully');
           },
           error: (error) => {
             console.error('Error deleting image:', error);
-            alert('Failed to delete image. Please try again.');
+            this.toast.error('Failed to delete image');
           }
         });
     } else if (!this.canDeleteImage(image)) {
-      alert('You can only delete images that you uploaded.');
+      this.toast.warning('You can only delete images that you uploaded');
     }
   }
 

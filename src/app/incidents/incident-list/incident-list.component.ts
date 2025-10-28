@@ -12,6 +12,7 @@ import {
   IncidentFilters
 } from '../types/incident.types';
 import { TokenService } from 'src/app/core/services/token.service';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
 @Component({
   selector: 'app-incident-list',
@@ -53,7 +54,7 @@ export class IncidentListComponent implements OnInit, OnDestroy {
   constructor(
     private incidentService: IncidentService,
     private router: Router,
-    private tokenService: TokenService
+    private tokenService: TokenService,private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -216,7 +217,7 @@ export class IncidentListComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Error updating incident status:', error);
-            alert('Failed to update incident status. Please try again.');
+            this.toast.error('Failed to update incident status. Please try again.');
           }
         });
     }
@@ -234,7 +235,7 @@ export class IncidentListComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             console.error('Error deleting incident:', error);
-            alert('Failed to delete incident. Please try again.');
+            this.toast.error('Failed to delete incident. Please try again.');
           }
         });
     }

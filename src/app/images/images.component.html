@@ -2,7 +2,7 @@
   <!-- Header Section -->
   <div class="images-header">
     <div class="header-left">
-      <button class="back-btn" (click)="goBack()">
+      <button class="back-btn" (click)="goBack()" title="Back to Dashboard" aria-label="Back to Dashboard">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
         </svg>
@@ -41,7 +41,6 @@
     <p>{{error}}</p>
     <button class="retry-btn" (click)="loadImages()">Try Again</button>
   </div>
-
   <!-- Images Content -->
   <div class="images-content" *ngIf="!loading && !error">
     <!-- Empty State -->
@@ -55,7 +54,6 @@
       <p>Start by uploading some images to your village gallery</p>
       <button class="upload-btn" (click)="openUploadModal()">Upload First Image</button>
     </div>
-
     <!-- Images by Date -->
     <div class="images-timeline" *ngIf="images.length > 0">
       <div class="date-section" *ngFor="let date of getDateKeys()">
@@ -64,7 +62,6 @@
           <div class="date-divider"></div>
           <span class="image-count">{{(imagesByDate[date] || []).length}} {{(imagesByDate[date] || []).length === 1 ? 'image' : 'images'}}</span>
         </div>
-
         <div class="images-grid">
           <div class="image-card" *ngFor="let image of imagesByDate[date] || []">
             <div class="image-container">

@@ -101,6 +101,8 @@ export class ImageUploadComponent implements OnDestroy {
     }
 
     this.uploading = true;
+    // Disable form controls via Reactive Forms API to avoid expression-changed warnings
+    this.uploadForm.disable({ emitEvent: false });
     this.error = null;
 
     this.selectedFiles.forEach((file, index) => {
@@ -126,6 +128,14 @@ export class ImageUploadComponent implements OnDestroy {
             if (index === this.selectedFiles.length - 1) {
               this.uploading = false;
               this.uploadProgress = 100;
+              this.uploadForm.enable({ emitEvent: false });
+              this.uploadForm.reset({
+                name: '',
+                description: '',
+                category: ImageCategory.OTHER,
+                altText: ''
+              });
+              this.selectedFiles = [];
               this.onUpload.emit();
             }
           },
@@ -133,6 +143,7 @@ export class ImageUploadComponent implements OnDestroy {
             console.error('Upload error:', error);
             this.error = 'Failed to upload image. Please try again.';
             this.uploading = false;
+            this.uploadForm.enable({ emitEvent: false });
           }
         });
     });

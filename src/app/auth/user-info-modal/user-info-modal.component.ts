@@ -23,7 +23,7 @@ export class UserInfoModalComponent {
     private usersService: UsersService
   ) {
     this.updatePasswordForm = this.fb.group({
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      newPassword: ['', [Validators.required, Validators.minLength(4)]],
       confirmPassword: ['', Validators.required]
     }, { validators: this.passwordMatchValidator });
   }

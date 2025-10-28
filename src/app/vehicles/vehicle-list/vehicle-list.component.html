@@ -108,9 +108,9 @@
           <div class="vehicle-icon">
             <span class="vehicle-emoji">{{getVehicleTypeIcon(vehicle.vehicleType)}}</span>
           </div>
-          <div class="vehicle-status" [class.active]="vehicle.isActive" [class.inactive]="!vehicle.isActive">
+          <div class="vehicle-status" [class.active]="vehicle.active" [class.inactive]="!vehicle.active">
             <span class="status-dot"></span>
-            {{vehicle.isActive ? 'Active' : 'Inactive'}}
+            {{vehicle.active ? 'Active' : 'Inactive'}}
           </div>
         </div>
 

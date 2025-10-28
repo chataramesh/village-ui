@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UsersService, Role, User } from 'src/app/users/users.service';
 import { TokenService } from 'src/app/core/services/token.service';
-import { Capacitor } from '@capacitor/core';
-import { Geolocation } from '@capacitor/geolocation';
+import { GeolocationService } from 'src/app/shared/services/geolocation.service';
+import { ToastService } from '../../services/toast.service';
 
 export interface UserProfile {
   id: string;
@@ -16,6 +16,8 @@ export interface UserProfile {
   joinDate: string;
   profileImage?: string;
   address: string;
+  latitude: any;
+  longitude: any;
   emergencyContact: string;
 }
 
@@ -45,7 +47,7 @@ export class ProfileModalComponent implements OnInit, OnChanges {
   // Available roles from API
   availableRoles: { value: string; label: string }[] = [];
 
-  constructor(private usersService: UsersService,private tokenService:TokenService) {}
+  constructor(private usersService: UsersService,private tokenService:TokenService,private toast: ToastService, private geo: GeolocationService) {}
 
   ngOnInit(): void {
 
@@ -101,11 +103,32 @@ export class ProfileModalComponent implements OnInit, OnChanges {
         email: this.editedProfile.email,
         phone: this.editedProfile.phone,
         role:  this.currentUser.role, 
-        isActive: true, // Default to active, you might want to add this field to the form
-        village: this.currentUser.village
+        active: true, // Default to active, you might want to add this field to the form
+        village: this.currentUser.village,
+        latitude: this.editedProfile.latitude,
+        longitude: this.editedProfile.longitude
       };
 
-      // Call the API to update user
+      // Decide whether to call update based on changes
+      const orig = this.currentUser || {};
+      const latChanged = Number(userData.latitude ?? 0) !== Number(orig.latitude ?? 0);
+      const lngChanged = Number(userData.longitude ?? 0) !== Number(orig.longitude ?? 0);
+      const otherChanged = (
+        userData.name !== orig.name ||
+        userData.email !== orig.email ||
+        userData.phone !== orig.phone ||
+        (userData.village?.id || userData.village) !== (orig.village?.id || orig.village) ||
+        this.editedProfile.address !== (this.userProfile?.address)
+      );
+
+      if (!(latChanged || lngChanged || otherChanged)) {
+        // Nothing changed; do not call API
+        this.isEditing = false;
+        this.closeModal.emit();
+        return;
+      }
+
+      // Call the API to update user only if something changed (esp. coords)
       this.usersService.updateUser(this.editedProfile.id, userData).subscribe({
         next: (updatedUser) => {
           console.log('User updated successfully:', updatedUser);
@@ -122,7 +145,7 @@ export class ProfileModalComponent implements OnInit, OnChanges {
         error: (error) => {
           console.error('Error updating user:', error);
           // You might want to show an error message to the user
-          alert('Failed to update profile. Please try again.');
+          this.toast.error('Failed to update profile. Please try again.');
         }
       });
     }
@@ -175,29 +198,7 @@ export class ProfileModalComponent implements OnInit, OnChanges {
     this.locationError = null;
     this.isLocating = true;
     try {
-      let lat: number, lng: number;
-
-      if (Capacitor.isNativePlatform()) {
-        // Capacitor native path: request runtime permissions and get position
-        await Geolocation.requestPermissions();
-        const pos = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 15000 });
-        lat = pos.coords.latitude;
-        lng = pos.coords.longitude;
-      } else {
-        // Web fallback
-        if (!('geolocation' in navigator)) {
-          throw new Error('Geolocation is not supported in this browser.');
-        }
-        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject, {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 30000,
-          });
-        });
-        lat = position.coords.latitude;
-        lng = position.coords.longitude;
-      }
+      const { lat, lng } = await this.geo.getCurrentCoordinates();
 
       this.coords = { lat, lng };
 
@@ -234,6 +235,8 @@ export class ProfileModalComponent implements OnInit, OnChanges {
       }
       if (this.editedProfile) {
         this.editedProfile.address = fullAddress;
+        this.editedProfile.latitude = lat;
+        this.editedProfile.longitude = lng;
       }
     } catch (err: any) {
       const code = err?.code as number | undefined;

@@ -71,6 +71,16 @@
         </div>
       </div>
 
+      <div class="form-group">
+        <label class="form-label">Village</label>
+        <input
+          type="text"
+          class="form-input"
+          [value]="currentUser?.village?.name || ''"
+          placeholder="Village"
+          readonly>
+      </div>
+
       <!-- Contact Information -->
       <div class="form-section">
         <h3 class="section-title">Contact Information</h3>

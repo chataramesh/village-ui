@@ -79,7 +79,7 @@
       <div class="password-section">
         <h3 class="section-title">Set New Password</h3>
         <p class="section-description">
-          Enter your new password below. Make sure it's at least 6 characters long and easy to remember.
+          Enter your new password below. Make sure it's at least 4 characters long and easy to remember.
         </p>
 
         <form [formGroup]="updatePasswordForm" (ngSubmit)="onSubmit()" class="password-form">
@@ -97,7 +97,7 @@
                 id="newPassword"
                 formControlName="newPassword"
                 type="password"
-                placeholder="Enter new password (min 6 characters)"
+                placeholder="Enter new password (min 4 characters)"
                 class="form-input"
                 [class.error]="updatePasswordForm.get('newPassword')!.invalid && updatePasswordForm.get('newPassword')!.touched">
               <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,7 +107,7 @@
             </div>
             <span class="error-message" *ngIf="updatePasswordForm.get('newPassword')!.invalid && updatePasswordForm.get('newPassword')!.touched">
               <span *ngIf="updatePasswordForm.get('newPassword')?.errors?.['required']">New password is required</span>
-              <span *ngIf="updatePasswordForm.get('newPassword')?.errors?.['minlength']">Password must be at least 6 characters</span>
+              <span *ngIf="updatePasswordForm.get('newPassword')?.errors?.['minlength']">Password must be at least 4 characters</span>
             </span>
           </div>
 

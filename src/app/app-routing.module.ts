@@ -25,14 +25,8 @@ const routes: Routes = [
     data: { roles: ['VILLAGE_ADMIN', 'SUPER_ADMIN', 'VILLAGER'] }
   },
   {
-    path: 'admins',
-    loadChildren: () => import('./admins/admins.module').then(m => m.AdminsModule),
-    canActivate: [AuthGuard, RoleGuard],
-    data: { role: 'SUPER_ADMIN' }
-  },
-  {
-    path: 'villages',
-    loadChildren: () => import('./villages/villages.module').then(m => m.VillagesModule),
+    path: 'address',
+    loadChildren: () => import('./address/villages.module').then(m => m.VillagesModule),
     canActivate: [AuthGuard],
     data: { role: 'SUPER_ADMIN' }
   },
@@ -55,6 +49,7 @@ const routes: Routes = [
     path: 'images',
     loadChildren: () => import('./images/images.module').then(m => m.ImagesModule),
     canActivate: [AuthGuard]
+    
     // Removed role restriction - villagers can access images too
   },
   {

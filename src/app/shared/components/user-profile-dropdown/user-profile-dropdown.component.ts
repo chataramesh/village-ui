@@ -9,6 +9,8 @@ export interface UserProfileData {
   userRole: string;
   userImage: string;
   userId: string;
+  latitude: any;
+  longitude: any;
 }
 
 export interface UserProfile {
@@ -22,6 +24,8 @@ export interface UserProfile {
   profileImage?: string;
   address: string;
   emergencyContact: string;
+  latitude: any;
+  longitude: any;
 }
 
 @Component({
@@ -108,7 +112,9 @@ export class UserProfileDropdownComponent implements OnChanges {
             village: userData.village?.name || '',
             joinDate: userData.createdDate?.toISOString() || new Date().toISOString(),
             address: '', // User interface doesn't have address field
-            emergencyContact: '' // User interface doesn't have emergencyContact field
+            emergencyContact: '', // User interface doesn't have emergencyContact field
+            latitude: userData.latitude,
+            longitude: userData.longitude
           };
           this.profileModalOpened.emit(userProfile);
         },
@@ -124,7 +130,9 @@ export class UserProfileDropdownComponent implements OnChanges {
             village: 'Village Name',
             joinDate: new Date().toISOString(),
             address: 'Village Address, District',
-            emergencyContact: '+91-9876543211'
+            emergencyContact: '+91-9876543211',
+            latitude: this.userData.latitude,
+            longitude: this.userData.longitude
           };
           this.profileModalOpened.emit(userProfile);
         }

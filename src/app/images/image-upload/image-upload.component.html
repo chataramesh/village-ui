@@ -81,8 +81,7 @@
           formControlName="name"
           class="form-control"
           placeholder="Enter a name for this image..."
-          [class.error]="uploadForm.get('name')?.invalid && uploadForm.get('name')?.touched"
-          [disabled]="uploading">
+          [class.error]="uploadForm.get('name')?.invalid && uploadForm.get('name')?.touched">
         <div class="field-error" *ngIf="uploadForm.get('name')?.invalid && uploadForm.get('name')?.touched">
           Image name is required
         </div>
@@ -95,8 +94,7 @@
           class="form-control"
           rows="3"
           placeholder="Describe this image..."
-          [class.error]="uploadForm.get('description')?.invalid && uploadForm.get('description')?.touched"
-          [disabled]="uploading"></textarea>
+          [class.error]="uploadForm.get('description')?.invalid && uploadForm.get('description')?.touched"></textarea>
         <div class="field-error" *ngIf="uploadForm.get('description')?.invalid && uploadForm.get('description')?.touched">
           Description is required
         </div>
@@ -108,8 +106,7 @@
           <select
             formControlName="category"
             class="form-control"
-            [class.error]="uploadForm.get('category')?.invalid && uploadForm.get('category')?.touched"
-            [disabled]="uploading">
+            [class.error]="uploadForm.get('category')?.invalid && uploadForm.get('category')?.touched">
             <option value="" disabled>Select a category...</option>
             <option *ngFor="let category of categories" [value]="category">
               {{getCategoryDisplayName(category)}}
@@ -127,8 +124,7 @@
           type="text"
           formControlName="altText"
           class="form-control"
-          placeholder="Alternative text for accessibility..."
-          [disabled]="uploading">
+          placeholder="Alternative text for accessibility...">
         <div class="field-hint">Helps screen readers describe the image to visually impaired users</div>
       </div>
     </div>

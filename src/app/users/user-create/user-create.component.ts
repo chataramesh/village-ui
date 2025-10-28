@@ -3,7 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { UsersService, Role, User } from '../users.service';
-import { VillagesService } from 'src/app/villages/services/villages.service';
+import { VillagesService } from 'src/app/address/services/villages.service';
+import { ToastService } from 'src/app/shared/services/toast.service';
 
 interface Village {
   id?: string;
@@ -59,7 +60,7 @@ export class UserCreateComponent implements OnInit {
     private route: ActivatedRoute,
     private http: HttpClient,
     private usersService: UsersService,
-    private villagesService: VillagesService
+    private villagesService: VillagesService,private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -142,7 +143,7 @@ export class UserCreateComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading user:', error);
-        alert('Failed to load user data');
+        this.toast.error('Failed to load user data');
       }
     });
   }
@@ -641,7 +642,7 @@ export class UserCreateComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error updating user:', error);
-          alert('Failed to update user');
+          this.toast.error('Failed to update user');
           this.isSubmitting = false;
         }
       });
@@ -663,7 +664,7 @@ export class UserCreateComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error creating user:', error);
-          alert('Failed to create user. Please try again.');
+          this.toast.error('Failed to create user. Please try again.');
           this.isSubmitting = false;
         }
       });
