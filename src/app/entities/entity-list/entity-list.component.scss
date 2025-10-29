@@ -28,6 +28,8 @@
       /* Actions column */
       width: auto;
       white-space: normal;
+      overflow: visible;
+      padding-right: 12px;
     }
   }
 }
@@ -80,31 +82,38 @@
 
 .action-buttons {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
   align-items: center;
   width: 100%;
+  justify-content: flex-start;
 
   .action-btn {
     box-sizing: border-box;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 10px;
-    border-radius: 8px;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 999px;
     border: none;
-    font-size: 12.5px;
+    font-size: 13px;
     line-height: 1.2;
     white-space: nowrap;
-    max-width: 100%;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    max-width: none;
+    min-width: auto;
+    overflow: visible;
+    text-overflow: initial;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+    min-height: 40px;
+    position: relative;
+    flex: 0 0 auto;
 
     svg {
       width: 18px;
       height: 18px;
       flex: 0 0 18px;
+      transition: transform 0.2s ease;
     }
 
     &.edit-btn {
@@ -113,6 +122,9 @@
 
       &:hover {
         background: rgba(59, 130, 246, 0.2);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px rgba(59,130,246,0.15);
+        svg { transform: scale(1.05); }
       }
     }
 
@@ -122,20 +134,57 @@
 
       &:hover {
         background: rgba(239, 68, 68, 0.2);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px rgba(239,68,68,0.15);
+        svg { transform: scale(1.05); }
       }
     }
 
     &.subscribe-btn {
-      background: transparent;
-      color: #065f46; /* emerald-800 */
-      border: 1px solid rgba(16, 185, 129, 0.4); /* emerald-500 */
-
-      font-weight: 600;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
 
       &:hover {
-        background: rgba(16, 185, 129, 0.08);
-        border-color: rgba(16, 185, 129, 0.6);
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        box-shadow: 0 6px 14px rgba(16, 185, 129, 0.35);
+        transform: translateY(-1px);
+        svg { transform: scale(1.05); }
       }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+    }
+
+    &.unsubscribe-btn {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: #ffffff;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25);
+
+      &:hover {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        box-shadow: 0 6px 14px rgba(239, 68, 68, 0.35);
+        transform: translateY(-1px);
+        svg { transform: scale(1.05); }
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.22);
     }
   }
 }
@@ -157,13 +206,42 @@
   text-overflow: ellipsis;
 }
 
+/* Page-scoped overrides to defeat shared 36x36 circular buttons */
+.list-container .table-section .action-buttons .action-btn {
+  width: auto !important;
+  height: auto !important;
+  min-height: 40px !important;
+  padding: 10px 16px !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  max-width: none !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+}
+
+@media (min-width: 1024px) {
+  .list-container .table-section .action-buttons {
+    flex-wrap: nowrap !important;
+  }
+  .list-container .data-table { table-layout: auto !important; }
+  .list-container .data-table td:last-child { white-space: normal !important; }
+  .list-container .data-table td:last-child .action-buttons .action-btn.subscribe-btn,
+  .list-container .data-table td:last-child .action-buttons .action-btn.unsubscribe-btn {
+    min-width: 140px !important;
+  }
+}
+
 /* Small screens: ensure buttons are full width if needed */
 @media (max-width: 640px) {
   .action-buttons {
     .action-btn {
-      flex: 1 1 140px;
+      flex: 1 1 100%;
       justify-content: center;
-      min-width: 120px;
+      min-width: 0;
+      width: 100%;
+      min-height: 44px;
     }
   }
 }

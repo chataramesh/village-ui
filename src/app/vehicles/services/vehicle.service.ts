@@ -36,4 +36,8 @@ export class VehicleService {
   updateVehicle(id: string, vehicle: Partial<Vehicle>): Observable<Vehicle> {
     return this.http.put<Vehicle>(`${this.apiUrl}/${id}`, vehicle);
   }
+
+  deleteVehicle(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
 }

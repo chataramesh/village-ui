@@ -47,6 +47,16 @@ export class VehicleCreateComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCurrentUser();
+    // Normalize input for mobile: uppercase and remove separators while typing
+    const vnCtrl = this.vehicleForm.get('vehicleNumber');
+    vnCtrl?.valueChanges.subscribe((val: any) => {
+      if (typeof val === 'string') {
+        const normalized = val.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+        if (normalized !== val) {
+          vnCtrl.setValue(normalized, { emitEvent: false });
+        }
+      }
+    });
     this.loadVillages();
 
     // Check if we're in edit mode
@@ -110,6 +120,15 @@ export class VehicleCreateComponent implements OnInit {
     if (this.vehicleForm.invalid || this.submitting) return;
 
     this.submitting = true;
+    // Final normalization to ensure strict format before validation/submit
+    const vnCtrl = this.vehicleForm.get('vehicleNumber');
+    if (vnCtrl) {
+      const normalized = (vnCtrl.value || '').toString().replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+      if (normalized !== vnCtrl.value) {
+        vnCtrl.setValue(normalized);
+      }
+    }
+
     const formData = this.vehicleForm.value;
 
     // Add owner and village information
@@ -128,7 +147,7 @@ export class VehicleCreateComponent implements OnInit {
       this.vehicleService.updateVehicle(this.vehicleId, vehicleData).subscribe({
         next: (response) => {
           this.toast.success('Vehicle updated successfully!');
-          this.router.navigate(['/vehicles']);
+          this.router.navigate(['/vehicles'], { replaceUrl: true });
           this.submitting = false;
         },
         error: (error) => {
@@ -142,7 +161,7 @@ export class VehicleCreateComponent implements OnInit {
       this.vehicleService.createVehicle(vehicleData).subscribe({
         next: (response) => {
            this.toast.success('Vehicle registered successfully!');
-          this.router.navigate(['/vehicles']);
+          this.router.navigate(['/vehicles'], { replaceUrl: true });
           this.submitting = false;
         },
         error: (error) => {
@@ -155,7 +174,7 @@ export class VehicleCreateComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.router.navigate(['/vehicles']);
+    this.router.navigate(['/vehicles'], { replaceUrl: true });
   }
 
   // Helper method to format vehicle number for display

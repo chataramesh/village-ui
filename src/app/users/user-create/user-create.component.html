@@ -196,49 +196,57 @@
           <!-- Country Selection -->
           <div class="form-row">
             <div class="form-group">
-              <label for="country" class="form-label">Country</label>
+              <label class="form-label">Country</label>
               <div class="select-wrapper">
                 <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                <select
-                  id="country"
-                  name="country"
-                  class="form-select"
-                  [(ngModel)]="selectedCountryId"
-                  (change)="onCountryChange()"
-                  #countryField="ngModel">
-                  <option value="" disabled>Select a country</option>
-                  <option *ngFor="let country of countries" [value]="country.id">
-                    {{country.name}}
-                  </option>
-                </select>
+                <div class="dropdown" [class.open]="countryOpen">
+                  <button type="button" class="dropdown-control" (click)="toggleCountry()">
+                    <span class="dropdown-value">{{ selectedCountryId ? (getCountryNameById(selectedCountryId) || 'Selected') : 'Select a country' }}</span>
+                    <span class="dropdown-caret">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </span>
+                  </button>
+                  <div class="dropdown-menu" *ngIf="countryOpen">
+                    <div class="dropdown-search">
+                      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                      <input name="countrySearch" class="dropdown-search-input" type="text" [(ngModel)]="countrySearch" [ngModelOptions]="{standalone: true}" placeholder="Search countries..." autocomplete="off"/>
+                    </div>
+                    <div class="dropdown-list">
+                      <button class="dropdown-item" *ngFor="let country of filteredCountries" (click)="selectCountry(country.id)">{{country.name}}</button>
+                      <div class="dropdown-empty" *ngIf="filteredCountries.length === 0">No countries found</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
             <!-- State Selection -->
             <div class="form-group">
-              <label for="state" class="form-label">State</label>
+              <label class="form-label">State</label>
               <div class="select-wrapper">
                 <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
                 </svg>
-                <select
-                  id="state"
-                  name="state"
-                  class="form-select"
-                  [(ngModel)]="selectedStateId"
-                  (change)="onStateChange()"
-                  [disabled]="!selectedCountryId || states.length === 0"
-                  #stateField="ngModel">
-                  <option value="" disabled *ngIf="selectedCountryId && states.length === 0">Loading states...</option>
-                  <option value="" disabled *ngIf="!selectedCountryId">Select country first</option>
-                  <option *ngFor="let state of states" [value]="state.id">
-                    {{state.name}}
-                  </option>
-                </select>
+                <div class="dropdown" [class.open]="stateOpen">
+                  <button type="button" class="dropdown-control" [class.disabled]="!selectedCountryId || states.length===0" (click)="$event.stopPropagation(); (selectedCountryId && states.length>0) ? toggleState() : null">
+                    <span class="dropdown-value">{{ selectedStateId ? (getStateNameById(selectedStateId) || 'Selected') : (!selectedCountryId ? 'Select country first' : (states.length===0 ? 'Loading states...' : 'Select a state')) }}</span>
+                    <span class="dropdown-caret">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </span>
+                  </button>
+                  <div class="dropdown-menu" *ngIf="stateOpen">
+                    <div class="dropdown-search">
+                      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                      <input name="stateSearch" class="dropdown-search-input" type="text" [(ngModel)]="stateSearch" [ngModelOptions]="{standalone: true}" placeholder="Search states..." autocomplete="off"/>
+                    </div>
+                    <div class="dropdown-list">
+                      <button class="dropdown-item" *ngFor="let state of filteredStates" (click)="selectState(state.id)">{{state.name}}</button>
+                      <div class="dropdown-empty" *ngIf="filteredStates.length === 0">No states found</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -246,53 +254,57 @@
           <!-- District Selection -->
           <div class="form-row">
             <div class="form-group">
-              <label for="district" class="form-label">District</label>
+              <label class="form-label">District</label>
               <div class="select-wrapper">
                 <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                 </svg>
-                <select
-                  id="district"
-                  name="district"
-                  class="form-select"
-                  [(ngModel)]="selectedDistrictId"
-                  (change)="onDistrictChange()"
-                  [disabled]="!selectedStateId || districts.length === 0"
-                  #districtField="ngModel">
-                  <option value="" disabled *ngIf="selectedStateId && districts.length === 0">Loading districts...</option>
-                  <option value="" disabled *ngIf="!selectedStateId">Select state first</option>
-                  <option *ngFor="let district of districts" [value]="district.id">
-                    {{district.name}}
-                  </option>
-                </select>
+                <div class="dropdown" [class.open]="districtOpen">
+                  <button type="button" class="dropdown-control" [class.disabled]="!selectedStateId || districts.length===0" (click)="$event.stopPropagation(); (selectedStateId && districts.length>0) ? toggleDistrict() : null">
+                    <span class="dropdown-value">{{ selectedDistrictId ? (getDistrictNameById(selectedDistrictId) || 'Selected') : (!selectedStateId ? 'Select state first' : (districts.length===0 ? 'Loading districts...' : 'Select a district')) }}</span>
+                    <span class="dropdown-caret">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </span>
+                  </button>
+                  <div class="dropdown-menu" *ngIf="districtOpen">
+                    <div class="dropdown-search">
+                      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                      <input name="districtSearch" class="dropdown-search-input" type="text" [(ngModel)]="districtSearch" [ngModelOptions]="{standalone: true}" placeholder="Search districts..." autocomplete="off"/>
+                    </div>
+                    <div class="dropdown-list">
+                      <button class="dropdown-item" *ngFor="let district of filteredDistricts" (click)="selectDistrict(district.id)">{{district.name}}</button>
+                      <div class="dropdown-empty" *ngIf="filteredDistricts.length === 0">No districts found</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
             <!-- Mandal Selection -->
             <div class="form-group">
-              <label for="mandal" class="form-label">Mandal</label>
+              <label class="form-label">Mandal</label>
               <div class="select-wrapper">
                 <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                 </svg>
-                <select
-                  id="mandal"
-                  name="mandal"
-                  class="form-select"
-                  [(ngModel)]="selectedMandalId"
-                  (change)="onMandalChange()"
-                  [disabled]="!selectedDistrictId || mandals.length === 0"
-                  #mandalField="ngModel">
-                  <option value="" disabled *ngIf="selectedDistrictId && mandals.length === 0">Loading mandals...</option>
-                  <option value="" disabled *ngIf="!selectedDistrictId">Select district first</option>
-                  <option *ngFor="let mandal of mandals" [value]="mandal.id">
-                    {{mandal.name}}
-                  </option>
-                </select>
+                <div class="dropdown" [class.open]="mandalOpen">
+                  <button type="button" class="dropdown-control" [class.disabled]="!selectedDistrictId || mandals.length===0" (click)="$event.stopPropagation(); (selectedDistrictId && mandals.length>0) ? toggleMandal() : null">
+                    <span class="dropdown-value">{{ selectedMandalId ? (getMandalNameById(selectedMandalId) || 'Selected') : (!selectedDistrictId ? 'Select district first' : (mandals.length===0 ? 'Loading mandals...' : 'Select a mandal')) }}</span>
+                    <span class="dropdown-caret">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </span>
+                  </button>
+                  <div class="dropdown-menu" *ngIf="mandalOpen">
+                    <div class="dropdown-search">
+                      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                      <input name="mandalSearch" class="dropdown-search-input" type="text" [(ngModel)]="mandalSearch" [ngModelOptions]="{standalone: true}" placeholder="Search mandals..." autocomplete="off"/>
+                    </div>
+                    <div class="dropdown-list">
+                      <button class="dropdown-item" *ngFor="let mandal of filteredMandals" (click)="selectMandal(mandal.id)">{{mandal.name}}</button>
+                      <div class="dropdown-empty" *ngIf="filteredMandals.length === 0">No mandals found</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -300,28 +312,29 @@
           <!-- Village Selection -->
           <div class="form-row">
             <div class="form-group">
-              <label for="village" class="form-label">Village</label>
+              <label class="form-label">Village</label>
               <div class="select-wrapper">
                 <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                 </svg>
-                <select
-                  id="village"
-                  name="village"
-                  class="form-select"
-                  [(ngModel)]="selectedVillageId"
-                  (change)="onVillageChange()"
-                  [disabled]="!selectedMandalId || villages.length === 0"
-                  #villageField="ngModel">
-                  <option value="" disabled *ngIf="selectedMandalId && villages.length === 0">Loading villages...</option>
-                  <option value="" disabled *ngIf="!selectedMandalId">Select mandal first</option>
-                  <option *ngFor="let village of villages" [value]="village.id">
-                    {{village.name}}
-                  </option>
-                </select>
+                <div class="dropdown" [class.open]="villageOpen">
+                  <button type="button" class="dropdown-control" [class.disabled]="!selectedMandalId || villages.length===0" (click)="$event.stopPropagation(); (selectedMandalId && villages.length>0) ? toggleVillage() : null">
+                    <span class="dropdown-value">{{ selectedVillageId ? (getVillageNameById(selectedVillageId) || 'Selected') : (!selectedMandalId ? 'Select mandal first' : (villages.length===0 ? 'Loading villages...' : 'Select a village')) }}</span>
+                    <span class="dropdown-caret">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </span>
+                  </button>
+                  <div class="dropdown-menu" *ngIf="villageOpen">
+                    <div class="dropdown-search">
+                      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                      <input name="villageSearch" class="dropdown-search-input" type="text" [(ngModel)]="villageSearch" [ngModelOptions]="{standalone: true}" placeholder="Search villages..." autocomplete="off"/>
+                    </div>
+                    <div class="dropdown-list">
+                      <button class="dropdown-item" *ngFor="let village of filteredVillages" (click)="selectVillage(village.id || '')">{{village.name}}</button>
+                      <div class="dropdown-empty" *ngIf="filteredVillages.length === 0">No villages found</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

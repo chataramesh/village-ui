@@ -47,6 +47,7 @@ export interface Vehicle {
     id: string;
     name: string;
     email: string;
+    phone: string;
     active: any;
   };
   village?: {

@@ -13,9 +13,7 @@ interface Entity {
   id: string;
   name: string;
   type: string;
-  villageId: string;
-  ownerName: string;
-  ownerId?: string;
+village?:any;
   owner?: {
     id: string;
     name: string;
@@ -50,11 +48,9 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
   showSubscribedOnly = false;
 
   // Villages for filter dropdown
-  villages = [
-    { id: 'v1', name: 'Green Valley Village' },
-    { id: 'v2', name: 'Riverside Village' },
-    { id: 'v3', name: 'Mountain View Village' }
-  ];
+  villages: { id: string; name: string }[] = [];
+  villageDropdownOpen = false;
+  villageSearch = '';
 
   // Entity types for filter dropdown
   entityTypes = [
@@ -67,6 +63,8 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
     'Religious',
     'Government'
   ];
+  entityTypeDropdownOpen = false;
+  entityTypeSearch = '';
 
   // Subscription tracking
   userSubscriptions: { [entityId: string]: boolean } = {};
@@ -129,7 +127,7 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
     // Try to load from API first
     this.entityService.getAllEntities().subscribe({
       next: (data: any) => {
-        console.log('Entities loaded successfully from API:', data);
+        console.log('Entities loaded successfully from API:', JSON.stringify(data));
         this.processEntitiesData(data);
       },
       error: (error) => {
@@ -146,10 +144,26 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
     if (data && data.length > 0) {
       this.entities = data.map((entity: any) => ({
         ...entity,
-        isSubscribed: false, // Initialize as not subscribed
+        isSubscribed: false,
         isOpen: entity.status === 'OPEN' || entity.active,
         ownerName: entity.owner?.name || 'Unknown Owner'
       }));
+
+      const villageMap: { [id: string]: string } = {};
+      this.entities.forEach((e: any) => {
+        const id = (e?.village && typeof e.village === 'object' ? e.village?.id : undefined)
+          || (typeof e?.village === 'string' ? e.village : undefined)
+          || e?.villageId;
+        const name = (e?.village && typeof e.village === 'object' ? e.village?.name : undefined)
+          || e?.villageName
+          || 'Unknown Village';
+        if (id && !villageMap[id]) {
+          villageMap[id] = name;
+        }
+      });
+      this.villages = Object.keys(villageMap)
+        .map(id => ({ id, name: villageMap[id] }))
+        .sort((a, b) => a.name.localeCompare(b.name));
     } else {
       // No data from API, load mock data
       console.log('No data from API, loading mock data...');
@@ -194,10 +208,13 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
       // Search filter
       const matchesSearch = !this.searchQuery ||
         entity.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        entity.ownerName.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        entity.owner?.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
         entity.type.toLowerCase().includes(this.searchQuery.toLowerCase());
 
-      const matchesVillage = !this.selectedVillage || entity.villageId === this.selectedVillage;
+      const entityVillageId = (entity?.village && typeof entity.village === 'object' ? entity.village?.id : undefined)
+        || (typeof (entity as any)?.village === 'string' ? (entity as any).village : undefined)
+        || (entity as any)?.villageId;
+      const matchesVillage = !this.selectedVillage || entityVillageId === this.selectedVillage;
       const matchesType = !this.selectedEntityType || entity.type === this.selectedEntityType;
       const matchesSubscription = !this.showSubscribedOnly || entity.isSubscribed;
 
@@ -222,7 +239,61 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
+  // Custom dropdown helpers
+  get filteredVillagesForDropdown(): { id: string; name: string }[] {
+    if (!this.villageSearch) return this.villages;
+    const q = this.villageSearch.toLowerCase();
+    return this.villages.filter(v => v.name.toLowerCase().includes(q));
+  }
+
+  toggleVillageDropdown(force?: boolean) {
+    this.villageDropdownOpen = typeof force === 'boolean' ? force : !this.villageDropdownOpen;
+  }
+
+  selectVillage(villageId: string) {
+    this.selectedVillage = villageId;
+    this.villageDropdownOpen = false;
+    this.villageSearch = '';
+    this.applyFilters();
+  }
+
+  clearVillageSelection() {
+    this.selectedVillage = '';
+    this.villageSearch = '';
+    this.applyFilters();
+  }
+
+  getVillageNameById(id: string): string {
+    if (!id) return 'All Villages';
+    const v = this.villages.find(v => v.id === id);
+    return v?.name || 'Selected';
+  }
+
   onTypeFilterChange() {
+    this.applyFilters();
+  }
+
+  // Entity type searchable dropdown helpers
+  get filteredEntityTypesForDropdown(): string[] {
+    if (!this.entityTypeSearch) return this.entityTypes;
+    const q = this.entityTypeSearch.toLowerCase();
+    return this.entityTypes.filter(t => t.toLowerCase().includes(q));
+  }
+
+  toggleEntityTypeDropdown(force?: boolean) {
+    this.entityTypeDropdownOpen = typeof force === 'boolean' ? force : !this.entityTypeDropdownOpen;
+  }
+
+  selectEntityType(type: string) {
+    this.selectedEntityType = type;
+    this.entityTypeDropdownOpen = false;
+    this.entityTypeSearch = '';
+    this.applyFilters();
+  }
+
+  clearEntityTypeSelection() {
+    this.selectedEntityType = '';
+    this.entityTypeSearch = '';
     this.applyFilters();
   }
 
@@ -264,10 +335,10 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
     console.log('Viewing entity details:', entity.name);
   }
 
-  getVillageName(villageId: string): string {
-    const village = this.villages.find(v => v.id === villageId);
-    return village ? village.name : 'Unknown Village';
-  }
+  // getVillageName(villageId: string): string {
+  //   const village = this.villages.find(v => v.id === villageId);
+  //   return village ? village.name : 'Unknown Village';
+  // }
 
   refresh() {
     this.loadEntities();
@@ -283,8 +354,8 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
     }
 
     // Check if entity has ownerId field
-    if (entity.ownerId) {
-      return entity.ownerId === this.currentUser.id;
+    if (entity.owner) {
+      return entity.owner === this.currentUser;
     }
 
     return false;
@@ -416,11 +487,23 @@ export class VillagerEntityListComponent implements OnInit, OnDestroy {
           });
 
           // Set subscription status for subscribed entities
-          subscriptions.forEach(sub => {
-            this.userSubscriptions[sub.entityId] = sub.active;
-            const entity = this.entities.find(e => e.id === sub.entityId);
+          subscriptions.forEach((sub: any) => {
+            // Support both shapes: { entityId, active } and { entity: { id }, active }
+            const entityId = sub?.entityId || sub?.entity?.id;
+            // Robust active detection (boolean or status field)
+            const isActive = typeof sub?.active === 'boolean'
+              ? sub.active
+              : (sub?.status === 'ACTIVE');
+
+            if (!entityId) {
+              console.warn('Subscription item missing entityId:', sub);
+              return;
+            }
+
+            this.userSubscriptions[entityId] = !!isActive;
+            const entity = this.entities.find(e => e.id === entityId);
             if (entity) {
-              entity.isSubscribed = sub.active;
+              entity.isSubscribed = !!isActive;
             }
           });
 

@@ -27,54 +27,101 @@
 
   <!-- Enhanced Search & Filters -->
   <div class="search-filters-section">
-    <div class="search-bar">
-      <div class="search-input-wrapper" [class.search-active]="searchQuery">
-        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-        </svg>
-        <input
-          type="text"
-          class="search-input"
-          placeholder="Search services by name..."
-          [(ngModel)]="searchQuery"
-          (input)="onSearchChange()"
-          autocomplete="off">
-        <button class="search-clear" *ngIf="searchQuery" (click)="clearSearch()">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </button>
-        <div class="search-status" *ngIf="searchQuery && filteredEntities.length === 0">
-          <span class="search-status-text">No services found for "{{searchQuery}}"</span>
-        </div>
-      </div>
-    </div>
-
     <div class="filters-section">
       <div class="filter-row">
+        <!-- Search as first item -->
+        <div class="filter-group">
+          <label class="filter-label">Search</label>
+          <div class="search-input-wrapper" [class.search-active]="searchQuery">
+            <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Search services by name..."
+              [(ngModel)]="searchQuery"
+              (input)="onSearchChange()"
+              autocomplete="off">
+            <button class="search-clear" *ngIf="searchQuery" (click)="clearSearch()">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+            <div class="search-status" *ngIf="searchQuery && filteredEntities.length === 0">
+              <span class="search-status-text">No services found for "{{searchQuery}}"</span>
+            </div>
+          </div>
+        </div>
         <div class="filter-group">
           <label class="filter-label">Village</label>
-          <select class="filter-select" [(ngModel)]="selectedVillage" (change)="onVillageFilterChange()">
-            <option value="">All Villages</option>
-            <option *ngFor="let village of villages" [value]="village.id">{{village.name}}</option>
-          </select>
+          <div class="dropdown" [class.open]="villageDropdownOpen">
+            <button type="button" class="dropdown-control" (click)="toggleVillageDropdown()">
+              <span class="dropdown-value" *ngIf="!selectedVillage">All Villages</span>
+              <span class="dropdown-value" *ngIf="selectedVillage">{{ getVillageNameById(selectedVillage) }}</span>
+              <span class="dropdown-clear" *ngIf="selectedVillage" (click)="$event.stopPropagation(); clearVillageSelection()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </span>
+              <span class="dropdown-caret" [class.rotate]="villageDropdownOpen">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </span>
+            </button>
+            <div class="dropdown-menu" *ngIf="villageDropdownOpen">
+              <div class="dropdown-search">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input class="dropdown-search-input" type="text" [(ngModel)]="villageSearch" placeholder="Search villages..." autocomplete="off"/>
+              </div>
+              <div class="dropdown-list">
+                <button class="dropdown-item" [class.active]="!selectedVillage" (click)="selectVillage('')">All Villages</button>
+                <button class="dropdown-item" *ngFor="let village of filteredVillagesForDropdown" [class.active]="selectedVillage===village.id" (click)="selectVillage(village.id)">
+                  {{village.name}}
+                </button>
+                <div class="dropdown-empty" *ngIf="filteredVillagesForDropdown.length === 0">
+                  No villages found
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="filter-group">
           <label class="filter-label">Entity Type</label>
-          <select class="filter-select" [(ngModel)]="selectedEntityType" (change)="onTypeFilterChange()">
-            <option value="">All Types</option>
-            <option *ngFor="let type of entityTypes" [value]="type">{{type}}</option>
-          </select>
+          <div class="dropdown" [class.open]="entityTypeDropdownOpen">
+            <button type="button" class="dropdown-control" (click)="toggleEntityTypeDropdown()">
+              <span class="dropdown-value" *ngIf="!selectedEntityType">All Types</span>
+              <span class="dropdown-value" *ngIf="selectedEntityType">{{ selectedEntityType }}</span>
+              <span class="dropdown-clear" *ngIf="selectedEntityType" (click)="$event.stopPropagation(); clearEntityTypeSelection()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </span>
+              <span class="dropdown-caret" [class.rotate]="entityTypeDropdownOpen">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </span>
+            </button>
+            <div class="dropdown-menu" *ngIf="entityTypeDropdownOpen">
+              <div class="dropdown-search">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input class="dropdown-search-input" type="text" [(ngModel)]="entityTypeSearch" placeholder="Search types..." autocomplete="off"/>
+              </div>
+              <div class="dropdown-list">
+                <button class="dropdown-item" [class.active]="!selectedEntityType" (click)="selectEntityType('')">All Types</button>
+                <button class="dropdown-item" *ngFor="let type of filteredEntityTypesForDropdown" [class.active]="selectedEntityType===type" (click)="selectEntityType(type)">
+                  {{type}}
+                </button>
+                <div class="dropdown-empty" *ngIf="filteredEntityTypesForDropdown.length === 0">
+                  No types found
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
+        <!-- Toggle as last item, no text label (slide only) -->
         <div class="filter-group">
-          <label class="filter-toggle">
+          <label class="filter-toggle" title="Subscribed Only">
             <input type="checkbox" [(ngModel)]="showSubscribedOnly" (change)="onSubscriptionFilterChange()">
             <span class="toggle-track">
               <span class="toggle-thumb"></span>
             </span>
-            <span class="toggle-label">Subscribed Only</span>
           </label>
         </div>
 
@@ -184,7 +231,7 @@
           </div>
           <div class="entity-info">
             <h3 class="entity-name">{{entity.name}}</h3>
-            <p class="entity-owner">by {{entity.ownerName}}</p>
+            <p class="entity-owner">by {{entity.owner!.name}}</p>
             <span class="entity-type-badge" [class]="entity.type.toLowerCase().replace(' ', '-')">
               {{entity.type}}
             </span>
@@ -209,7 +256,7 @@
               </div>
               <div class="detail-text">
                 <span class="detail-label">Village</span>
-                <span class="detail-value">{{getVillageName(entity.villageId)}}</span>
+                <span class="detail-value">{{entity.village!.name}}</span>
               </div>
             </div>
 
@@ -240,7 +287,6 @@
             </div>
           </div>
         </div>
-
         <!-- Card Actions -->
         <div class="card-actions">
           <!-- Subscription Actions -->

@@ -120,6 +120,7 @@
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
   margin-bottom: 24px;
+  overflow: visible; /* allow dropdown menus to extend */
 
   &:last-child {
     margin-bottom: 0;
@@ -175,6 +176,7 @@
       color: #1e293b;
       background: white;
       transition: all 0.3s ease;
+      min-height: 48px; /* larger touch target to match modern controls */
 
       &:focus {
         outline: none;
@@ -203,6 +205,126 @@
       background-position: right 12px center;
       background-size: 20px;
       padding-right: 40px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+
+      &:hover {
+        border-color: #cbd5e1;
+      }
+
+      &:disabled {
+        background-color: #f8fafc;
+        color: #94a3b8;
+        cursor: not-allowed;
+        opacity: 0.85;
+      }
+    }
+
+    /* Custom searchable dropdown (for country/state/district/mandal/village) */
+    .dropdown {
+      position: relative;
+      width: 100%;
+
+      &.open { z-index: 1000; }
+
+      &.open .dropdown-control {
+        border-color: #8b5cf6;
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+      }
+
+      .dropdown-control {
+        width: 100%;
+        min-height: 48px;
+        padding: 12px 40px 12px 44px; /* align with left icon */
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background: #fff;
+        font-size: 14px;
+        color: #1e293b;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &.disabled {
+          cursor: not-allowed;
+          background: #f8fafc;
+          color: #94a3b8;
+        }
+
+        &:hover:not(.disabled) { border-color: #cbd5e1; }
+
+        .dropdown-value { flex: 1; text-align: left; }
+
+        .dropdown-caret {
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #94a3b8;
+          svg { width: 20px; height: 20px; }
+        }
+      }
+
+      .dropdown-menu {
+        position: absolute;
+        left: 0; right: 0;
+        top: calc(100% + 8px);
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+        z-index: 2000;
+        overflow: hidden;
+
+        .dropdown-search {
+          position: relative;
+          padding: 8px 12px;
+          border-bottom: 1px solid #f1f5f9;
+
+          .search-icon {
+            position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+            width: 16px; height: 16px; color: #94a3b8;
+          }
+
+          .dropdown-search-input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 13.5px;
+            transition: all 0.2s ease;
+
+            &:focus { outline: none; border-color: #8b5cf6; box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
+          }
+        }
+
+        .dropdown-list {
+          max-height: 260px;
+          overflow-y: auto;
+
+          .dropdown-item {
+            width: 100%;
+            padding: 10px 12px;
+            background: transparent;
+            border: none;
+            text-align: left;
+            font-size: 14px;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            &:hover { background: #f8fafc; }
+          }
+
+          .dropdown-empty {
+            padding: 12px;
+            font-size: 13px;
+            color: #64748b;
+            text-align: center;
+          }
+        }
+      }
     }
 
     .toggle-password {

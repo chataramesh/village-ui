@@ -195,12 +195,32 @@ export class VehicleListComponent implements OnInit, OnDestroy {
   canEditDelete(vehicle: Vehicle): boolean {
     const role = this.currentUser?.role;
     if (role === 'SUPER_ADMIN') return true;
+    // Owner can edit/delete their own vehicles
+    if (this.isCurrentUserOwner(vehicle)) return true;
     if (role === 'VILLAGE_ADMIN') {
       const userVillageId = this.currentUser?.village?.id;
       const vehicleVillageId = vehicle?.village?.id || (vehicle as any)?.villageId || null;
       return !!userVillageId && userVillageId === vehicleVillageId;
     }
     return false;
+  }
+
+  deleteVehicle(vehicle: Vehicle): void {
+    if (!this.canEditDelete(vehicle)) return;
+    if (!confirm(`Are you sure you want to delete ${vehicle.vehicleNumber}?`)) return;
+
+    this.vehicleService.deleteVehicle(vehicle.id!)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.toast.success('Vehicle deleted successfully');
+          this.loadVehicles();
+        },
+        error: (error) => {
+          console.error('Error deleting vehicle:', error);
+          this.toast.error('Failed to delete vehicle');
+        }
+      });
   }
 
   get paginatedVehicles(): Vehicle[] {

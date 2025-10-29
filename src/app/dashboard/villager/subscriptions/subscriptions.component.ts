@@ -161,7 +161,7 @@ export class SubscriptionsComponent implements OnInit {
 
   gotoEntities(): void {
     //this.router.navigate(['/dashboard/villager']);
-    this.router.navigate(['/entities']);
+    this.router.navigate(['/dashboard/villager/entities']);
   }
    goBack(): void {
     this.router.navigate(['/dashboard']);

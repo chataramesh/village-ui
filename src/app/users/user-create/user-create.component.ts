@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
@@ -49,6 +49,125 @@ export class UserCreateComponent implements OnInit {
   selectedDistrictId: string = '';
   selectedMandalId: string = '';
   selectedVillageId: string = '';
+
+  // Dropdown open states
+  countryOpen = false;
+  stateOpen = false;
+  districtOpen = false;
+  mandalOpen = false;
+  villageOpen = false;
+
+  // Search terms
+  countrySearch = '';
+  stateSearch = '';
+  districtSearch = '';
+  mandalSearch = '';
+  villageSearch = '';
+
+  // Filtered getters
+  get filteredCountries() {
+    if (!this.countrySearch) return this.countries;
+    const q = this.countrySearch.toLowerCase();
+    return this.countries.filter(c => (c?.name || '').toLowerCase().includes(q));
+  }
+
+  get filteredStates() {
+    if (!this.stateSearch) return this.states;
+    const q = this.stateSearch.toLowerCase();
+    return this.states.filter(s => (s?.name || '').toLowerCase().includes(q));
+  }
+
+  get filteredDistricts() {
+    if (!this.districtSearch) return this.districts;
+    const q = this.districtSearch.toLowerCase();
+    return this.districts.filter(d => (d?.name || '').toLowerCase().includes(q));
+  }
+
+  get filteredMandals() {
+    if (!this.mandalSearch) return this.mandals;
+    const q = this.mandalSearch.toLowerCase();
+    return this.mandals.filter(m => (m?.name || '').toLowerCase().includes(q));
+  }
+
+  get filteredVillages() {
+    if (!this.villageSearch) return this.villages;
+    const q = this.villageSearch.toLowerCase();
+    return this.villages.filter(v => (v?.name || '').toLowerCase().includes(q));
+  }
+
+  // Toggle helpers
+  toggleCountry(open?: boolean) { this.countryOpen = typeof open === 'boolean' ? open : !this.countryOpen; }
+  toggleState(open?: boolean) { this.stateOpen = typeof open === 'boolean' ? open : !this.stateOpen; }
+  toggleDistrict(open?: boolean) { this.districtOpen = typeof open === 'boolean' ? open : !this.districtOpen; }
+  toggleMandal(open?: boolean) { this.mandalOpen = typeof open === 'boolean' ? open : !this.mandalOpen; }
+  toggleVillage(open?: boolean) { this.villageOpen = typeof open === 'boolean' ? open : !this.villageOpen; }
+
+  // Select handlers (set, close, clear searches, invoke existing change chains)
+  selectCountry(id: string) {
+    this.selectedCountryId = id;
+    this.countryOpen = false;
+    this.countrySearch = '';
+    this.onCountryChange();
+  }
+
+  selectState(id: string) {
+    this.selectedStateId = id;
+    this.stateOpen = false;
+    this.stateSearch = '';
+    this.onStateChange();
+  }
+
+  selectDistrict(id: string) {
+    this.selectedDistrictId = id;
+    this.districtOpen = false;
+    this.districtSearch = '';
+    this.onDistrictChange();
+  }
+
+  selectMandal(id: string) {
+    this.selectedMandalId = id;
+    this.mandalOpen = false;
+    this.mandalSearch = '';
+    this.onMandalChange();
+  }
+
+  selectVillage(id: string) {
+    this.selectedVillageId = id;
+    this.villageOpen = false;
+    this.villageSearch = '';
+    this.onVillageChange();
+  }
+
+  // Display helpers for template (avoid inline arrow functions)
+  getCountryNameById(id: string | undefined): string {
+    if (!id) return '';
+    const item = this.countries?.find?.((c: any) => c?.id === id);
+    return item?.name || '';
+  }
+
+  getStateNameById(id: string | undefined): string {
+    if (!id) return '';
+    const item = this.states?.find?.((s: any) => s?.id === id);
+    return item?.name || '';
+  }
+
+  getDistrictNameById(id: string | undefined): string {
+    if (!id) return '';
+    const item = this.districts?.find?.((d: any) => d?.id === id);
+    return item?.name || '';
+  }
+
+  getMandalNameById(id: string | undefined): string {
+    if (!id) return '';
+    const item = this.mandals?.find?.((m: any) => m?.id === id);
+    return item?.name || '';
+  }
+
+  getVillageNameById(id: string | undefined): string {
+    if (!id) return '';
+    const item = this.villages?.find?.((v: any) => v?.id === id);
+    return item?.name || '';
+  }
 
   // Expose Role enum to template
   Role = Role;
@@ -700,4 +819,12 @@ export class UserCreateComponent implements OnInit {
       this.router.navigate(['/users'], { replaceUrl: true });
     }
   }
+  @HostListener('window:popstate', ['$event'])
+onBrowserBack(_event: any) {
+  const role = this.contextRole || 'VILLAGER';
+  this.router.navigate(['/users'], {
+    queryParams: { role },
+    replaceUrl: true
+  });
+}
 }
