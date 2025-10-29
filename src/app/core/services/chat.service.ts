@@ -23,7 +23,7 @@ export interface UserWithMessageCount extends User {
 })
 export class ChatService {
 
-  private apiUrl = environment.chatUrl;
+  private apiUrl = environment.apiUrl;
 
   // Track unread message counts per user
   private unreadCountsSubject = new BehaviorSubject<Map<string, number>>(new Map());

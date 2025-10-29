@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Client, Message } from '@stomp/stompjs';
 import { BehaviorSubject } from 'rxjs';
 import SockJS from 'sockjs-client';
+import { environment } from 'src/environments/environment';
 
 
 @Injectable({
@@ -10,7 +11,8 @@ import SockJS from 'sockjs-client';
 export class WebsocketService {
 
   stompClient: Client | null = null;  // STOMP client instance to handle WebSocket connection
-
+  private apiUrl = environment.apiUrl+'/ws';
+   private wsUrl = environment.apiUrl.replace('/api', '/ws'); 
   // Subject to manage the stream of incoming messages
   private messageSubject = new BehaviorSubject<any>(null);
   public messages$ = this.messageSubject.asObservable();  // Observable for components to subscribe to messages
@@ -19,16 +21,19 @@ export class WebsocketService {
   private connectionSubject = new BehaviorSubject<boolean>(false);
   public connectionStatus$ = this.connectionSubject.asObservable();  // Observable for components to track connection status
 
-
+constructor() {
+    // Get the token when service is initialized
+   
+  }
   connect (username:string){
 
-    const socket = new SockJS('http://localhost:8083/chat-service/ws');  // Initialize the SockJS WebSocket connection to the server
+    const socket = new SockJS(this.wsUrl);  // Initialize the SockJS WebSocket connection to the server
 
     // Configure the STOMP client with connection details
     this.stompClient = new Client({
       webSocketFactory: () => socket,  // Use SockJS as the WebSocket factory
       reconnectDelay: 5000,  // Reconnect delay if connection is lost
-      debug: (str) => console.log(str)  // Log STOMP debug messages for troubleshooting
+      debug: (str) => console.log(str),  // Log STOMP debug messages for troubleshooting
     });
 
     // On successful connection
