@@ -1,5 +1,7 @@
 # VillageUi
 
+<a href="http://localhost:4200" target="_blank">Open Localhost App</a>
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.16.
 
 ## Development server
